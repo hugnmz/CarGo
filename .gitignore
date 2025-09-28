@@ -1,0 +1,14 @@
+/build/
+/dist/
+/nbproject/private/
+/nbproject/configs/
+/nbproject/var/
+/nbproject/cache/
+/.idea/
+/*.iml
+/.vscode/
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.bak
