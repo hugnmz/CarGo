@@ -22,7 +22,7 @@ public class DB {
     static {
 
         // tìm file db.properties trong classpathkhi deploy
-        try (InputStream inputStream = DB.class.getClassLoader().getResourceAsStream("config/db.properties")) {
+        try (InputStream inputStream = DB.class.getClassLoader().getResourceAsStream("db.properties")) {
 
             // nếu ko thấy file thì dừng web sớm
             if (inputStream == null) {

@@ -16,7 +16,8 @@ import java.io.IOException;
 public class EncodingFilter implements Filter{
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) 
+            throws IOException, ServletException {
     
         // ép charset của req alf UTF-8, đảm bảo POST đọc đc tham số đúng
         req.setCharacterEncoding("UTF-8");

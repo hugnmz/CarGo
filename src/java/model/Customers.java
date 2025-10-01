@@ -75,4 +75,16 @@ public class Customers {
     
     public Carts getCart() { return cart; }
     public void setCart(Carts cart) { this.cart = cart; }
+
+    @Override
+    public String toString() {
+        return "Customers{" + "customerId=" + customerId + ", username=" + username + 
+                ", passwordHash=" + passwordHash + ", passwordSalt=" + passwordSalt + 
+                ", fullName=" + fullName + ", phone=" + phone + ", email=" + email + 
+                ", dateOfBirth=" + dateOfBirth + ", createAt=" + createAt + ", locationId=" + 
+                locationId + ", location=" + location + ", contracts=" + 
+                contracts + ", cart=" + cart + '}';
+    }
+    
+    
 }
