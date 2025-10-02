@@ -47,24 +47,22 @@ public class CustomersDAOImpl implements CustomersDAO {
             customer.setCreateAt(createAt.toLocalDateTime());
         }
 
-        Integer locationId = rs.getObject("locationId", Integer.class);
+        Integer locationId = rs.getInt("locationId");
         customer.setLocationId(locationId);
 
-        if (locationId != null) {
-            Locations location = new Locations();
-            location.setLocationId(locationId);
-            location.setCity(rs.getString("city"));
-            customer.setLocation(location);
-        }
+//        if (locationId != null) {
+//            Locations location = new Locations();
+//            location.setLocationId(locationId);
+//            location.setCity(rs.getString("city"));
+//            customer.setLocation(location);
+//        }
 
         return customer;
     }
 
     @Override
     public List<Customers> getAllCustomers() {
-        String sql = "select c.*, l.city"
-                + " from Customers c left join Locations l on"
-                + "c.locationId = l.locationId";
+        String sql = "select * from Customers";
 
         List<Customers> customersList = new ArrayList<>();
 
@@ -273,6 +271,14 @@ public class CustomersDAOImpl implements CustomersDAO {
         }
 
         return false;
+    }
+
+    public static void main(String[] args) {
+        CustomersDAOImpl c = new CustomersDAOImpl();
+        List<Customers> list = c.getAllCustomers();
+        for (Customers customers : list) {
+            System.out.println(customers.toString());
+        }
     }
 
 }
