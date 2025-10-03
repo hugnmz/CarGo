@@ -7,12 +7,14 @@ package mapper;
 import dto.CustomerDTO;
 import model.Customers;
 import model.Locations;
+import util.di.annotation.Component;
 
 /**
  *
  * @author admin
  */
 // class này để chuyển đối giữa DTO và Model và gược lại
+@Component
 public class CustomerMapper {
 
     // chuyển từ model sang DTO

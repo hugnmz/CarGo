@@ -13,22 +13,24 @@ import mapper.CustomerMapper;
 import model.Customers;
 import util.PasswordUtil;
 import service.CustomerService;
+import util.di.annotation.Autowired;
+import util.di.annotation.Service;
 
 /**
  *
  * @author admin
  */
+@Service
 public class CustomerServiceImpl implements CustomerService {
 
-    // Mapper để chuyển đổi giữa DTO và Model
-    private CustomerMapper customerMapper;
-    // DAO để truy cập cơ sở dữ liệu
+    @Autowired
     private CustomersDAO customersDAO;
+
+    @Autowired
+    private CustomerMapper customerMapper;
     
     // Constructor để khởi tạo dependencies (tránh NullPointerException)
-    public CustomerServiceImpl(CustomersDAO customersDAO, CustomerMapper customerMapper) {
-        this.customersDAO = customersDAO;
-        this.customerMapper = customerMapper;
+    public CustomerServiceImpl(){
     }
 
     @Override

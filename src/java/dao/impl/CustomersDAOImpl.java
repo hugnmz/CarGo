@@ -17,11 +17,13 @@ import java.sql.Date;
 import util.DB;
 import java.sql.Timestamp;
 import model.Locations;
+import util.di.annotation.Repository;
 
 /**
  *
  * @author admin
  */
+@Repository
 public class CustomersDAOImpl implements CustomersDAO {
 
     // chuyển đổi từ ResultSet sang model

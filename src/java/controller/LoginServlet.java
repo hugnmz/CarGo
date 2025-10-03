@@ -15,6 +15,7 @@ import mapper.CustomerMapper;
 import model.Customers;
 import service.*;
 import service.impl.CustomerServiceImpl;
+import util.di.DIContainer;
 
 
 
@@ -26,12 +27,8 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        // Tạo DAO và Mapper
-        CustomersDAO customersDAO = new CustomersDAOImpl(); 
-        CustomerMapper customerMapper = new CustomerMapper();
-
-        // Khởi tạo Service Impl
-        cuss = new CustomerServiceImpl(customersDAO, customerMapper);
+        // Lấy bean từ DIContainer thay vì new thủ công
+        cuss = DIContainer.get(CustomerService.class);
     }
 
     @Override
@@ -47,9 +44,10 @@ public class LoginServlet extends HttpServlet {
         if (cu.isPresent()) {
             // Lưu thông tin user vào session
             HttpSession session = request.getSession();
-            session.setAttribute("username", username);
+            session.setAttribute("customer", cu.get());
             // Chuyển hướng sang home.jsp
-            request.getRequestDispatcher("home.jsp").forward(request, response);
+            response.sendRedirect("register.jsp");
+
         } else {
             // Sai thông tin đăng nhập
             request.setAttribute("errorMessage", "Tài khoản hoặc mật khẩu không đúng!");
