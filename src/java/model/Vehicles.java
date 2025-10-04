@@ -11,7 +11,7 @@ public class Vehicles {
     // Các đối tượng liên quan
     private Cars car;                // Model xe
     private List<ContractDetails> contractDetails; // Chi tiết hợp đồng
-    private List<Orders> orders;      // Đơn hàng trong giỏ
+    private List<Orders> orders;      // Don hang trong gio
     private List<Feedbacks> feedbacks; // Phản hồi
     
     // Constructors

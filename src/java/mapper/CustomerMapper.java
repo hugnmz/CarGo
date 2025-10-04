@@ -33,7 +33,7 @@ public class CustomerMapper {
         dto.setDateOfBirth(customer.getDateOfBirth());
         dto.setCreateAt(customer.getCreateAt());
        
-        if(customer.getLocationId() != null){
+        if(customer.getLocationId() != null && customer.getLocation() != null){
             dto.setCity(customer.getLocation().getCity());
             dto.setAddress(customer.getLocation().getAddress());
         }

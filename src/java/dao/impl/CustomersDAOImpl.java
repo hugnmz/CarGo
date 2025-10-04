@@ -6,6 +6,7 @@ package dao.impl;
 
 import java.sql.Connection;
 import dao.CustomersDAO;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +17,6 @@ import java.sql.SQLException;
 import java.sql.Date;
 import util.DB;
 import java.sql.Timestamp;
-import model.Locations;
 import util.di.annotation.Repository;
 
 /**
@@ -49,15 +49,15 @@ public class CustomersDAOImpl implements CustomersDAO {
             customer.setCreateAt(createAt.toLocalDateTime());
         }
 
-        Integer locationId = rs.getInt("locationId");
+        Integer locationId = rs.getObject("locationId", Integer.class);
         customer.setLocationId(locationId);
 
-//        if (locationId != null) {
-//            Locations location = new Locations();
-//            location.setLocationId(locationId);
-//            location.setCity(rs.getString("city"));
-//            customer.setLocation(location);
-//        }
+        customer.setIsVerified(rs.getBoolean("isVerified"));
+        customer.setVerifyCode(rs.getString("verifyCode"));
+        Timestamp vexp = rs.getTimestamp("verifyCodeExpire");
+        if (vexp != null) {
+            customer.setVerifyCodeExpire(vexp.toLocalDateTime());
+        }
 
         return customer;
     }
@@ -68,7 +68,7 @@ public class CustomersDAOImpl implements CustomersDAO {
 
         List<Customers> customersList = new ArrayList<>();
 
-        try (Connection conn = (Connection) DB.get(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DB.get(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 Customers customers = mapResultSet(rs);
                 customersList.add(customers);
@@ -103,36 +103,50 @@ public class CustomersDAOImpl implements CustomersDAO {
     }
 
     @Override
-    public boolean addCustomer(Customers customer) {
-        String sql = "insert into Customers(username, password_hash, password_salt"
-                + ", fullName, phone, email, dateOfBirth, locationId)"
-                + "values(?, ?, ?, ?, ?, ?, ?, ?)";
+    public boolean addCustomer(Customers c) {
+        String sql = "INSERT INTO Customers("
+                + "username, password_hash, password_salt, fullName, phone, email, dateOfBirth, "
+                + "isVerified, verifyCode, verifyCodeExpire, locationId"
+                + ") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DB.get(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-        try (Connection conn = DB.get(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, c.getUsername());
+            ps.setBytes(2, c.getPasswordHash());
+            ps.setBytes(3, c.getPasswordSalt());
+            ps.setString(4, c.getFullName());
+            ps.setString(5, c.getPhone());
+            ps.setString(6, c.getEmail());
+            ps.setDate(7, c.getDateOfBirth() != null ? java.sql.Date.valueOf(c.getDateOfBirth()) : null);
 
-            ps.setString(1, customer.getUsername());
-            ps.setBytes(2, customer.getPasswordHash());
-            ps.setBytes(3, customer.getPasswordSalt());
-            ps.setString(4, customer.getFullName());
-            ps.setString(5, customer.getPhone());
-            ps.setString(6, customer.getEmail());
-            ps.setDate(7, customer.getDateOfBirth() != null
-                    ? Date.valueOf(customer.getDateOfBirth()) : null);
-            ps.setObject(8, customer.getLocationId());
+            // thêm 3 cột xác minh (PLAIN TEXT code)
+            ps.setBoolean(8, c.isIsVerified());
+            ps.setString(9, c.getVerifyCode());
+            ps.setTimestamp(10, c.getVerifyCodeExpire() != null
+                    ? Timestamp.valueOf(c.getVerifyCodeExpire()) : null);
 
-            int rowAffected = ps.executeUpdate();
-            return rowAffected > 0;
+            ps.setObject(11, c.getLocationId());
+
+            int affected = ps.executeUpdate();
+            if (affected > 0) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        c.setCustomerId(rs.getInt(1));
+                    }
+                }
+                return true;
+            }
+            return false;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
-
     }
 
     @Override
     public boolean updateCustomer(Customers customer) {
-        String sql = "update Customers set fullName = ?, phone = ?, email = ?, dateOfBirth = ?"
-                + "locationId = ? where customerId = ?";
+        String sql = "update Customers set fullName = ?, phone = ?, email = ?, dateOfBirth = ?,"
+                + "locationId = ?, verifyCode = ?, verifyCodeExpire = ?, isVerified=?"
+                + " where customerId = ?";
 
         try (Connection conn = DB.get(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -142,8 +156,12 @@ public class CustomersDAOImpl implements CustomersDAO {
             ps.setDate(4, customer.getDateOfBirth() != null
                     ? Date.valueOf(customer.getDateOfBirth()) : null);
             ps.setObject(5, customer.getLocationId());
-            ps.setInt(6, customer.getCustomerId());
-
+            ps.setString(6, customer.getVerifyCode());
+            ps.setTimestamp(7, customer.getVerifyCodeExpire() != null 
+                    ? Timestamp.valueOf(customer.getVerifyCodeExpire()) : null);
+            ps.setBoolean(8, customer.isIsVerified());
+            ps.setInt(9, customer.getCustomerId());
+            
             int rowAffected = ps.executeUpdate();
             return rowAffected > 0;
 
@@ -273,14 +291,6 @@ public class CustomersDAOImpl implements CustomersDAO {
         }
 
         return false;
-    }
-
-    public static void main(String[] args) {
-        CustomersDAOImpl c = new CustomersDAOImpl();
-        List<Customers> list = c.getAllCustomers();
-        for (Customers customers : list) {
-            System.out.println(customers.toString());
-        }
     }
 
 }

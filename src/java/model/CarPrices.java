@@ -9,12 +9,12 @@ public class CarPrices {
     private Integer priceId;          // ID giá
     private Integer carId;            // ID xe
     private BigDecimal dailyPrice;    // Giá theo ngày
-    private BigDecimal depositAmount; // Số tiền cọc
+    private BigDecimal depositAmount; // So tien coc
     private LocalDate startDate;      // Ngày bắt đầu áp dụng
     private LocalDate endDate;        // Ngày kết thúc áp dụng (NULL = hiện hành)
     private LocalDateTime createAt;   // Ngày tạo
     
-    // Đối tượng liên quan
+    // Doi tuong lien quan
     private Cars car;                // Model xe
     
     // Constructors

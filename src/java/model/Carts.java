@@ -4,13 +4,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class Carts {
-    private Integer cartId;           // ID giỏ hàng
+    private Integer cartId;           // ID gio hang
     private Integer customerId;       // ID khách hàng
-    private LocalDateTime createAt;   // Ngày tạo giỏ hàng
+    private LocalDateTime createAt;   // Ngay tao gio hang
     
     // Các đối tượng liên quan
     private Customers customer;       // Khách hàng
-    private List<Orders> orders;      // Danh sách đơn hàng trong giỏ
+    private List<Orders> orders;      // Danh sach don hang trong gio
     
     // Constructors
     public Carts() {}

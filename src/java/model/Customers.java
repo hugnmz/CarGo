@@ -11,19 +11,22 @@ import java.util.List;
 public class Customers {
     private Integer customerId;      // ID khách hàng
     private String username;         // Tên đăng nhập
-    private byte[] passwordHash;    // Hash mật khẩu
-    private byte[] passwordSalt;    // Salt mật khẩu
-    private String fullName;        // Họ tên
+    private byte[] passwordHash;    // Hash mật khẩu (VARBINARY)
+    private byte[] passwordSalt;    // Salt mật khẩu (VARBINARY)
+    private String fullName;        // Ho ten
     private String phone;           // Số điện thoại
     private String email;           // Email
     private LocalDate dateOfBirth;  // Ngày sinh
     private LocalDateTime createAt; // Ngày tạo
     private Integer locationId;     // ID địa điểm
+    private boolean isVerified;
+    private String verifyCode;
+    private LocalDateTime verifyCodeExpire;
     
     // Các đối tượng liên quan
-    private Locations location;     // Địa điểm
+    private Locations location;     // Dia diem
     private List<Contracts> contracts; // Danh sách hợp đồng
-    private Carts cart;             // Giỏ hàng
+    private Carts cart;             // Gio hang
     
     // Constructors
     public Customers() {}
@@ -45,7 +48,7 @@ public class Customers {
     
     public byte[] getPasswordHash() { return passwordHash; }
     public void setPasswordHash(byte[] passwordHash) { this.passwordHash = passwordHash; }
-    
+
     public byte[] getPasswordSalt() { return passwordSalt; }
     public void setPasswordSalt(byte[] passwordSalt) { this.passwordSalt = passwordSalt; }
     
@@ -75,6 +78,32 @@ public class Customers {
     
     public Carts getCart() { return cart; }
     public void setCart(Carts cart) { this.cart = cart; }
+
+    public boolean isIsVerified() {
+        return isVerified;
+    }
+
+    public void setIsVerified(boolean isVerified) {
+        this.isVerified = isVerified;
+    }
+
+    public String getVerifyCode() {
+        return verifyCode;
+    }
+
+    public void setVerifyCode(String verifyCode) {
+        this.verifyCode = verifyCode;
+    }
+
+    public LocalDateTime getVerifyCodeExpire() {
+        return verifyCodeExpire;
+    }
+
+    public void setVerifyCodeExpire(LocalDateTime verifyCodeExpire) {
+        this.verifyCodeExpire = verifyCodeExpire;
+    }
+    
+    
 
     @Override
     public String toString() {

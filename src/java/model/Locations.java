@@ -9,10 +9,10 @@ import java.util.List;
 public class Locations {
     private Integer locationId;      // ID địa điểm
     private String city;             // Thành phố
-    private String address;          // Địa chỉ
+    private String address;          // Dia chi
     
     // Các đối tượng liên quan
-    private List<Users> users;       // Danh sách người dùng
+    private List<Users> users;       // Danh sach nguoi dung
     private List<Customers> customers; // Danh sách khách hàng
     private List<Cars> cars;         // Danh sách xe
     

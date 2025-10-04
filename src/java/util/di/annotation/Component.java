@@ -4,7 +4,7 @@
  */
 package util.di.annotation;
 
-import util.di.*;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

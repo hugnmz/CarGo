@@ -11,8 +11,8 @@ public class Roles {
     private String roleName;         // Tên vai trò (STAFF, MANAGER, ADMIN)
     
     // Các đối tượng liên quan
-    private List<Users> users;       // Danh sách người dùng có vai trò này
-    private List<UserRoles> userRoles; // Quan hệ với người dùng
+    private List<Users> users;       // Danh sach nguoi dung co vai tro nay
+    private List<UserRoles> userRoles; // Quan he voi nguoi dung
     
     // Constructors
     public Roles() {}

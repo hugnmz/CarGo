@@ -2,11 +2,11 @@ package model;
 
 
 public class UserRoles {
-    private Integer userId;          // ID người dùng
+    private Integer userId;          // ID nguoi dung
     private Integer roleId;          // ID vai trò
     
     // Các đối tượng liên quan
-    private Users user;              // Người dùng
+    private Users user;              // Nguoi dung
     private Roles role;              // Vai trò
     
     // Constructors

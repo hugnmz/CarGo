@@ -22,7 +22,7 @@ public class Cars {
     private Categories category;      // Danh mục xe
     private Fuels fuel;              // Loại nhiên liệu
     private Seatings seating;        // Số chỗ ngồi
-    private Locations location;       // Địa điểm
+    private Locations location;       // Dia diem
     private List<Vehicles> vehicles; // Danh sách xe thực tế
     private List<CarPrices> carPrices; // Danh sách giá xe
     

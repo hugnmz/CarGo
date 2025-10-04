@@ -40,5 +40,10 @@ public interface CustomerService {
 
     // password method
     boolean changeCustomerPassword(Integer customerId, String oldPassword, String newPassword);
+
     boolean resetCustomerPassword(String username, String newPassword);
+
+    boolean verifyAccount(String username, String code);
+
+    Optional<String> generateAndStoreVerificationCode(String username);
 }

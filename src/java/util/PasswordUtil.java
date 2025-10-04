@@ -7,6 +7,7 @@ package util;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Base64;
 
 /**
@@ -18,27 +19,23 @@ public class PasswordUtil {
 
     public static final int ITERATIONS = 100_000;
 
-    // trả về chuỗi password đã hash dạng Base64
-    public static String[] hashPassword(String password, byte[] salt) {
+    // tra ve password da hash dang byte[] (de luu vao VARBINARY)
+    public static byte[][] hashPassword(String password, byte[] salt) {
         try {
-
             MessageDigest md = MessageDigest.getInstance("SHA-256");
 
             // Kết hợp salt + password
-            md.update(salt); 
+            md.update(salt);
             byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
 
-         
             for (int i = 1; i < ITERATIONS; i++) {
                 md.reset();
                 hash = md.digest(hash);
             }
 
-            String hashB64 = Base64.getEncoder().encodeToString(hash);
-            String saltB64 = Base64.getEncoder().encodeToString(salt);
-            return new String[]{hashB64, saltB64};
+            // Tra ve byte[] thay vi Base64 string
+            return new byte[][]{hash, salt};
         } catch (Exception e) {
-
             throw new RuntimeException("Error hashing password", e);
         }
     }
@@ -52,20 +49,30 @@ public class PasswordUtil {
         // tạo mảng byte 16 bytes
         byte[] salt = new byte[16];
 
-        // điền số ngẫu nhiên vào mảng
+        // dien so ngau nhien vao mang
         random.nextBytes(salt);
 
         return salt;
     }
 
-    // So sánh mật khẩu có đúng không, so sánh mk nhập vào với mk đã hash
-    public static boolean verifyPassword(String password, byte[] passwordHash,
-            byte[] passwordSalt) {
+    public static boolean verifyPassword(String password, byte[] passwordHash, byte[] passwordSalt) {
+        try {
+            // Hash password với salt từ database
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            md.update(passwordSalt);
+            byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
 
-        // Hash mật khẩu người dùng nhập với salt từ database
-        String[] hashedPassword = hashPassword(password, passwordSalt);
+            for (int i = 1; i < ITERATIONS; i++) {
+                md.reset();
+                hash = md.digest(hash);
+            }
 
-        // So sánh hash mới với hash đã lưu trong database
-        return hashedPassword[0].equals(new String(passwordHash));
+            // So sánh hash
+            return Arrays.equals(hash, passwordHash);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
+
 }
