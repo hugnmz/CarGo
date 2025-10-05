@@ -5,15 +5,15 @@ import java.time.LocalDateTime;
 
 
 public class Orders {
-    private Integer cartDetailId;    // ID chi tiết giỏ hàng
-    private Integer cartId;           // ID giỏ hàng
+    private Integer cartDetailId;    // ID chi tiet gio hang
+    private Integer cartId;           // ID gio hang
     private Integer vehicleId;        // ID xe
     private LocalDateTime rentStartDate; // Ngày bắt đầu thuê
     private LocalDateTime rentEndDate;   // Ngày kết thúc thuê
     private BigDecimal price;        // Giá tạm tính
     
     // Các đối tượng liên quan
-    private Carts cart;              // Giỏ hàng
+    private Carts cart;              // Gio hang
     private Vehicles vehicle;        // Xe
     
     // Constructors

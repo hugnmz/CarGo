@@ -13,8 +13,8 @@ public class Contracts {
     private LocalDateTime endDate;   // Ngày kết thúc hợp đồng
     private String status;           // Trạng thái hợp đồng (pending, accepted, rejected)
     private LocalDateTime createAt; // Ngày tạo hợp đồng
-    private BigDecimal totalAmount;  // Tổng tiền
-    private BigDecimal depositAmount; // Tiền cọc
+    private BigDecimal totalAmount;  // Tong tien
+    private BigDecimal depositAmount; // Tien coc
     
     // Các đối tượng liên quan
     private Customers customer;      // Khách hàng

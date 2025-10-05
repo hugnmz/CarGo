@@ -6,13 +6,13 @@ import java.time.LocalDateTime;
 public class CustomerDTO {
     private Integer customerId;      // ID khách hàng
     private String username;         // Tên đăng nhập
-    private String fullName;         // Họ tên
+    private String fullName;         // Ho ten
     private String phone;            // Số điện thoại
     private String email;            // Email
     private LocalDate dateOfBirth;   // Ngày sinh
     private LocalDateTime createAt;  // Ngày tạo
     private String city;             // Thành phố
-    private String address;          // Địa chỉ
+    private String address;          // Dia chi
     
     // Constructors
     public CustomerDTO() {}

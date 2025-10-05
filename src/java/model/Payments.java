@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public class Payments {
     private Integer paymentId;       // ID thanh toán
     private Integer contractId;      // ID hợp đồng
-    private BigDecimal amount;       // Số tiền thanh toán
+    private BigDecimal amount;       // So tien thanh toan
     private Integer methodId;        // ID phương thức thanh toán
     private String status;           // Trạng thái thanh toán (pending, completed, failed)
     private LocalDateTime paymentDate; // Ngày thanh toán

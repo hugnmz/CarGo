@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class Users {
-    private Integer userId;          // ID người dùng
+    private Integer userId;          // ID nguoi dung
     private String username;         // Tên đăng nhập
     private byte[] passwordHash;    // Hash mật khẩu
     private byte[] passwordSalt;    // Salt mật khẩu
-    private String fullName;        // Họ tên
+    private String fullName;        // Ho ten
     private String phone;           // Số điện thoại
     private String email;           // Email
     private LocalDate dateOfBirth;  // Ngày sinh
@@ -21,7 +21,7 @@ public class Users {
     private Integer locationId;     // ID địa điểm
     
     // Các đối tượng liên quan
-    private Locations location;     // Địa điểm
+    private Locations location;     // Dia diem
     private List<Roles> roles;      // Danh sách vai trò
     private List<UserRoles> userRoles; // Quan hệ với vai trò
     private List<Contracts> contracts; // Danh sách hợp đồng xử lý

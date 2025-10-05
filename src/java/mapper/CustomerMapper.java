@@ -7,12 +7,14 @@ package mapper;
 import dto.CustomerDTO;
 import model.Customers;
 import model.Locations;
+import util.di.annotation.Component;
 
 /**
  *
  * @author admin
  */
 // class này để chuyển đối giữa DTO và Model và gược lại
+@Component
 public class CustomerMapper {
 
     // chuyển từ model sang DTO
@@ -31,7 +33,7 @@ public class CustomerMapper {
         dto.setDateOfBirth(customer.getDateOfBirth());
         dto.setCreateAt(customer.getCreateAt());
        
-        if(customer.getLocationId() != null){
+        if(customer.getLocationId() != null && customer.getLocation() != null){
             dto.setCity(customer.getLocation().getCity());
             dto.setAddress(customer.getLocation().getAddress());
         }

@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public class Incidents {
     private Integer incidentId;      // ID sự cố
     private String description;      // Mô tả sự cố
-    private BigDecimal fineAmount;   // Số tiền phạt
+    private BigDecimal fineAmount;   // So tien phat
     private LocalDateTime incidentDate; // Ngày xảy ra sự cố
     private String status;           // Trạng thái sự cố (pending, resolved, cancelled)
     private Integer contractDetailId; // ID chi tiết hợp đồng
