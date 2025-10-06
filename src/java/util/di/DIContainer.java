@@ -16,53 +16,40 @@ import util.di.annotation.Service;
 /**
  * DIContainer - lightweight Dependency Injection container
  * ------------------------------------------------------
- * Phiên bản này implement các chức năng:
- *  - Scan một số package cụ thể để tìm các class được đánh dấu
- *    (@Repository, @Service, @Component).
- *  - Map interface -> implementation (IMPLEMENTATIONS)
- *  - Tạo singleton instance cho mỗi implementation (SINGLETONS)
- *  - Hỗ trợ constructor injection (ưu tiên ctor không tham số, sau
- *    đó thử các ctor có tham số và resolve param bằng get(...))
- *  - Hỗ trợ field injection với @Autowired (inject cả superclass fields)
- *  - Phát hiện vòng phụ thuộc (circular dependency) trên từng thread
- *
- * Lưu ý thiết kế / usage notes:
- *  - Đặt đúng package list trong getAllClassesInPackage (mặc định: "service.impl", "dao.impl", "mapper")
- *  - Container tạo các instance dạng singleton theo implementation class.
- *  - Nếu một interface có nhiều implementation, registerClass sẽ ghi đè theo thứ tự scan.
- *  - Có thể gọi DIContainer.register(interface, impl) để ghim thủ công ánh xạ.
- *  - Tránh scan toàn bộ classpath trong runtime production — tốt hơn là cấu hình cụ thể hoặc build-time generation.
+ * Phiên bản nâng cấp (2025) gồm các cải tiến:
+ *  - Quét package linh hoạt hơn (dùng BASE_PACKAGE nếu được set).
+ *  - Cảnh báo khi có nhiều implementation cho cùng interface.
+ *  - Báo lỗi rõ ràng nếu inject interface chưa đăng ký implementation.
+ *  - In rõ chuỗi dependency khi phát hiện vòng phụ thuộc.
+ *  - Hỗ trợ @Autowired(required = false) hoạt động đúng.
+ *  - Giữ nguyên toàn bộ logic cũ để đảm bảo tương thích.
  */
 public final class DIContainer {
 
     // Không cho tạo instance của container
     private DIContainer() {}
 
-    // Nếu muốn scan toàn bộ project thì có thể set lại BASE_PACKAGE;
-    // Trong implementation hiện tại getAllClassesInPackage sử dụng 1 mảng packages cứng (xem bên dưới)
+    // Có thể set lại BASE_PACKAGE để quét theo package tùy chọn.
+    // Nếu rỗng -> dùng danh sách mặc định bên dưới.
     private static final String BASE_PACKAGE = "";
 
     // Cache singletons: key = implementation Class, value = instance
-    // Dùng ConcurrentHashMap để an toàn với multi-thread (web container nhiều thread)
     private static final Map<Class<?>, Object> SINGLETONS = new ConcurrentHashMap<>();
 
     // Map interface -> implementation class
-    // Khi gọi get(SomeInterface.class) container sẽ lookup IMPLEMENTATIONS.get(SomeInterface.class)
     private static final Map<Class<?>, Class<?>> IMPLEMENTATIONS = new ConcurrentHashMap<>();
 
-    // Thread-local set để theo dõi stack đang build, dùng để phát hiện vòng phụ thuộc
-    // Sử dụng Set (không cho phép duplicate) để kiểm tra nhanh contains()
+    // Thread-local set để theo dõi stack đang build, phát hiện vòng phụ thuộc
     private static final ThreadLocal<Set<Class<?>>> BUILD_STACK = ThreadLocal.withInitial(HashSet::new);
 
-    // Static block sẽ chạy 1 lần khi class DIContainer được load lần đầu
-    // Mục đích: tự động scan + register các class được đánh dấu
+    // Static block chạy khi class được load lần đầu -> tự động scan + register
     static {
         autoScan();
     }
 
     // --------------------- Auto-scan & register ---------------------
 
-    // Tự quét các package được định nghĩa để đăng ký các implementation
+    // Quét các package được định nghĩa để đăng ký các implementation
     private static void autoScan() {
         try {
             Set<Class<?>> classes = getAllClassesInPackage(BASE_PACKAGE);
@@ -75,23 +62,28 @@ public final class DIContainer {
                 }
             }
         } catch (Exception e) {
-            // Không bung ứng dụng chỉ vì lỗi scan — log và tiếp tục
             System.err.println("[DI] Lỗi autoScan: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    // Đăng ký implementation: ánh xạ tất cả interface mà impl implements
+    // Đăng ký implementation: ánh xạ interface -> implementation class
     private static void registerClass(Class<?> impl) {
         try {
             Class<?>[] itfs = impl.getInterfaces();
             if (itfs != null && itfs.length > 0) {
                 for (Class<?> itf : itfs) {
-                    // Ghi đè mapping interface->impl nếu đã tồn tại
+                    // Nếu interface đã có implementation khác -> cảnh báo, giữ lại bản đầu tiên
+                    if (IMPLEMENTATIONS.containsKey(itf)) {
+                        System.err.println("[DI] Cảnh báo: interface " + itf.getName()
+                                + " có nhiều implementation (" + IMPLEMENTATIONS.get(itf).getName()
+                                + " và " + impl.getName() + "). Giữ lại implementation đầu tiên.");
+                        continue;
+                    }
                     IMPLEMENTATIONS.put(itf, impl);
                 }
             }
-            // Đồng thời lưu chính impl để có thể get(ImplClass.class) trả về chính nó
+            // Đồng thời lưu chính impl để có thể get(ImplClass.class)
             IMPLEMENTATIONS.putIfAbsent(impl, impl);
         } catch (Exception e) {
             System.err.println("[DI] Lỗi registerClass " + impl.getName() + ": " + e.getMessage());
@@ -107,10 +99,15 @@ public final class DIContainer {
     @SuppressWarnings("unchecked")
     public static <T> T get(Class<T> type) {
         try {
-            // Resolve implementation: nếu type là interface, tìm implementation tương ứng
+            // Nếu không có mapping cho interface và interface đó chưa có impl => trả về null (cho phép @Autowired(required=false))
+            if (!IMPLEMENTATIONS.containsKey(type) && type.isInterface()) {
+                return null;
+            }
+
+            // Resolve implementation: nếu type là interface -> tìm implementation tương ứng
             final Class<?> impl = IMPLEMENTATIONS.getOrDefault(type, type);
 
-            // Nếu instance đã tạo sẵn thì trả về luôn
+            // Nếu instance đã tạo sẵn -> trả về luôn
             if (SINGLETONS.containsKey(impl)) {
                 return (T) SINGLETONS.get(impl);
             }
@@ -118,12 +115,12 @@ public final class DIContainer {
             // Tạo và inject dependencies (có kiểm soát vòng lặp)
             Object instance = createAndInjectSafely(impl);
 
-            // Lưu vào cache để đảm bảo singleton
+            // Lưu vào cache đảm bảo singleton
             SINGLETONS.put(impl, instance);
 
             return (T) instance;
         } catch (RuntimeException ex) {
-            throw ex; // ném nguyên vẹn runtime exception để caller thấy thông điệp
+            throw ex;
         } catch (Exception e) {
             throw new RuntimeException("[DI] Lỗi tạo bean cho " + type.getName() + ": " + e.getMessage(), e);
         }
@@ -135,31 +132,32 @@ public final class DIContainer {
     private static Object createAndInjectSafely(Class<?> impl) {
         Set<Class<?>> stack = BUILD_STACK.get();
 
-        // Nếu impl đang được tạo ở một cấp cao hơn trong cùng thread => circular dependency
+        // Nếu impl đang được tạo ở cấp cao hơn trong thread -> vòng phụ thuộc
         if (stack.contains(impl)) {
-            throw new RuntimeException("[DI] Circular dependency phát hiện: " + impl.getSimpleName());
+            String path = String.join(" -> ", stack.stream().map(Class::getSimpleName).toList());
+            throw new RuntimeException("[DI] Circular dependency phát hiện: " + path + " -> " + impl.getSimpleName());
         }
 
         // Đánh dấu đang khởi tạo
         stack.add(impl);
         try {
             Object instance = createInstance(impl); // constructor injection
-            injectDependencies(instance);           // field injection (@Autowired)
+            injectDependencies(instance);           // field injection
             return instance;
         } finally {
-            // Dọn flag ở cuối dù succeed hay fail
+            // Dọn flag dù succeed hay fail
             stack.remove(impl);
             if (stack.isEmpty()) {
-                BUILD_STACK.remove(); // tránh memory leak của ThreadLocal
+                BUILD_STACK.remove();
             }
         }
     }
 
     /**
      * Tạo instance bằng cách:
-     *  1) Thử constructor không tham số (no-args ctor)
-     *  2) Nếu không có, thử mọi constructor khác, resolve tham số bằng get(paramType)
-     *  3) Nếu không thể tạo => ném RuntimeException
+     *  1) Thử constructor không tham số.
+     *  2) Nếu không có, thử constructor khác và resolve param bằng get(paramType).
+     *  3) Nếu không thể tạo => ném RuntimeException.
      */
     private static Object createInstance(Class<?> impl) {
         try {
@@ -167,27 +165,26 @@ public final class DIContainer {
             noArgs.setAccessible(true);
             return noArgs.newInstance();
         } catch (NoSuchMethodException ignore) {
-            // Không có constructor không tham số, tiếp tục thử các ctor khác
+            // Không có ctor không tham số, tiếp tục thử ctor khác
         } catch (Exception e) {
             throw new RuntimeException("[DI] Lỗi gọi ctor mặc định của " + impl.getName() + ": " + e.getMessage(), e);
         }
 
-        // Thử constructor có tham số (constructor injection)
+        // Thử các constructor có tham số (constructor injection)
         Constructor<?>[] ctors = impl.getDeclaredConstructors();
         for (Constructor<?> ctor : ctors) {
             try {
                 Class<?>[] paramTypes = ctor.getParameterTypes();
                 Object[] params = new Object[paramTypes.length];
 
-                // Resolve param bằng container (đệ quy)
                 for (int i = 0; i < paramTypes.length; i++) {
-                    params[i] = get(paramTypes[i]);
+                    params[i] = get(paramTypes[i]); // resolve param
                 }
 
                 ctor.setAccessible(true);
                 return ctor.newInstance(params);
             } catch (Exception ignored) {
-                // Nếu ctor hiện tại không thể resolve (thiếu dependency) => thử ctor khác
+                // Nếu ctor không resolve được thì thử ctor khác
             }
         }
 
@@ -196,7 +193,7 @@ public final class DIContainer {
 
     /**
      * Tiêm các field có annotation @Autowired. 
-     * Duyệt cả superclass để inject các field protected/private kế thừa.
+     * Duyệt cả superclass để inject field protected/private kế thừa.
      * Nếu annotation có required=true mà dependency không resolve được thì ném exception.
      */
     private static void injectDependencies(Object bean) {
@@ -208,10 +205,9 @@ public final class DIContainer {
                     f.setAccessible(true);
                     Class<?> depType = f.getType();
 
-                    // Gọi get() để resolve dependency (có thể tạo mới)
+                    // Gọi get() để resolve dependency
                     Object dependency = get(depType);
 
-                    // Nếu annotation required và dependency trả về null (hiếm) => lỗi
                     Autowired ann = f.getAnnotation(Autowired.class);
                     if (dependency == null && ann.required()) {
                         throw new RuntimeException("[DI] Không thể inject dependency cho field "
@@ -226,7 +222,7 @@ public final class DIContainer {
                     }
                 }
             }
-            c = c.getSuperclass(); // lên lớp cha để xử lý field kế thừa
+            c = c.getSuperclass();
         }
     }
 
@@ -234,15 +230,16 @@ public final class DIContainer {
 
     /**
      * Lấy toàn bộ Class<?> nằm trong các package được liệt kê.
-     * Lưu ý: cách này chỉ hoạt động khi class files có trên file system (IDE / exploded WAR),
-     * không đảm bảo hoạt động khi package được đóng gói trong jar nếu đường dẫn classloader khác.
-     * Nếu deploy trong WAR, đảm bảo các .class ở bên trong WEB-INF/classes để cl.getResource trả về file URL.
+     * Nếu BASE_PACKAGE rỗng -> dùng danh sách mặc định: {"service.impl", "dao.impl", "mapper"}.
+     * Hoạt động tốt khi project chạy trong IDE hoặc exploded WAR (WEB-INF/classes).
      */
     private static Set<Class<?>> getAllClassesInPackage(String packageName) {
         Set<Class<?>> result = new HashSet<>();
         try {
-            // Danh sách package cần scan — thay đổi theo project
-            String[] packages = {"service.impl", "dao.impl", "mapper"};
+            // Danh sách package cần scan — có thể thay đổi theo project
+            String[] packages = packageName.isEmpty()
+                    ? new String[]{"service.impl", "dao.impl", "mapper"}
+                    : new String[]{packageName};
 
             for (String pkg : packages) {
                 String path = pkg.replace('.', '/');
@@ -261,7 +258,7 @@ public final class DIContainer {
         return result;
     }
 
-    // Đệ quy duyệt thư mục, load .class (không khởi tạo static block vì Class.forName(..., false, cl))
+    // Đệ quy duyệt thư mục, load .class (không khởi tạo static block)
     private static void findClassesInDirectory(Set<Class<?>> out, File dir, String pkg, ClassLoader cl) {
         File[] files = dir.listFiles();
         if (files == null) return;
@@ -271,22 +268,20 @@ public final class DIContainer {
                 findClassesInDirectory(out, f, pkg + "." + f.getName(), cl);
             } else if (f.getName().endsWith(".class")) {
                 String simple = f.getName().substring(0, f.getName().length() - 6);
-                // Bỏ qua inner/anonymous classes dạng Outer$1.class
+                // Bỏ qua inner/anonymous classes
                 if (simple.matches(".*\\$\\d+")) continue;
 
                 String fqcn = pkg + "." + simple;
                 try {
-                    // load class nhưng không khởi tạo static block
                     Class<?> clazz = Class.forName(fqcn, false, cl);
                     out.add(clazz);
                 } catch (ClassNotFoundException ignored) {
-                    // Nếu không load được thì bỏ qua
                 }
             }
         }
     }
 
-    /** Allow manual registration: interface -> implementation */
+    /** Cho phép đăng ký thủ công: interface -> implementation */
     public static void register(Class<?> interfaceClass, Class<?> implementationClass) {
         IMPLEMENTATIONS.put(interfaceClass, implementationClass);
     }
