@@ -8,6 +8,7 @@ import dto.CustomerDTO;
 import model.Customers;
 import model.Locations;
 import util.di.annotation.Component;
+import util.reflection.ReflectionMapper;
 
 /**
  *
@@ -17,48 +18,11 @@ import util.di.annotation.Component;
 @Component
 public class CustomerMapper {
 
-    // chuyển từ model sang DTO
     public CustomerDTO toDTO(Customers customer) {
-
-        if (customer == null) {
-            return null;
-        }
-        CustomerDTO dto = new CustomerDTO();
-
-        dto.setCustomerId(customer.getCustomerId());
-        dto.setUsername(customer.getUsername());
-        dto.setFullName(customer.getFullName());
-        dto.setPhone(customer.getPhone());
-        dto.setEmail(customer.getEmail());
-        dto.setDateOfBirth(customer.getDateOfBirth());
-        dto.setCreateAt(customer.getCreateAt());
-       
-        if(customer.getLocationId() != null && customer.getLocation() != null){
-            dto.setCity(customer.getLocation().getCity());
-            dto.setAddress(customer.getLocation().getAddress());
-        }
-        
-        return dto;
+        return ReflectionMapper.map(customer, CustomerDTO.class);
     }
-    
-    // từ dto sang model
-    public Customers toUsers(CustomerDTO dto){
-        if(dto == null) return null;
-        
-        // tạo mới Customer
-        Customers user = new Customers();
-        user.setUsername(dto.getUsername());       
-        user.setFullName(dto.getFullName());        
-        user.setPhone(dto.getPhone());              
-        user.setEmail(dto.getEmail());           
-        user.setDateOfBirth(dto.getDateOfBirth());  
-        if (dto.getCity() != null || dto.getAddress() != null) {
-            Locations location = new Locations();
-            location.setCity(dto.getCity());
-            location.setAddress(dto.getAddress());
-            user.setLocation(location);
-        }
-        //tra ve user
-        return user;
+
+    public Customers toUsers(CustomerDTO dto) {
+        return ReflectionMapper.map(dto, Customers.class);
     }
 }

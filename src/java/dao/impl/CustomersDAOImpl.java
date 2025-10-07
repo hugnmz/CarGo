@@ -18,6 +18,7 @@ import java.sql.Date;
 import util.DB;
 import java.sql.Timestamp;
 import util.di.annotation.Repository;
+import util.reflection.ReflectionMapper;
 
 /**
  *
@@ -28,38 +29,7 @@ public class CustomersDAOImpl implements CustomersDAO {
 
     // chuyển đổi từ ResultSet sang model
     private Customers mapResultSet(ResultSet rs) throws SQLException {
-        Customers customer = new Customers();
-
-        //map cac field co ban
-        customer.setCustomerId(rs.getInt("customerId"));
-        customer.setUsername(rs.getString("username"));
-        customer.setPasswordHash(rs.getBytes("password_hash"));
-        customer.setPasswordSalt(rs.getBytes("password_salt"));
-        customer.setFullName(rs.getString("fullName"));
-        customer.setPhone(rs.getString("phone"));
-        customer.setEmail(rs.getString("email"));
-
-        Date dateOfBirth = rs.getDate("dateOfBirth");
-        if (dateOfBirth != null) {
-            customer.setDateOfBirth(dateOfBirth.toLocalDate());
-        }
-
-        Timestamp createAt = rs.getTimestamp("createAt");
-        if (createAt != null) {
-            customer.setCreateAt(createAt.toLocalDateTime());
-        }
-
-        Integer locationId = rs.getObject("locationId", Integer.class);
-        customer.setLocationId(locationId);
-
-        customer.setIsVerified(rs.getBoolean("isVerified"));
-        customer.setVerifyCode(rs.getString("verifyCode"));
-        Timestamp vexp = rs.getTimestamp("verifyCodeExpire");
-        if (vexp != null) {
-            customer.setVerifyCodeExpire(vexp.toLocalDateTime());
-        }
-
-        return customer;
+        return ReflectionMapper.mapResultSet(rs, Customers.class);
     }
 
     @Override

@@ -17,7 +17,8 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        super.init(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+        // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+        super.init();
 
         try {
             customerService = DIContainer.get(CustomerService.class);
@@ -33,7 +34,6 @@ public class LoginServlet extends HttpServlet {
         //chi lay session neu da ton tai
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("customerId") != null) {
-
             // da login
             response.sendRedirect("home.jsp");
             return;
