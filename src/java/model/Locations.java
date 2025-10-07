@@ -5,10 +5,14 @@
 package model;
 
 import java.util.List;
+import util.di.annotation.Column;
 
 public class Locations {
+    @Column()
     private Integer locationId;      // ID địa điểm
+    @Column()
     private String city;             // Thành phố
+    @Column()
     private String address;          // Dia chi
     
     // Các đối tượng liên quan
