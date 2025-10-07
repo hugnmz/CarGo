@@ -1,43 +1,33 @@
-
 package controller;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
-@WebServlet("/LoginServlet")
+@WebServlet(name = "LoginServlet", value = "/LoginServlet")
 public class LoginServlet extends HttpServlet {
-    // Giả lập cơ sở dữ liệu bằng Map
-    private static Map<String, String> accounts = new HashMap<>();
 
     @Override
-    public void init() throws ServletException {
-        super.init();
-        // Thêm 1 tài khoản mặc định
-        accounts.put("admin", "123456");
-    }
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String username = request.getParameter("username").trim();
+        String password = request.getParameter("password").trim();
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
+        // Lấy danh sách accounts từ application scope
+        Map<String, String> accounts = (Map<String, String>) getServletContext().getAttribute("accounts");
 
-        String storedPassword = accounts.get(username);
+        if (accounts != null && accounts.containsKey(username) && accounts.get(username).equals(password)) {
+            // Đăng nhập thành công
+            HttpSession session = request.getSession(true);
+            session.setAttribute("loggedInUser", username);
 
-        if (storedPassword != null && storedPassword.equals(password)) {
-            // Lưu thông tin user vào session
-            HttpSession session = request.getSession();
-            session.setAttribute("username", username);
-            // Chuyển hướng sang home.jsp
-            request.getRequestDispatcher("home.jsp").forward(request, response);
+            // Chuyển hướng về home.jsp
+            response.sendRedirect(request.getContextPath() + "/home.jsp");
         } else {
-            // Sai thông tin đăng nhập
-            request.setAttribute("errorMessage", "Tài khoản hoặc mật khẩu không đúng!");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+            // Đăng nhập thất bại
+            request.setAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng.");
+            request.getRequestDispatcher("/login.jsp").forward(request, response);
         }
     }
 }
