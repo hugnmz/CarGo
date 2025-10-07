@@ -12,18 +12,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import mapper.CartMapper;
-import mapper.OrderMapper;
-
 import model.Carts;
 import model.Orders;
 import model.Vehicles;
+import util.Mapper;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
-
-import util.di.annotation.Service;
-
-import model.Carts;
 import service.CartService;
 
 /**
@@ -42,10 +36,9 @@ public class CartServiceImpl implements CartService {
     private VehiclesDAO vehiclesDAO;
     @Autowired
     private CarPricesDAO carPricesDAO;
+    
     @Autowired
-    private CartMapper cartMapper;
-    @Autowired
-    private OrderMapper orderMapper;
+    private Mapper mapper;
 
     public CartServiceImpl() {
     }
@@ -144,7 +137,14 @@ public class CartServiceImpl implements CartService {
                 return Optional.empty();
             }
 
-            CartDTO dto = cartMapper.toDTO(cartOptional.get());
+            Carts cart = cartOptional.get();
+            CartDTO dto = mapper.map(cart, CartDTO.class);
+            
+            // Set customer name if customer exists
+            if (cart.getCustomer() != null) {
+                dto.setCustomerName(cart.getCustomer().getFullName());
+            }
+            
             return Optional.of(dto);
         } catch (Exception e) {
             e.printStackTrace();
@@ -164,7 +164,18 @@ public class CartServiceImpl implements CartService {
             List<OrderDTO> orderDTO = new ArrayList<>();
 
             for (Orders o : orders) {
-                orderDTO.add(orderMapper.toDTO(o));
+                OrderDTO dto = mapper.map(o, OrderDTO.class);
+                
+                // Set vehicle info if available
+                if (o.getVehicle() != null) {
+                    dto.setPlateNumber(o.getVehicle().getPlateNumber());
+                    
+                    if (o.getVehicle().getCar() != null) {
+                        dto.setCarName(o.getVehicle().getCar().getName());
+                    }
+                }
+                
+                orderDTO.add(dto);
             }
             return orderDTO;
 

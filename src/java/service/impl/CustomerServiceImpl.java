@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import mapper.CustomerMapper;
+import util.Mapper;
 import model.Customers;
 import util.PasswordUtil;
 import service.CustomerService;
@@ -30,7 +30,7 @@ public class CustomerServiceImpl implements CustomerService {
     private CustomersDAO customersDAO;
 
     @Autowired
-    private CustomerMapper customerMapper;
+    private Mapper mapper;
 
     @Autowired
     private LocationsDAO locationsDAO;
@@ -58,7 +58,13 @@ public class CustomerServiceImpl implements CustomerService {
             }
 
             // Buoc 3: Chuyen doi tu Model sang DTO de tra ve cho Controller
-            CustomerDTO customerDTO = customerMapper.toDTO(customer);
+            CustomerDTO customerDTO = mapper.map(customer, CustomerDTO.class);
+            
+            // Set location info (location will not be null when registered)
+            if(customer.getLocation() != null){
+                customerDTO.setCity(customer.getLocation().getCity());
+                customerDTO.setAddress(customer.getLocation().getAddress());
+            }
 
             return Optional.of(customerDTO);
         } catch (Exception e) {
@@ -92,7 +98,15 @@ public class CustomerServiceImpl implements CustomerService {
             LocalDateTime expireAt = VerificationUtil.expiryAfterMinutes(10);
 
             // Bước 5: Chuyển đổi DTO sang Model
-            Customers customer = customerMapper.toUsers(customerDTO);
+            Customers customer = mapper.map(customerDTO, Customers.class);
+            
+            // Set location (required when registering)
+            if (customerDTO.getCity() != null || customerDTO.getAddress() != null) {
+                model.Locations location = new model.Locations();
+                location.setCity(customerDTO.getCity());
+                location.setAddress(customerDTO.getAddress());
+                customer.setLocation(location);
+            }
             customer.setPasswordHash(passwordHash); // Lưu hash password (byte[])
             customer.setPasswordSalt(passwordSalt); // Lưu salt (byte[])
             customer.setLocationId(locationId);
@@ -123,7 +137,16 @@ public class CustomerServiceImpl implements CustomerService {
             }
 
             // Chuyen doi tu Model sang DTO va tra ve
-            return Optional.of(customerMapper.toDTO(oc.get()));
+            Customers customer = oc.get();
+            CustomerDTO customerDTO = mapper.map(customer, CustomerDTO.class);
+            
+            // Set location info (location will not be null when registered)
+            if(customer.getLocation() != null){
+                customerDTO.setCity(customer.getLocation().getCity());
+                customerDTO.setAddress(customer.getLocation().getAddress());
+            }
+            
+            return Optional.of(customerDTO);
         } catch (Exception e) {
             e.printStackTrace();
             return Optional.empty(); // Có lỗi xảy ra
@@ -140,7 +163,15 @@ public class CustomerServiceImpl implements CustomerService {
 
             // Chuyển đổi từng Model sang DTO
             for (Customers c : customersList) {
-                dto.add(customerMapper.toDTO(c));
+                CustomerDTO customerDTO = mapper.map(c, CustomerDTO.class);
+                
+                // Set location info (location will not be null when registered)
+                if(c.getLocation() != null){
+                    customerDTO.setCity(c.getLocation().getCity());
+                    customerDTO.setAddress(c.getLocation().getAddress());
+                }
+                
+                dto.add(customerDTO);
             }
 
             return dto; // Tra ve danh sach DTO
@@ -159,7 +190,16 @@ public class CustomerServiceImpl implements CustomerService {
 
         try {
             // Chuyển đổi DTO sang Model
-            Customers customers = customerMapper.toUsers(customerDTO);
+            Customers customers = mapper.map(customerDTO, Customers.class);
+            
+            // Set location (required when registering)
+            if (customerDTO.getCity() != null || customerDTO.getAddress() != null) {
+                model.Locations location = new model.Locations();
+                location.setCity(customerDTO.getCity());
+                location.setAddress(customerDTO.getAddress());
+                customers.setLocation(location);
+            }
+            
             // Lưu vào database
             return customersDAO.addCustomer(customers);
         } catch (Exception e) {
@@ -176,7 +216,16 @@ public class CustomerServiceImpl implements CustomerService {
         }
         try {
             // Chuyển đổi DTO sang Model
-            Customers customer = customerMapper.toUsers(customerDTO);
+            Customers customer = mapper.map(customerDTO, Customers.class);
+            
+            // Set location (required when registering)
+            if (customerDTO.getCity() != null || customerDTO.getAddress() != null) {
+                model.Locations location = new model.Locations();
+                location.setCity(customerDTO.getCity());
+                location.setAddress(customerDTO.getAddress());
+                customer.setLocation(location);
+            }
+            
             // Cập nhật trong database
             return customersDAO.updateCustomer(customer);
         } catch (Exception e) {
