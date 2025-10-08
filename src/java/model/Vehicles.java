@@ -1,13 +1,20 @@
 package model;
 
 import java.util.List;
+import util.di.annotation.Column;
 
 public class Vehicles {
-    private Integer vehicleId;       // ID xe thực tế
-    private Integer carId;           // ID model xe
-    private String plateNumber;      // Biển số xe
-    private Boolean isActive;        // Trạng thái hoạt động
     
+    @Column()
+    private Integer vehicleId;       // ID xe thực tế
+    @Column()
+    private Integer carId;           // ID model xe
+    @Column()
+    private String plateNumber;      // Biển số xe
+    @Column()
+    private Boolean isActive;        // Trạng thái hoạt động
+   @Column()
+   private Integer locationId;
     // Các đối tượng liên quan
     private Cars car;                // Model xe
     private List<ContractDetails> contractDetails; // Chi tiết hợp đồng
@@ -16,12 +23,26 @@ public class Vehicles {
     
     // Constructors
     public Vehicles() {}
-    
-    public Vehicles(Integer carId, String plateNumber) {
+
+    public Vehicles(Integer vehicleId, Integer carId, String plateNumber, Boolean isActive, Integer locationId) {
+        this.vehicleId = vehicleId;
         this.carId = carId;
         this.plateNumber = plateNumber;
-        this.isActive = true;
+        this.isActive = isActive;
+        this.locationId = locationId;
     }
+
+    
+    
+    public Integer getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(Integer locationId) {
+        this.locationId = locationId;
+    }
+    
+    
     
     // Getters and Setters
     public Integer getVehicleId() { return vehicleId; }

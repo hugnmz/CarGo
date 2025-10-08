@@ -1,6 +1,7 @@
 package model;
 
 import java.time.LocalDateTime;
+import util.di.annotation.Nested;
 
 
 public class Feedbacks {
@@ -10,8 +11,10 @@ public class Feedbacks {
     private String comment;           // Nội dung phản hồi
     private LocalDateTime createAt;   // Ngày tạo phản hồi
     
+    @Nested
     // Các đối tượng liên quan
     private Customers customer;       // Khách hàng
+    @Nested
     private Vehicles vehicle;        // Xe
     
     // Constructors

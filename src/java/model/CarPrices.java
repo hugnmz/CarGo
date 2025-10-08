@@ -3,18 +3,29 @@ package model;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import util.di.annotation.Column;
+import util.di.annotation.Nested;
 
 
 public class CarPrices {
+    
+    @Column()
     private Integer priceId;          // ID giá
+    @Column()
     private Integer carId;            // ID xe
+    @Column()
     private BigDecimal dailyPrice;    // Giá theo ngày
+    @Column()
     private BigDecimal depositAmount; // So tien coc
+    @Column()
     private LocalDate startDate;      // Ngày bắt đầu áp dụng
+    @Column()
     private LocalDate endDate;        // Ngày kết thúc áp dụng (NULL = hiện hành)
+    @Column()
     private LocalDateTime createAt;   // Ngày tạo
     
     // Doi tuong lien quan
+    @Nested
     private Cars car;                // Model xe
     
     // Constructors

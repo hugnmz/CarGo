@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import util.di.annotation.Column;
+import util.di.annotation.Nested;
 
 public class Customers {
 
@@ -40,7 +41,8 @@ public class Customers {
     @Column()
     private LocalDateTime verifyCodeExpire;
 
-    // Các đối tượng liên quan
+    @Nested
+// Các đối tượng liên quan
     private Locations location;     // Dia diem
     private List<Contracts> contracts; // Danh sách hợp đồng
     private Carts cart;             // Gio hang

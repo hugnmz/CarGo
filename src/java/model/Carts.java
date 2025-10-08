@@ -2,13 +2,22 @@ package model;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import util.di.annotation.Column;
+import util.di.annotation.Nested;
 
 public class Carts {
+    
+    @Column()
     private Integer cartId;           // ID gio hang
+    
+    @Column()
     private Integer customerId;       // ID khách hàng
+    
+    @Column()
     private LocalDateTime createAt;   // Ngay tao gio hang
     
     // Các đối tượng liên quan
+    @Nested
     private Customers customer;       // Khách hàng
     private List<Orders> orders;      // Danh sach don hang trong gio
     

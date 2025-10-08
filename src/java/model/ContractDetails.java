@@ -3,18 +3,29 @@ package model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import util.di.annotation.Column;
+import util.di.annotation.Nested;
 
 public class ContractDetails {
-    private Integer contractDetailId; // ID chi tiết hợp đồng
-    private Integer contractId;      // ID hợp đồng
-    private Integer vehicleId;       // ID xe thuê
-    private BigDecimal price;        // Giá thuê
-    private LocalDateTime rentStartDate; // Ngày bắt đầu thuê
-    private LocalDateTime rentEndDate;   // Ngày kết thúc thuê
-    private String note;             // Ghi chú
     
+    @Column()
+    private Integer contractDetailId; // ID chi tiết hợp đồng
+    @Column()
+    private Integer contractId;      // ID hợp đồng
+    @Column()
+    private Integer vehicleId;       // ID xe thuê
+    @Column()
+    private BigDecimal price;        // Giá thuê
+    @Column()
+    private LocalDateTime rentStartDate; // Ngày bắt đầu thuê
+    @Column()
+    private LocalDateTime rentEndDate;   // Ngày kết thúc thuê
+    @Column()
+    private String note;             // Ghi chú
+    @Nested
     // Các đối tượng liên quan
     private Contracts contract;      // Hợp đồng
+    @Nested
     private Vehicles vehicle;        // Xe thuê
     private List<Incidents> incidents; // Sự cố
     

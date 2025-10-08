@@ -3,6 +3,7 @@ package model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import util.di.annotation.Nested;
 
 
 public class Contracts {
@@ -15,9 +16,11 @@ public class Contracts {
     private LocalDateTime createAt; // Ngày tạo hợp đồng
     private BigDecimal totalAmount;  // Tong tien
     private BigDecimal depositAmount; // Tien coc
-    
+   
+    @Nested
     // Các đối tượng liên quan
     private Customers customer;      // Khách hàng
+    @Nested
     private Users staff;            // Nhân viên
     private List<ContractDetails> contractDetails; // Chi tiết hợp đồng
     private List<Payments> payments; // Thanh toán

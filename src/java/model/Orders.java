@@ -2,31 +2,52 @@ package model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import util.di.annotation.Column;
+import util.di.annotation.Nested;
 
 
 public class Orders {
+    
+    @Column()
     private Integer cartDetailId;    // ID chi tiet gio hang
+    @Column()
     private Integer cartId;           // ID gio hang
+    @Column()
     private Integer vehicleId;        // ID xe
+    @Column()
     private LocalDateTime rentStartDate; // Ngày bắt đầu thuê
+    @Column()
     private LocalDateTime rentEndDate;   // Ngày kết thúc thuê
+    @Column()
     private BigDecimal price;        // Giá tạm tính
     
     // Các đối tượng liên quan
+    
+    @Nested
     private Carts cart;              // Gio hang
+    @Nested
     private Vehicles vehicle;        // Xe
+    @Nested
+    private Cars car;
+    @Nested
+    private Locations location;
     
     // Constructors
     public Orders() {}
-    
-    public Orders(Integer cartId, Integer vehicleId, LocalDateTime rentStartDate, 
-                  LocalDateTime rentEndDate, BigDecimal price) {
+
+    public Orders( Integer cartId, Integer vehicleId, LocalDateTime rentStartDate, LocalDateTime rentEndDate, BigDecimal price, Carts cart, Vehicles vehicle, Cars car, Locations location) {
         this.cartId = cartId;
         this.vehicleId = vehicleId;
         this.rentStartDate = rentStartDate;
         this.rentEndDate = rentEndDate;
         this.price = price;
+        this.cart = cart;
+        this.vehicle = vehicle;
+        this.car = car;
+        this.location = location;
     }
+    
+
     
     // Getters and Setters
     public Integer getCartDetailId() { return cartDetailId; }
@@ -52,4 +73,22 @@ public class Orders {
     
     public Vehicles getVehicle() { return vehicle; }
     public void setVehicle(Vehicles vehicle) { this.vehicle = vehicle; }
+
+    public Cars getCar() {
+        return car;
+    }
+
+    public void setCar(Cars car) {
+        this.car = car;
+    }
+
+    public Locations getLocation() {
+        return location;
+    }
+
+    public void setLocation(Locations location) {
+        this.location = location;
+    }
+    
+    
 }

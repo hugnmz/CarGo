@@ -5,35 +5,56 @@
 package model;
 
 import java.util.List;
+import util.di.annotation.Column;
+import util.di.annotation.Nested;
 
 
 public class Cars {
+    
+    @Column()
     private Integer carId;           // ID xe
+    @Column()
     private String name;              // Tên xe
+    @Column()
     private Integer year;             // Năm sản xuất
+    @Column()
     private String description;      // Mô tả xe
+    @Column()
     private String image;             // Hình ảnh xe
+    @Column()
     private Integer categoryId;        // ID danh mục
+    @Column()
     private Integer fuelId;           // ID loại nhiên liệu
+    @Column()
     private Integer seatingId;        // ID số chỗ ngồi
-    private Integer locationId;       // ID địa điểm
     
     // Các đối tượng liên quan
+    @Nested
     private Categories category;      // Danh mục xe
+    @Nested
     private Fuels fuel;              // Loại nhiên liệu
+    @Nested
     private Seatings seating;        // Số chỗ ngồi
+    @Nested
     private Locations location;       // Dia diem
     private List<Vehicles> vehicles; // Danh sách xe thực tế
     private List<CarPrices> carPrices; // Danh sách giá xe
     
     // Constructors
     public Cars() {}
-    
-    public Cars(String name, Integer year, String description) {
+
+    public Cars(String name, Integer year, String description, String image, Integer categoryId, Integer fuelId, Integer seatingId) {
         this.name = name;
         this.year = year;
         this.description = description;
+        this.image = image;
+        this.categoryId = categoryId;
+        this.fuelId = fuelId;
+        this.seatingId = seatingId;
     }
+    
+    
+    
     
     // Getters and Setters
     public Integer getCarId() { return carId; }
@@ -60,8 +81,6 @@ public class Cars {
     public Integer getSeatingId() { return seatingId; }
     public void setSeatingId(Integer seatingId) { this.seatingId = seatingId; }
     
-    public Integer getLocationId() { return locationId; }
-    public void setLocationId(Integer locationId) { this.locationId = locationId; }
     
     public Categories getCategory() { return category; }
     public void setCategory(Categories category) { this.category = category; }

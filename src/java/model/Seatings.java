@@ -1,10 +1,14 @@
 package model;
 
 import java.util.List;
+import util.di.annotation.Column;
 
 
 public class Seatings {
+    
+    @Column()
     private Integer seatingId;       // ID số chỗ ngồi
+    @Column()
     private Integer seatingType;     // Số chỗ ngồi
     private List<Cars> cars;         // Danh sách xe có số chỗ ngồi này
     
