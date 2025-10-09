@@ -11,6 +11,7 @@ import java.util.Optional;
 import model.Customers;
 import util.JdbcTemplateUtil;
 import util.di.annotation.Repository;
+import util.reflection.ReflectionMapper;
 
 /**
  *
@@ -18,6 +19,15 @@ import util.di.annotation.Repository;
  */
 @Repository
 public class CustomersDAOImpl implements CustomersDAO {
+<<<<<<< HEAD
+=======
+
+    // chuyển đổi từ ResultSet sang model
+    private Customers mapResultSet(ResultSet rs) throws SQLException {
+        return ReflectionMapper.mapResultSet(rs, Customers.class);
+    }
+
+>>>>>>> main
     @Override
     public List<Customers> getAllCustomers() {
         String sql = "select * from Customers";
