@@ -1,7 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
-<%@ page import="javax.servlet.http.*, javax.servlet.*" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+
 <%
     String username = (String) session.getAttribute("loggedInUser");
     String avatar = (String) session.getAttribute("userAvatar"); // có thể null, dùng mặc định
@@ -103,7 +101,8 @@
                 <a class="navbar-brand fw-bold text-success" href="#">🚗 CarRental</a>
                 <div class="collapse navbar-collapse">
                     <ul class="navbar-nav ms-auto">
-                        <li class="nav-item"><a class="nav-link" href="#">Trang chủ</a></li>
+                        <li class="nav-item"><a class="nav-link" href="home">Trang chủ</a></li>
+                        <li class="nav-item"><a class="nav-link" href="cart">Giỏ hàng</a></li>
                         <li class="nav-item"><a class="nav-link" href="#">Về chúng tôi</a></li>
                         <li class="nav-item"><a class="nav-link" href="#">Liên hệ</a></li>
 
@@ -234,43 +233,155 @@
                 </div>
             </div>
 
+            <!-- Hiển thị thông báo lỗi nếu có -->
+            <c:if test="${not empty error}">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle"></i> ${error}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </c:if>
+
+            <!-- Hiển thị thông báo thành công nếu có -->
+            <c:if test="${not empty param.message}">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i> ${param.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </c:if>
+
+            <!-- Hiển thị thông báo lỗi từ parameter nếu có -->
+            <c:if test="${not empty param.error}">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle"></i> ${param.error}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </c:if>
+
             <!-- Danh sách xe nổi bật -->
             <h3 class="fw-bold mt-5 mb-3 text-center">Xe nổi bật</h3>
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="card car-card shadow">
-                        <img src="https://cdn.prod.website-files.com/63fcd665ef8a472d9e7f9a5f/64b17bb248eddfb24b2e0d4b_2023-toyota-camry.jpeg" alt="">
-                        <div class="card-body">
-                            <h5 class="card-title">Toyota Camry</h5>
-                            <p class="text-muted">Xe 5 chỗ - Số tự động</p>
-                            <p class="text-success fw-bold">900.000đ/ngày</p>
-                            <a href="#" class="btn btn-success w-100">Đặt xe ngay</a>
-                        </div>
+            
+            <!-- Kiểm tra có xe không -->
+            <c:choose>
+                <c:when test="${empty cars}">
+                    <!-- Không có xe -->
+                    <div class="text-center py-5">
+                        <i class="fas fa-car fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Hiện tại chưa có xe nào</h5>
+                        <p class="text-muted">Vui lòng liên hệ admin để thêm xe vào hệ thống</p>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card car-card shadow">
-                        <img src="https://www.motortrend.com/uploads/sites/10/2022/08/2023-honda-civic-sedan-lx-4door-sedan-angular-front.png" alt="">
-                        <div class="card-body">
-                            <h5 class="card-title">Honda Civic</h5>
-                            <p class="text-muted">Xe 5 chỗ - Số tự động</p>
-                            <p class="text-success fw-bold">850.000đ/ngày</p>
-                            <a href="#" class="btn btn-success w-100">Đặt xe ngay</a>
-                        </div>
+                </c:when>
+                <c:otherwise>
+                    <!-- Hiển thị danh sách xe từ database -->
+                    <div class="row g-4">
+                        <c:forEach var="car" items="${cars}" varStatus="status">
+                            <div class="col-md-4">
+                                <div class="card car-card shadow">
+                                    <!-- Hình ảnh xe -->
+                                    <img src="${not empty car.image ? car.image : 'https://via.placeholder.com/400x250/4CAF50/white?text=' += car.name}" 
+                                         alt="${car.name}" 
+                                         style="height: 200px; object-fit: cover;">
+                                    
+                                    <div class="card-body">
+                                        <!-- Tên xe -->
+                                        <h5 class="card-title">
+                                            <i class="fas fa-car"></i> ${car.name}
+                                        </h5>
+                                        
+                                        <!-- Thông tin xe -->
+                                        <p class="text-muted">
+                                            <i class="fas fa-calendar"></i> Năm ${car.year}
+                                            <br>
+                                            <i class="fas fa-users"></i> 
+                                            <c:choose>
+                                                <c:when test="${car.seatingId == 1}">4 chỗ</c:when>
+                                                <c:when test="${car.seatingId == 2}">5 chỗ</c:when>
+                                                <c:when test="${car.seatingId == 3}">7 chỗ</c:when>
+                                                <c:otherwise>${car.seatingId} chỗ</c:otherwise>
+                                            </c:choose>
+                                        </p>
+                                        
+                                        <!-- Mô tả xe -->
+                                        <c:if test="${not empty car.description}">
+                                            <p class="text-muted small">
+                                                <i class="fas fa-info-circle"></i> ${car.description}
+                                            </p>
+                                        </c:if>
+                                        
+                                        <!-- Giá thuê -->
+                                        <c:choose>
+                                            <c:when test="${not empty car.carPrices and not empty car.carPrices[0].dailyPrice}">
+                                                <p class="text-success fw-bold">
+                                                    <i class="fas fa-dollar-sign"></i>
+                                                    <fmt:formatNumber value="${car.carPrices[0].dailyPrice}" type="currency" currencyCode="VND"/>/ngày
+                                                </p>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <p class="text-warning fw-bold">
+                                                    <i class="fas fa-exclamation-triangle"></i> Liên hệ để biết giá
+                                                </p>
+                                            </c:otherwise>
+                                        </c:choose>
+                                        
+                                        <!-- Form đặt xe -->
+                                        <form action="add-to-cart" method="post" class="add-to-cart-form">
+                                            <!-- Hidden field chứa ID của xe thực tế -->
+                                            <c:set var="availableVehicles" value="" />
+                                            <c:forEach var="vehicle" items="${vehicles}">
+                                                <c:if test="${vehicle.carId == car.carId}">
+                                                    <c:set var="availableVehicles" value="${availableVehicles},${vehicle.vehicleId}" />
+                                                </c:if>
+                                            </c:forEach>
+                                            
+                                            <c:choose>
+                                                <c:when test="${not empty availableVehicles}">
+                                                    <!-- Có xe thực tế - hiển thị form đặt xe -->
+                                                    <input type="hidden" name="vehicleId" value="${availableVehicles.split(',')[1]}">
+                                                    
+                                                    <!-- Ngày bắt đầu thuê -->
+                                                    <div class="mb-2">
+                                                        <label class="form-label small">
+                                                            <i class="fas fa-calendar-alt"></i> Ngày bắt đầu:
+                                                        </label>
+                                                        <input type="datetime-local" 
+                                                               name="rentStartDate" 
+                                                               class="form-control form-control-sm" 
+                                                               required
+                                                               min="<%= java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")) %>"
+                                                               title="Chọn ngày bắt đầu thuê xe">
+                                                    </div>
+                                                    
+                                                    <!-- Ngày kết thúc thuê -->
+                                                    <div class="mb-2">
+                                                        <label class="form-label small">
+                                                            <i class="fas fa-calendar-alt"></i> Ngày kết thúc:
+                                                        </label>
+                                                        <input type="datetime-local" 
+                                                               name="rentEndDate" 
+                                                               class="form-control form-control-sm" 
+                                                               required
+                                                               title="Chọn ngày kết thúc thuê xe">
+                                                    </div>
+                                                    
+                                                    <!-- Nút thêm vào giỏ hàng -->
+                                                    <button type="submit" class="btn btn-success w-100 btn-sm">
+                                                        <i class="fas fa-shopping-cart"></i> Thêm vào giỏ
+                                                    </button>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <!-- Không có xe thực tế -->
+                                                    <button type="button" class="btn btn-secondary w-100 btn-sm" disabled>
+                                                        <i class="fas fa-times"></i> Tạm hết xe
+                                                    </button>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:forEach>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card car-card shadow">
-                        <img src="https://www.hyundai.com/content/dam/hyundai/ww/en/images/find-a-car/pip/suv/tucson/2023/tucson-2023-exterior-front-side.jpg" alt="">
-                        <div class="card-body">
-                            <h5 class="card-title">Hyundai Tucson</h5>
-                            <p class="text-muted">Xe 7 chỗ - Số tự động</p>
-                            <p class="text-success fw-bold">1.200.000đ/ngày</p>
-                            <a href="#" class="btn btn-success w-100">Đặt xe ngay</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                </c:otherwise>
+            </c:choose>
 
             <!-- 3 bước thuê xe -->
             <h3 class="fw-bold mt-5 mb-4 text-center">3 bước thuê xe dễ dàng</h3>
