@@ -2,14 +2,21 @@
 <%@ page import="javax.servlet.http.*, javax.servlet.*" %>
 <%
     String username = (String) session.getAttribute("loggedInUser");
-    String avatar = (String) session.getAttribute("userAvatar");
+    Integer avatarId = (Integer) session.getAttribute("userAvatar"); 
+    String avatar = avatarId != null ? avatarId.toString() : null;
 
-    // Nếu chưa đăng nhập → chuyển về login
+    // lấy các thông tin khác
+    String fullName = (String) session.getAttribute("fullName");
+    String email = (String) session.getAttribute("email");
+    String phone = (String) session.getAttribute("phone");
+    String city = (String) session.getAttribute("city");
+
     if (username == null) {
         response.sendRedirect("login.jsp");
         return;
     }
 %>
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -20,13 +27,12 @@
     <style>
         body { background-color: #f9f9f9; }
         .profile-card {
-            max-width: 500px;
+            max-width: 600px;
             margin: 80px auto;
             background: #fff;
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            text-align: center;
         }
         .profile-card img {
             width: 120px;
@@ -36,16 +42,26 @@
             margin-bottom: 20px;
             border: 4px solid #4CAF50;
         }
+        .profile-info p {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
     </style>
 </head>
 <body>
-    <div class="profile-card">
+    <div class="profile-card text-center">
         <img src="<%= avatar != null ? avatar : "https://cdn-icons-png.flaticon.com/512/3135/3135715.png" %>" alt="Avatar">
-        <h3 class="fw-bold"><%= username %></h3>
-        <p>Chào mừng bạn đến với CarRental!</p>
+        <h3 class="fw-bold"><%= fullName != null ? fullName : username %></h3>
+        <p>@<%= username %></p>
+
+        <div class="profile-info text-start mt-4 px-4">
+            <p><strong>Email:</strong> <%= email != null ? email : "Chưa cập nhật" %></p>
+            <p><strong>Điện thoại:</strong> <%= phone != null ? phone : "Chưa cập nhật" %></p>
+            <p><strong>Thành phố:</strong> <%= city != null ? city : "Chưa cập nhật" %></p>
+        </div>
 
         <div class="d-flex justify-content-center gap-3 mt-4">
-            <a href="index.jsp" class="btn btn-outline-success"><i class="fa fa-home"></i> Trang chủ</a>
+            <a href="home.jsp" class="btn btn-outline-success"><i class="fa fa-home"></i> Trang chủ</a>
             <a href="LogoutServlet" class="btn btn-success"><i class="fa fa-sign-out-alt"></i> Đăng xuất</a>
         </div>
     </div>

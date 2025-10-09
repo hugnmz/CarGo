@@ -2,164 +2,110 @@
 <%@ page import="javax.servlet.http.*, javax.servlet.*" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
+<%@ page import="javax.servlet.http.*, javax.servlet.*" %>
 <%
+    // Lấy username từ session
     String username = (String) session.getAttribute("loggedInUser");
-    String avatar = (String) session.getAttribute("userAvatar"); // có thể null, dùng mặc định
+    if (username == null) {
+        response.sendRedirect("login.jsp"); // chưa login -> chuyển về login
+        return;
+    }
+
+    // Avatar cố định
+    String avatar = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
 %>
 
 <!DOCTYPE html>
 <html lang="vi">
-    <head>
-        <meta charset="UTF-8">
-        <title>Thuê xe tự lái - Car Rental</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-        <style>
-            body {
-                background-color: #f9f9f9;
-            }
-            .navbar {
-                background-color: #fff;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            }
-            .hero {
-                background: url('https://img.freepik.com/free-photo/red-sport-car-road_1232-4143.jpg') center/cover no-repeat;
-                color: white;
-                text-align: center;
-                padding: 120px 20px;
-                border-radius: 15px;
-                margin-top: 20px;
-            }
-            .search-box {
-                background-color: white;
-                padding: 25px;
-                border-radius: 15px;
-                margin-top: -60px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            }
-            .brand-logo img {
-                width: 60px;
-                height: 60px;
-                object-fit: contain;
-            }
-            .brand-logo {
-                border: 1px solid #eee;
-                border-radius: 12px;
-                background: #fff;
-                padding: 20px;
-                transition: 0.2s;
-            }
-            .brand-logo:hover {
-                transform: scale(1.05);
-                border-color: #4CAF50;
-            }
-            .card-location img {
-                height: 180px;
-                object-fit: cover;
-            }
-            .card-location {
-                border-radius: 12px;
-                overflow: hidden;
-                transition: 0.2s;
-            }
-            .card-location:hover {
-                transform: scale(1.03);
-            }
-            .car-card img {
-                height: 180px;
-                object-fit: cover;
-                border-radius: 12px 12px 0 0;
-            }
-            .car-card:hover {
-                transform: scale(1.03);
-                transition: 0.2s;
-            }
-            .step-card img {
-                width: 90px;
-                height: 90px;
-                border-radius: 50%;
-                border: 4px solid #4CAF50;
-            }
-            .review-card {
-                background: #fff;
-                border-radius: 12px;
-                padding: 20px;
-                box-shadow: 0 0 10px rgba(0,0,0,0.05);
-            }
-            footer {
-                margin-top: 80px;
-                padding: 30px 0;
-                background-color: #fff;
-                text-align: center;
-                border-top: 1px solid #ddd;
-            }
-        </style>
-    </head>
-    <body>
+<head>
+    <meta charset="UTF-8">
+    <title>Thuê xe tự lái - Car Rental</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f9f9f9; }
+        .navbar { background-color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .hero {
+            background: url('https://img.freepik.com/free-photo/red-sport-car-road_1232-4143.jpg') center/cover no-repeat;
+            color: white; text-align: center; padding: 120px 20px; border-radius: 15px; margin-top: 20px;
+        }
+        .search-box {
+            background-color: white; padding: 25px; border-radius: 15px; margin-top: -60px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .brand-logo img { width: 60px; height: 60px; object-fit: contain; }
+        .brand-logo { border: 1px solid #eee; border-radius: 12px; background: #fff; padding: 20px; transition: 0.2s; }
+        .brand-logo:hover { transform: scale(1.05); border-color: #4CAF50; }
+        .card-location img, .car-card img { object-fit: cover; }
+        .card-location { border-radius: 12px; overflow: hidden; transition: 0.2s; }
+        .card-location:hover, .car-card:hover { transform: scale(1.03); transition: 0.2s; }
+        .step-card img { width: 90px; height: 90px; border-radius: 50%; border: 4px solid #4CAF50; }
+        .review-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
+        footer { margin-top: 80px; padding: 30px 0; background-color: #fff; text-align: center; border-top: 1px solid #ddd; }
+    </style>
+</head>
+<body>
 
-        <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg fixed-top">
-            <div class="container">
-                <a class="navbar-brand fw-bold text-success" href="#">🚗 CarRental</a>
-                <div class="collapse navbar-collapse">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item"><a class="nav-link" href="#">Trang chủ</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Về chúng tôi</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Liên hệ</a></li>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-success" href="#">🚗 CarRental</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="#">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Về chúng tôi</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Liên hệ</a></li>
 
-                        <% if (username != null) { %>
-<li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button"
-       data-bs-toggle="dropdown" aria-expanded="false">
-        <img src="<%= avatar != null ? avatar : "https://cdn-icons-png.flaticon.com/512/3135/3135715.png" %>" 
-             alt="Avatar" style="width:40px; height:40px; border-radius:50%;">
-        <span class="ms-2"><%= username %></span>
-    </a>
-    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-        <li><a class="dropdown-item" href="user.jsp">Thông tin cá nhân</a></li>
-        <li><a class="dropdown-item" href="LogoutServlet">Đăng xuất</a></li>
-    </ul>
-</li>
-<% } else { %>
-<li class="nav-item"><a class="btn btn-outline-success" href="login.jsp">Đăng nhập</a></li>
-<% } %>
+                <!-- User avatar -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="<%= avatar %>" alt="Avatar" style="width:40px; height:40px; border-radius:50%;">
+                        <span class="ms-1"><%= username %></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="user.jsp">Thông tin cá nhân</a></li>
+                        <li><a class="dropdown-item" href="LogoutServlet">Đăng xuất</a></li>
                     </ul>
-                </div>
-            </div>
-        </nav>
+                </li>
 
-        <!-- Banner -->
-        <div class="container mt-5 pt-5">
-            <div class="hero rounded">
-                <h1 class="fw-bold">Thuê xe tự lái dễ dàng và nhanh chóng</h1>
-                <p>Hơn 1000+ xe trên toàn quốc với giá ưu đãi nhất</p>
-            </div>
+            </ul>
+        </div>
+    </div>
+</nav>
 
-            <!-- Form tìm kiếm -->
-            <div class="search-box shadow mt-4">
-                <form class="row g-3">
-                    <div class="col-md-3">
-                        <label class="form-label">Địa điểm nhận xe</label>
-                        <input type="text" class="form-control" placeholder="Nhập địa điểm...">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Địa điểm trả xe</label>
-                        <input type="text" class="form-control" placeholder="Nhập địa điểm...">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label">Ngày nhận</label>
-                        <input type="date" class="form-control">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label">Ngày trả</label>
-                        <input type="date" class="form-control">
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-success w-100"><i class="fa fa-search"></i> Tìm xe</button>
-                    </div>
-                </form>
-            </div>
+<!-- Banner -->
+<div class="container mt-5 pt-5">
+    <div class="hero rounded">
+        <h1 class="fw-bold">Thuê xe tự lái dễ dàng và nhanh chóng</h1>
+        <p>Hơn 1000+ xe trên toàn quốc với giá ưu đãi nhất</p>
+    </div>
 
+    <!-- Form tìm kiếm -->
+    <div class="search-box shadow mt-4">
+        <form class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Địa điểm nhận xe</label>
+                <input type="text" class="form-control" placeholder="Nhập địa điểm...">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Địa điểm trả xe</label>
+                <input type="text" class="form-control" placeholder="Nhập địa điểm...">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Ngày nhận</label>
+                <input type="date" class="form-control">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Ngày trả</label>
+                <input type="date" class="form-control">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-success w-100"><i class="fa fa-search"></i> Tìm xe</button>
+            </div>
+        </form>
+    </div>
             <!-- Chọn xe theo hãng -->
             <h3 class="fw-bold mt-5 mb-3 text-center">Chọn xe theo hãng</h3>
             <div class="d-flex flex-wrap justify-content-center gap-3">
