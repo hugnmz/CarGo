@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
-<%@ page import="javax.servlet.http.*, javax.servlet.*" %>
+<%@ page import="jakarta.servlet.http.*, jakarta.servlet.*" %>
 <%
     String username = (String) session.getAttribute("loggedInUser");
     String avatar = (String) session.getAttribute("userAvatar");

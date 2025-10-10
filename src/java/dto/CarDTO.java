@@ -20,6 +20,24 @@ public class CarDTO {
     
     // Constructors
     public CarDTO() {}
+
+    public CarDTO(Integer carId, String name, Integer year, String description, String image, String categoryName, String fuelType, Integer seatingType, String city, String address, BigDecimal currentPrice, BigDecimal depositAmount, List<String> availableVehicles) {
+        this.carId = carId;
+        this.name = name;
+        this.year = year;
+        this.description = description;
+        this.image = image;
+        this.categoryName = categoryName;
+        this.fuelType = fuelType;
+        this.seatingType = seatingType;
+        this.city = city;
+        this.address = address;
+        this.currentPrice = currentPrice;
+        this.depositAmount = depositAmount;
+        this.availableVehicles = availableVehicles;
+    }
+    
+    
     
     // Getters and Setters
     public Integer getCarId() { return carId; }

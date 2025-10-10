@@ -27,6 +27,8 @@ public class Cars {
     private Integer fuelId;           // ID loại nhiên liệu
     @Column()
     private Integer seatingId;        // ID số chỗ ngồi
+    @Column()
+    private Integer locationId;       // ID địa điểm
     
     // Các đối tượng liên quan
     @Nested
@@ -81,6 +83,8 @@ public class Cars {
     public Integer getSeatingId() { return seatingId; }
     public void setSeatingId(Integer seatingId) { this.seatingId = seatingId; }
     
+    public Integer getLocationId() { return locationId; }
+    public void setLocationId(Integer locationId) { this.locationId = locationId; }
     
     public Categories getCategory() { return category; }
     public void setCategory(Categories category) { this.category = category; }

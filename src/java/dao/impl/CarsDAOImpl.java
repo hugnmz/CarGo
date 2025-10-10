@@ -29,47 +29,94 @@ public class CarsDAOImpl implements CarsDAO {
 
     @Override
     public boolean addCar(Cars car) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = "INSERT INTO dbo.Cars (name, year, description, image, categoryId, fuelId, seatingId, locationId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        
+        int result = JdbcTemplateUtil.update(sql, 
+            car.getName(), 
+            car.getYear(), 
+            car.getDescription(), 
+            car.getImage(), 
+            car.getCategoryId(), 
+            car.getFuelId(), 
+            car.getSeatingId(), 
+            car.getLocationId()
+        );
+        
+        return result > 0;
     }
 
     @Override
     public boolean updateCar(Cars car) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = "UPDATE dbo.Cars SET name = ?, year = ?, description = ?, image = ?, categoryId = ?, fuelId = ?, seatingId = ?, locationId = ? WHERE carId = ?";
+        
+        int result = JdbcTemplateUtil.update(sql, 
+            car.getName(), 
+            car.getYear(), 
+            car.getDescription(), 
+            car.getImage(), 
+            car.getCategoryId(), 
+            car.getFuelId(), 
+            car.getSeatingId(), 
+            car.getLocationId(),
+            car.getCarId()
+        );
+        
+        return result > 0;
     }
 
     @Override
     public boolean deleteCar(Integer carId) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = "DELETE FROM dbo.Cars WHERE carId = ?";
+        
+        int result = JdbcTemplateUtil.update(sql, carId);
+        
+        return result > 0;
     }
 
     @Override
     public List<Cars> getCarByCategory(Integer categoryId) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = "SELECT * FROM dbo.Cars WHERE categoryId = ?";
+        
+        return JdbcTemplateUtil.query(sql, Cars.class, categoryId);
     }
 
     @Override
     public List<Cars> getCarByFuel(Integer fuelId) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = "SELECT * FROM dbo.Cars WHERE fuelId = ?";
+        
+        return JdbcTemplateUtil.query(sql, Cars.class, fuelId);
     }
 
     @Override
     public List<Cars> getCarBySeating(Integer seatingId) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = "SELECT * FROM dbo.Cars WHERE seatingId = ?";
+        
+        return JdbcTemplateUtil.query(sql, Cars.class, seatingId);
     }
 
     @Override
     public List<Cars> getCarByLocation(Integer locationId) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = "SELECT * FROM dbo.Cars WHERE locationId = ?";
+        
+        return JdbcTemplateUtil.query(sql, Cars.class, locationId);
     }
 
     @Override
     public List<Cars> searchCars(String keyword) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = "SELECT * FROM dbo.Cars WHERE name LIKE ? OR description LIKE ?";
+        String searchPattern = "%" + keyword + "%";
+        
+        return JdbcTemplateUtil.query(sql, Cars.class, searchPattern, searchPattern);
     }
 
     @Override
     public List<Cars> getCarWithCurrentPrice(BigDecimal minPrice, BigDecimal maxPrice) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = "SELECT DISTINCT c.* FROM dbo.Cars c " +
+                    "INNER JOIN dbo.CarPrices cp ON c.carId = cp.carId " +
+                    "WHERE cp.endDate IS NULL " +
+                    "AND cp.dailyPrice >= ? AND cp.dailyPrice <= ?";
+        
+        return JdbcTemplateUtil.query(sql, Cars.class, minPrice, maxPrice);
     }
 
 }

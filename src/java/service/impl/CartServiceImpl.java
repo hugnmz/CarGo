@@ -1,6 +1,9 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package service.impl;
 
-import dao.CarPricesDAO;
 import dao.CartsDAO;
 import dao.OrdersDAO;
 import dao.VehiclesDAO;
@@ -8,29 +11,19 @@ import dto.CartDTO;
 import dto.OrderDTO;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import mapper.CartMapper;
-import mapper.OrderMapper;
-
 import model.Carts;
 import model.Orders;
 import model.Vehicles;
-import util.di.annotation.Autowired;
-import util.di.annotation.Service;
-
-import util.di.annotation.Service;
-
-import model.Carts;
 import service.CartService;
+import util.di.annotation.Autowired;
 
 /**
  *
  * @author admin
  */
-@Service
 public class CartServiceImpl implements CartService {
 
     @Autowired
@@ -38,57 +31,62 @@ public class CartServiceImpl implements CartService {
 
     @Autowired
     private OrdersDAO ordersDAO;
+
     @Autowired
     private VehiclesDAO vehiclesDAO;
-    @Autowired
-    private CarPricesDAO carPricesDAO;
+    
     @Autowired
     private CartMapper cartMapper;
-    @Autowired
-    private OrderMapper orderMapper;
-
-    public CartServiceImpl() {
-    }
 
     @Override
     public boolean addToCart(Integer customerId, Integer vehicleId, LocalDateTime rentStartDate, LocalDateTime rentEndDate) {
+
         try {
-            if (rentStartDate.isAfter(rentEndDate) || rentStartDate.isBefore(LocalDateTime.now())) {
+
+            // ktra xem thoi gian co hop le hay ko
+            if (rentStartDate.isAfter(rentEndDate) || rentStartDate.isBefore(rentEndDate)) {
                 return false;
             }
 
-            Optional<Vehicles> vehicleOptional = vehiclesDAO.getVehicleById(vehicleId);
-            if (vehicleOptional.isEmpty()) {
+            // ktra xem xe  co ton tai va dang hoat dong hay ko
+            Optional<Vehicles> v = vehiclesDAO.getVehicleById(vehicleId);
+            if (v.isEmpty()) {
                 return false;
             }
 
-            Vehicles vehicle = vehicleOptional.get();
+            Vehicles vehicle = v.get();
             if (!vehicle.getIsActive()) {
                 return false;
             }
 
-            Optional<Carts> cartOptional = cartsDAO.getCartByCustomer(customerId);
-            Carts cart;
-            if (cartOptional.isEmpty()) {
-                if (!cartsDAO.createCart(customerId)) {
-                    return false;
-                }
+            // ktra ngay thue co kha dung trong thoi gian do ko
+            if (!isVehicleAvailable(vehicleId, rentStartDate, rentEndDate)) {
+                return false;
+            }
 
-                cartOptional = cartsDAO.getCartByCustomer(customerId);
-                if (cartOptional.isEmpty()) {
-                    return false;
+            // lay hoac tao them gio hang cho khach
+            Optional<Carts> c = cartsDAO.getCartByCustomer(customerId);
+            if (c.isEmpty()) {
+                // tao gio hang moi neu chua co
+                if (!cartsDAO.createCart(customerId)) {
+                    return false; // tao gio hang that bai
+                }
+                // lay gio hang ay ra
+                c = cartsDAO.getCartByCustomer(customerId);
+                if (c.isEmpty()) {
+                    return false; // tao gio hang ko dc
                 }
             }
 
-            cart = cartOptional.get();
+            Carts cart = c.get();
 
-            BigDecimal price = calculateRentalPrice(vehicleId,
-                    rentStartDate, rentEndDate);
-
+            // tinh gia thue xe
+            BigDecimal price = calculateRentalPrice(vehicleId, rentStartDate, rentEndDate);
             if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {
                 return false;
             }
 
+            // tao 1 order moi t rong gio hang
             Orders order = new Orders();
             order.setCartId(cart.getCartId());
             order.setVehicleId(vehicleId);
@@ -97,53 +95,64 @@ public class CartServiceImpl implements CartService {
             order.setPrice(price);
 
             return ordersDAO.addOrder(order);
+
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
+
     }
 
+    // xoa khoi gio hang
     @Override
     public boolean removeFromCart(Integer customerId, Integer cartDetailId) {
         try {
-            Optional<Orders> orderOptional = ordersDAO.getOrderById(cartDetailId);
-            if (orderOptional.isEmpty()) {
+            // kiem tra don hang co ton tai hay ko
+            Optional<Orders> o = ordersDAO.getOrderById(cartDetailId);
+            if (o.isEmpty()) {
                 return false;
             }
 
-            Orders order = orderOptional.get();
-            Optional<Carts> cartOptional = cartsDAO.getCartByCustomer(customerId);
-            if (cartOptional.isEmpty() || cartOptional.get()
-                    .getCartId().equals(order.getCartId())) {
+            // kiem tra xem don hang co thuoc ve gio hang cua khach hang nay ko
+            Orders order = o.get();
+            Optional<Carts> c = cartsDAO.getCartByCustomer(customerId);
+            if (c.isEmpty() || c.get().getCartId().equals(order.getCartId())) {
                 return false;
             }
 
+            // xoa don hang
             return ordersDAO.deleteOrder(cartDetailId);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
+
     }
 
     @Override
     public boolean clearCart(Integer customerId) {
-        Optional<Carts> cartOptional = cartsDAO.getCartByCustomer(customerId);
-        if (cartOptional.isEmpty()) {
-            return true;
-        }
+        try {
+            Optional<Carts> c = cartsDAO.getCartByCustomer(customerId);
+            if (c.isEmpty()) {
+                return true; // gio hang trong
+            }
 
-        return cartsDAO.clearCart(customerId);
+            return cartsDAO.clearCart(customerId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
     public Optional<CartDTO> getCartByCustomer(Integer customerId) {
-
         try {
             Optional<Carts> cartOptional = cartsDAO.getCartByCustomer(customerId);
             if (cartOptional.isEmpty()) {
                 return Optional.empty();
             }
 
+            // Chuyen doi tu Model sang DTO
             CartDTO dto = cartMapper.toDTO(cartOptional.get());
             return Optional.of(dto);
         } catch (Exception e) {
@@ -154,66 +163,17 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public List<OrderDTO> getCartItems(Integer customerId) {
-        try {
-            Optional<Carts> cartOptional = cartsDAO.getCartByCustomer(customerId);
-            if (cartOptional.isEmpty()) {
-                return new ArrayList<>();
-            }
-
-            List<Orders> orders = ordersDAO.getOrdersByCart(cartOptional.get().getCartId());
-            List<OrderDTO> orderDTO = new ArrayList<>();
-
-            for (Orders o : orders) {
-                orderDTO.add(orderMapper.toDTO(o));
-            }
-            return orderDTO;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList<>();
-        }
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
     public boolean isVehicleAvailable(Integer vehicleId, LocalDateTime startDate, LocalDateTime endDate) {
-        try {
-            // Comment removed
-            // Comment removed
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
     public BigDecimal calculateRentalPrice(Integer vehicleId, LocalDateTime startDate, LocalDateTime endDate) {
-
-        try {
-            Optional<Vehicles> vehicleOptional = vehiclesDAO.getVehicleById(vehicleId);
-            if (vehicleOptional.isEmpty()) {
-                return null;
-            }
-
-            Vehicles vehicle = vehicleOptional.get();
-            Optional<BigDecimal> dailyPriceOptional = carPricesDAO.getCurrentDailyPrice(vehicle.getCarId());
-            if (dailyPriceOptional.isEmpty()) {
-                return null;
-            }
-
-            BigDecimal dailyPrice = dailyPriceOptional.get();
-
-            long days = ChronoUnit.DAYS.between(startDate.toLocalDate(), endDate.toLocalDate());
-            if (days <= 0) {
-                days = 1;
-            }
-
-            return dailyPrice.multiply(BigDecimal.valueOf(days));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
 }
