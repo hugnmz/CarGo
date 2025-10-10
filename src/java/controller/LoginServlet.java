@@ -168,7 +168,7 @@ public class LoginServlet extends HttpServlet {
     // set attribute cho session
     private void setSessionAttributes(HttpSession session, CustomerDTO customer) {
         session.setAttribute("customerId", customer.getCustomerId());
-        session.setAttribute("useranme", customer.getUsername());
+        session.setAttribute("username", customer.getUsername());
         session.setAttribute("fullName", customer.getFullName());
         session.setAttribute("email", customer.getEmail());
         session.setAttribute("phone", customer.getPhone());

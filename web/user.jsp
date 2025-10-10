@@ -5,10 +5,7 @@
     String avatar = (String) session.getAttribute("userAvatar");
 
     // Nếu chưa đăng nhập → chuyển về login
-    if (username == null) {
-        response.sendRedirect("login.jsp");
-        return;
-    }
+    
 %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -45,7 +42,7 @@
         <p>Chào mừng bạn đến với CarRental!</p>
 
         <div class="d-flex justify-content-center gap-3 mt-4">
-            <a href="index.jsp" class="btn btn-outline-success"><i class="fa fa-home"></i> Trang chủ</a>
+            <a href="home.jsp" class="btn btn-outline-success"><i class="fa fa-home"></i> Trang chủ</a>
             <a href="LogoutServlet" class="btn btn-success"><i class="fa fa-sign-out-alt"></i> Đăng xuất</a>
         </div>
     </div>

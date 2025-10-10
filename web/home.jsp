@@ -1,16 +1,13 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ page import="jakarta.servlet.http.*, jakarta.servlet.*" %>
 <%
-    String username = (String) session.getAttribute("useranme"); // dùng đúng tên từ Servlet
+    String username = (String) session.getAttribute("username"); // dùng đúng tên từ Servlet
     String avatar = (String) session.getAttribute("avatar");
     if (avatar == null || avatar.isEmpty()) {
         avatar = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
     }
+    
 
-    if (username == null) {
-        response.sendRedirect("login.jsp");
-        return;
-    }
 %>
 
 
@@ -113,8 +110,7 @@
                         <li class="nav-item"><a class="nav-link" href="#">Trang chủ</a></li>
                         <li class="nav-item"><a class="nav-link" href="#">Về chúng tôi</a></li>
                         <li class="nav-item"><a class="nav-link" href="#">Liên hệ</a></li>
-
-                        <% if (username != null && !username.isEmpty()) { %>
+                            <% if (username != null && !username.isEmpty()) { %>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                data-bs-toggle="dropdown" aria-expanded="false">
@@ -126,7 +122,10 @@
                                 <li><a class="dropdown-item" href="LogoutServlet">Đăng xuất</a></li>
                             </ul>
                         </li>
-
+                        <%  }else { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="login.jsp">Đăng nhập</a>
+                        </li>
                         <% } %>
                     </ul>
                 </div>
