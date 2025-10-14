@@ -1,4 +1,4 @@
-package controller;
+package controller.auth;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -29,7 +29,7 @@ public class LogoutServlet extends HttpServlet {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("rememberedUsername".equals(cookie.getName())) {
+                if ("rememberMeUser".equals(cookie.getName())) {
                     cookie.setMaxAge(0);
                     cookie.setPath("/");
                     response.addCookie(cookie);
@@ -38,6 +38,6 @@ public class LogoutServlet extends HttpServlet {
             }
         }
         
-        response.sendRedirect("home.jsp");
+        response.sendRedirect("home?logout=success");
     }
 }

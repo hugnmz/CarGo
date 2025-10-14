@@ -3,9 +3,8 @@
 <%
     String username = (String) session.getAttribute("loggedInUser");
     String avatar = (String) session.getAttribute("userAvatar");
-
-    // Nếu chưa đăng nhập → chuyển về login
     
+
 %>
 <!DOCTYPE html>
 <html lang="vi">

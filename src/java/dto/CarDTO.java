@@ -1,27 +1,31 @@
 package dto;
 
-import java.math.BigDecimal;
-import java.util.List;
-
+/**
+ * CarDTO - Data Transfer Object cho Car
+ * 
+ * MỤC ĐÍCH:
+ * - Chuyển đổi từ Entity sang DTO để hiển thị
+ * - Chỉ chứa các field cần thiết cho UI
+ * - Tránh expose toàn bộ Entity ra ngoài
+ */
 public class CarDTO {
-    private Integer carId;           // ID xe
-    private String name;              // Tên xe
-    private Integer year;             // Năm sản xuất
-    private String description;      // Mô tả xe
-    private String image;             // Hình ảnh xe
-    private String categoryName;      // Tên danh mục
-    private String fuelType;          // Loại nhiên liệu
-    private Integer seatingType;      // Số chỗ ngồi
-    private String city;              // Thành phố
-    private String address;           // Địa chỉ
-    private BigDecimal currentPrice;  // Giá hiện tại
-    private BigDecimal depositAmount; // Số tiền cọc
-    private List<String> availableVehicles; // Danh sách xe có sẵn
+    
+    private Integer carId;
+    private String name;
+    private Integer year;
+    private String description;
+    private String image;
+    private String categoryName;
+    private String fuelType;
+    private Integer seatingType;
+    private String locationCity;
+    private Double dailyPrice;
     
     // Constructors
     public CarDTO() {}
-
-    public CarDTO(Integer carId, String name, Integer year, String description, String image, String categoryName, String fuelType, Integer seatingType, String city, String address, BigDecimal currentPrice, BigDecimal depositAmount, List<String> availableVehicles) {
+    
+    public CarDTO(Integer carId, String name, Integer year, String description, String image,
+                  String categoryName, String fuelType, Integer seatingType, String locationCity, Double dailyPrice) {
         this.carId = carId;
         this.name = name;
         this.year = year;
@@ -30,52 +34,104 @@ public class CarDTO {
         this.categoryName = categoryName;
         this.fuelType = fuelType;
         this.seatingType = seatingType;
-        this.city = city;
-        this.address = address;
-        this.currentPrice = currentPrice;
-        this.depositAmount = depositAmount;
-        this.availableVehicles = availableVehicles;
+        this.locationCity = locationCity;
+        this.dailyPrice = dailyPrice;
     }
     
-    
-    
     // Getters and Setters
-    public Integer getCarId() { return carId; }
-    public void setCarId(Integer carId) { this.carId = carId; }
+    public Integer getCarId() {
+        return carId;
+    }
     
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setCarId(Integer carId) {
+        this.carId = carId;
+    }
     
-    public Integer getYear() { return year; }
-    public void setYear(Integer year) { this.year = year; }
+    public String getName() {
+        return name;
+    }
     
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public void setName(String name) {
+        this.name = name;
+    }
     
-    public String getImage() { return image; }
-    public void setImage(String image) { this.image = image; }
+    public Integer getYear() {
+        return year;
+    }
     
-    public String getCategoryName() { return categoryName; }
-    public void setCategoryName(String categoryName) { this.categoryName = categoryName; }
+    public void setYear(Integer year) {
+        this.year = year;
+    }
     
-    public String getFuelType() { return fuelType; }
-    public void setFuelType(String fuelType) { this.fuelType = fuelType; }
+    public String getDescription() {
+        return description;
+    }
     
-    public Integer getSeatingType() { return seatingType; }
-    public void setSeatingType(Integer seatingType) { this.seatingType = seatingType; }
+    public void setDescription(String description) {
+        this.description = description;
+    }
     
-    public String getCity() { return city; }
-    public void setCity(String city) { this.city = city; }
+    public String getImage() {
+        return image;
+    }
     
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
+    public void setImage(String image) {
+        this.image = image;
+    }
     
-    public BigDecimal getCurrentPrice() { return currentPrice; }
-    public void setCurrentPrice(BigDecimal currentPrice) { this.currentPrice = currentPrice; }
+    public String getCategoryName() {
+        return categoryName;
+    }
     
-    public BigDecimal getDepositAmount() { return depositAmount; }
-    public void setDepositAmount(BigDecimal depositAmount) { this.depositAmount = depositAmount; }
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
     
-    public List<String> getAvailableVehicles() { return availableVehicles; }
-    public void setAvailableVehicles(List<String> availableVehicles) { this.availableVehicles = availableVehicles; }
+    public String getFuelType() {
+        return fuelType;
+    }
+    
+    public void setFuelType(String fuelType) {
+        this.fuelType = fuelType;
+    }
+    
+    public Integer getSeatingType() {
+        return seatingType;
+    }
+    
+    public void setSeatingType(Integer seatingType) {
+        this.seatingType = seatingType;
+    }
+    
+    public String getLocationCity() {
+        return locationCity;
+    }
+    
+    public void setLocationCity(String locationCity) {
+        this.locationCity = locationCity;
+    }
+    
+    public Double getDailyPrice() {
+        return dailyPrice;
+    }
+    
+    public void setDailyPrice(Double dailyPrice) {
+        this.dailyPrice = dailyPrice;
+    }
+    
+    @Override
+    public String toString() {
+        return "CarDTO{" +
+                "carId=" + carId +
+                ", name='" + name + '\'' +
+                ", year=" + year +
+                ", description='" + description + '\'' +
+                ", image='" + image + '\'' +
+                ", categoryName='" + categoryName + '\'' +
+                ", fuelType='" + fuelType + '\'' +
+                ", seatingType=" + seatingType +
+                ", locationCity='" + locationCity + '\'' +
+                ", dailyPrice=" + dailyPrice +
+                '}';
+    }
 }

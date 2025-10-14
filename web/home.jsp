@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ page import="jakarta.servlet.http.*, jakarta.servlet.*" %>
 <%
@@ -10,7 +11,6 @@
 
 %>
 
-
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -18,87 +18,7 @@
         <title>Thuê xe tự lái - Car Rental</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-        <style>
-            body {
-                background-color: #f9f9f9;
-            }
-            .navbar {
-                background-color: #fff;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            }
-            .hero {
-                /* GIF nền nếu muốn */
-                background: url('https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif') center/cover no-repeat;
-                color: white;
-                text-align: center;
-                padding: 120px 20px;
-                border-radius: 15px;
-                margin-top: 20px;
-            }
-            .search-box {
-                background-color: white;
-                padding: 25px;
-                border-radius: 15px;
-                margin-top: -60px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            }
-            .brand-logo img {
-                width: 60px;
-                height: 60px;
-                object-fit: contain;
-            }
-            .brand-logo {
-                border: 1px solid #eee;
-                border-radius: 12px;
-                background: #fff;
-                padding: 20px;
-                transition: 0.2s;
-            }
-            .brand-logo:hover {
-                transform: scale(1.05);
-                border-color: #4CAF50;
-            }
-            .card-location img {
-                height: 180px;
-                object-fit: cover;
-            }
-            .card-location {
-                border-radius: 12px;
-                overflow: hidden;
-                transition: 0.2s;
-            }
-            .card-location:hover {
-                transform: scale(1.03);
-            }
-            .car-card img {
-                height: 180px;
-                object-fit: cover;
-                border-radius: 12px 12px 0 0;
-            }
-            .car-card:hover {
-                transform: scale(1.03);
-                transition: 0.2s;
-            }
-            .step-card img {
-                width: 90px;
-                height: 90px;
-                border-radius: 50%;
-                border: 4px solid #4CAF50;
-            }
-            .review-card {
-                background: #fff;
-                border-radius: 12px;
-                padding: 20px;
-                box-shadow: 0 0 10px rgba(0,0,0,0.05);
-            }
-            footer {
-                margin-top: 80px;
-                padding: 30px 0;
-                background-color: #fff;
-                text-align: center;
-                border-top: 1px solid #ddd;
-            }
-        </style>
+        <link href="${pageContext.request.contextPath}/css/home.css" rel="stylesheet">
     </head>
     <body>
         <!-- Navbar -->
@@ -240,40 +160,127 @@
 
             <!-- Danh sách xe nổi bật -->
             <h3 class="fw-bold mt-5 mb-3 text-center">Xe nổi bật</h3>
+
+
             <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="card car-card shadow">
-                        <img src="https://cdn.prod.website-files.com/63fcd665ef8a472d9e7f9a5f/64b17bb248eddfb24b2e0d4b_2023-toyota-camry.jpeg" alt="">
-                        <div class="card-body">
-                            <h5 class="card-title">Toyota Camry</h5>
-                            <p class="text-muted">Xe 5 chỗ - Số tự động</p>
-                            <p class="text-success fw-bold">900.000đ/ngày</p>
-                            <a href="#" class="btn btn-success w-100">Đặt xe ngay</a>
+                <c:choose>
+                    <c:when test="${not empty allCars}">
+                        <c:forEach var="car" items="${allCars}" varStatus="status" end="5">
+                            <div class="col-md-4">
+                                <div class="card car-card shadow-sm" onclick="window.location.href = 'car-detail?carId=${car.carId}'" style="cursor: pointer;">                                    <!-- Hình ảnh xe với overlay -->
+                                    <div class="car-image-container position-relative">
+                                        <c:choose>
+                                            <c:when test="${not empty car.image}">
+                                                <img src="${car.image}" class="card-img-top car-image" alt="${car.name}">
+                                            </c:when>
+                                            <c:otherwise>
+                                                <img src="https://via.placeholder.com/400x250?text=No+Image" class="card-img-top car-image" alt="No Image">
+                                            </c:otherwise>
+                                        </c:choose>
+
+                                        <!-- Icon đặc biệt (góc trái trên) -->
+                                        <div class="special-icon">
+                                            <i class="fa fa-bolt text-warning"></i>
+                                        </div>
+
+                                        <!-- Badge giảm giá (góc phải dưới) - chỉ hiển thị nếu có giá -->
+                                        <c:if test="${not empty car.dailyPrice}">
+                                            <div class="discount-badge">
+                                                <span class="badge bg-warning text-dark">Giảm 18%</span>
+                                            </div>
+                                        </c:if>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <!-- Badge miễn thế chấp -->
+                                        <div class="mb-2">
+                                            <span class="badge bg-success">
+                                                <i class="fa fa-shield-alt me-1"></i>Miễn thế chấp
+                                            </span>
+                                        </div>
+
+                                        <!-- Tên xe và năm -->
+                                        <h5 class="card-title fw-bold text-dark mb-2">${car.name.toUpperCase()} ${car.year}</h5>
+
+                                        <!-- Thông tin kỹ thuật -->
+                                        <div class="car-specs mb-3">
+                                            <div class="row text-center">
+                                                <div class="col-4">
+                                                    <div class="spec-item">
+                                                        <i class="fa fa-cog text-muted"></i>
+                                                        <small class="d-block text-muted">Số tự động</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-4">
+                                                    <div class="spec-item">
+                                                        <i class="fa fa-users text-muted"></i>
+                                                        <small class="d-block text-muted">${car.seatingType != null ? car.seatingType : 'N/A'} chỗ</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-4">
+                                                    <div class="spec-item">
+                                                        <i class="fa fa-gas-pump text-muted"></i>
+                                                        <small class="d-block text-muted">${car.fuelType != null ? car.fuelType : 'N/A'}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Địa điểm -->
+                                        <div class="location-info mb-2">
+                                            <i class="fa fa-map-marker-alt text-danger me-1"></i>
+                                            <small class="text-muted">${car.locationCity != null ? car.locationCity : 'N/A'}</small>
+                                        </div>
+
+                                        <!-- Đánh giá (không có số chuyến) -->
+                                        <div class="rating-info mb-3">
+                                            <span>
+                                                <i class="fa fa-star text-warning"></i>
+                                                <small class="text-muted">5.0</small>
+                                            </span>
+                                        </div>
+
+                                        <!-- Giá -->
+                                        <div class="price-section">
+                                            <c:choose>
+                                                <c:when test="${not empty car.dailyPrice}">
+                                                    <c:set var="currentPrice" value="${car.dailyPrice}" />
+                                                    <c:set var="originalPrice" value="${currentPrice * 1.18}" />
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <span class="text-decoration-line-through text-muted small">${originalPrice}K</span>
+                                                            <span class="h5 text-success fw-bold ms-2">${currentPrice}K/ngày</span>
+                                                        </div>
+                                                    </div>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <span class="text-muted">Liên hệ</span>
+                                                    </div>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:forEach>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="col-12 text-center">
+                            <div class="alert alert-info">
+                                <i class="fa fa-info-circle"></i>
+                                Hiện tại chưa có xe nào trong hệ thống.
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card car-card shadow">
-                        <img src="https://www.motortrend.com/uploads/sites/10/2022/08/2023-honda-civic-sedan-lx-4door-sedan-angular-front.png" alt="">
-                        <div class="card-body">
-                            <h5 class="card-title">Honda Civic</h5>
-                            <p class="text-muted">Xe 5 chỗ - Số tự động</p>
-                            <p class="text-success fw-bold">850.000đ/ngày</p>
-                            <a href="#" class="btn btn-success w-100">Đặt xe ngay</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card car-card shadow">
-                        <img src="https://www.hyundai.com/content/dam/hyundai/ww/en/images/find-a-car/pip/suv/tucson/2023/tucson-2023-exterior-front-side.jpg" alt="">
-                        <div class="card-body">
-                            <h5 class="card-title">Hyundai Tucson</h5>
-                            <p class="text-muted">Xe 7 chỗ - Số tự động</p>
-                            <p class="text-success fw-bold">1.200.000đ/ngày</p>
-                            <a href="#" class="btn btn-success w-100">Đặt xe ngay</a>
-                        </div>
-                    </div>
-                </div>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+
+            <!-- Nút xem thêm xe -->
+            <div class="text-center mt-4">
+                <a href="cars.jsp" class="btn btn-outline-success btn-lg">
+                    <i class="fa fa-car"></i> Xem tất cả xe
+                </a>
             </div>
 
             <!-- 3 bước thuê xe -->

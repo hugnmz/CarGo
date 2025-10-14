@@ -1,5 +1,6 @@
 package dto;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class VehicleDTO {
@@ -20,26 +21,38 @@ public class VehicleDTO {
     
     // Thông tin địa điểm
     private String city;             // Thành phố
-    private String address;          // Địa chỉ
     
     // Thông tin giá
-    private java.math.BigDecimal currentPrice;  // Giá hiện tại
-    private java.math.BigDecimal depositAmount; // Số tiền cọc
+    private BigDecimal currentPrice;  // Giá hiện tại
+    private BigDecimal depositAmount; // Số tiền cọc
     
     // Danh sách liên quan
-    private List<ContractDetailDTO> contractDetails; // Chi tiết hợp đồng
-    private List<OrderDTO> orders;    // Đơn hàng trong giỏ
-    private List<FeedbackDTO> feedbacks; // Phản hồi
-    
+//    private List<ContractDetailDTO> contractDetails; // Chi tiết hợp đồng
+//    private List<OrderDTO> orders;    // Đơn hàng trong giỏ
+//    private List<FeedbackDTO> feedbacks; // Phản hồi
+//    
     // Constructors
     public VehicleDTO() {}
-    
-    public VehicleDTO(Integer vehicleId, Integer carId, String plateNumber, Boolean isActive) {
+
+    public VehicleDTO(Integer vehicleId, Integer carId, String plateNumber, Boolean isActive, Integer locationId, String carName, Integer year, String description, String image, String categoryName, String fuelType, Integer seatingType, String city, BigDecimal currentPrice, BigDecimal depositAmount) {
         this.vehicleId = vehicleId;
         this.carId = carId;
         this.plateNumber = plateNumber;
         this.isActive = isActive;
+        this.locationId = locationId;
+        this.carName = carName;
+        this.year = year;
+        this.description = description;
+        this.image = image;
+        this.categoryName = categoryName;
+        this.fuelType = fuelType;
+        this.seatingType = seatingType;
+        this.city = city;
+        this.currentPrice = currentPrice;
+        this.depositAmount = depositAmount;
     }
+    
+    
     
     // Getters and Setters
     public Integer getVehicleId() { return vehicleId; }
@@ -81,21 +94,21 @@ public class VehicleDTO {
     public String getCity() { return city; }
     public void setCity(String city) { this.city = city; }
     
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
-    
+//    public String getAddress() { return address; }
+//    public void setAddress(String address) { this.address = address; }
+//    
     public java.math.BigDecimal getCurrentPrice() { return currentPrice; }
     public void setCurrentPrice(java.math.BigDecimal currentPrice) { this.currentPrice = currentPrice; }
     
     public java.math.BigDecimal getDepositAmount() { return depositAmount; }
     public void setDepositAmount(java.math.BigDecimal depositAmount) { this.depositAmount = depositAmount; }
-    
-    public List<ContractDetailDTO> getContractDetails() { return contractDetails; }
-    public void setContractDetails(List<ContractDetailDTO> contractDetails) { this.contractDetails = contractDetails; }
-    
-    public List<OrderDTO> getOrders() { return orders; }
-    public void setOrders(List<OrderDTO> orders) { this.orders = orders; }
-    
-    public List<FeedbackDTO> getFeedbacks() { return feedbacks; }
-    public void setFeedbacks(List<FeedbackDTO> feedbacks) { this.feedbacks = feedbacks; }
+//    
+//    public List<ContractDetailDTO> getContractDetails() { return contractDetails; }
+//    public void setContractDetails(List<ContractDetailDTO> contractDetails) { this.contractDetails = contractDetails; }
+//    
+//    public List<OrderDTO> getOrders() { return orders; }
+//    public void setOrders(List<OrderDTO> orders) { this.orders = orders; }
+//    
+//    public List<FeedbackDTO> getFeedbacks() { return feedbacks; }
+//    public void setFeedbacks(List<FeedbackDTO> feedbacks) { this.feedbacks = feedbacks; }
 }

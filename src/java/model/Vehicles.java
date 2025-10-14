@@ -17,10 +17,10 @@ public class Vehicles {
     @Column()
     private Integer locationId;
     // Các đối tượng liên quan
-    @Nested
+    @Nested(prefix = "c")
     private Cars car;
     
-    @Nested                                   // Model xe
+    @Nested(prefix = "l")                                   // Model xe
     private Locations location;
     private List<ContractDetails> contractDetails; // Chi tiết hợp đồng
     private List<Orders> orders;      // Don hang trong gio

@@ -27,8 +27,6 @@ public class Cars {
     private Integer fuelId;           // ID loại nhiên liệu
     @Column()
     private Integer seatingId;        // ID số chỗ ngồi
-    @Column()
-    private Integer locationId;       // ID địa điểm
     
     // Các đối tượng liên quan
     @Nested
@@ -37,10 +35,9 @@ public class Cars {
     private Fuels fuel;              // Loại nhiên liệu
     @Nested
     private Seatings seating;        // Số chỗ ngồi
-    @Nested
-    private Locations location;       // Dia diem
     private List<Vehicles> vehicles; // Danh sách xe thực tế
-    private List<CarPrices> carPrices; // Danh sách giá xe
+    @Nested(prefix = "cp")
+    private CarPrices carPrices; // Giá xe hiện tại
     
     // Constructors
     public Cars() {}
@@ -83,9 +80,6 @@ public class Cars {
     public Integer getSeatingId() { return seatingId; }
     public void setSeatingId(Integer seatingId) { this.seatingId = seatingId; }
     
-    public Integer getLocationId() { return locationId; }
-    public void setLocationId(Integer locationId) { this.locationId = locationId; }
-    
     public Categories getCategory() { return category; }
     public void setCategory(Categories category) { this.category = category; }
     
@@ -95,12 +89,10 @@ public class Cars {
     public Seatings getSeating() { return seating; }
     public void setSeating(Seatings seating) { this.seating = seating; }
     
-    public Locations getLocation() { return location; }
-    public void setLocation(Locations location) { this.location = location; }
     
     public List<Vehicles> getVehicles() { return vehicles; }
     public void setVehicles(List<Vehicles> vehicles) { this.vehicles = vehicles; }
     
-    public List<CarPrices> getCarPrices() { return carPrices; }
-    public void setCarPrices(List<CarPrices> carPrices) { this.carPrices = carPrices; }
+    public CarPrices getCarPrices() { return carPrices; }
+    public void setCarPrices(CarPrices carPrices) { this.carPrices = carPrices; }
 }
