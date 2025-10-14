@@ -62,9 +62,16 @@ public class MapResultSet {
 
                 Nested nested = f.getAnnotation(Nested.class);
                 if (nested == null) {
-                    continue; // ko dc gan annotation
+                    continue;
                 }
-                String prefix = nested.prefix(); // default la dung chi ten cot cua db
+
+                //Bỏ qua nếu là Collection hoặc Map
+                if (java.util.Collection.class.isAssignableFrom(f.getType())
+                        || java.util.Map.class.isAssignableFrom(f.getType())) {
+                    continue;
+                }
+
+                String prefix = nested.prefix();
                 Class<?> childType = f.getType();
                 Object child = childType.getDeclaredConstructor().newInstance();
                 boolean check = false;

@@ -30,7 +30,7 @@ public class UserMapper {
         dto.setPhone(user.getPhone());
         dto.setEmail(user.getEmail());
         dto.setDateOfBirth(user.getDateOfBirth());
-        dto.setCreateAt(user.getCreateAt());
+        dto.setCreateAt(user.getCreatedAt());
 
         // Thong tin dia diem (nested)
         if (user.getLocation() != null) {
@@ -67,7 +67,7 @@ public class UserMapper {
         user.setPhone(dto.getPhone());
         user.setEmail(dto.getEmail());
         user.setDateOfBirth(dto.getDateOfBirth());
-        user.setCreateAt(dto.getCreateAt());
+        user.setCreatedAt(dto.getCreateAt());
 
         // Tao doi tuong Location neu co thong tin dia diem
         if (dto.getCity() != null || dto.getAddress() != null) {

@@ -5,32 +5,66 @@
 package model;
 
 import java.util.List;
+import util.di.annotation.Column;
+import util.di.annotation.Nested;
 
 public class Roles {
-    private Integer roleId;          // ID vai trò
-    private String roleName;         // Tên vai trò (STAFF, MANAGER, ADMIN)
-    
-    // Các đối tượng liên quan
-    private List<Users> users;       // Danh sach nguoi dung co vai tro nay
-    private List<UserRoles> userRoles; // Quan he voi nguoi dung
-    
+
+    @Column(name = "role_id")
+    private Integer roleId;
+
+    @Column(name = "role_name")
+    private String roleName;
+
+    @Nested
+    private List<Users> users;
+
+    @Nested
+    private List<UserRoles> userRoles;
+
+    // Constants for predefined roles
+    public static final String ADMIN = "ADMIN";
+    public static final String MANAGER = "MANAGER";
+    public static final String STAFF = "STAFF";
+
     // Constructors
-    public Roles() {}
-    
+    public Roles() {
+    }
+
     public Roles(String roleName) {
         this.roleName = roleName;
     }
-    
+
     // Getters and Setters
-    public Integer getRoleId() { return roleId; }
-    public void setRoleId(Integer roleId) { this.roleId = roleId; }
-    
-    public String getRoleName() { return roleName; }
-    public void setRoleName(String roleName) { this.roleName = roleName; }
-    
-    public List<Users> getUsers() { return users; }
-    public void setUsers(List<Users> users) { this.users = users; }
-    
-    public List<UserRoles> getUserRoles() { return userRoles; }
-    public void setUserRoles(List<UserRoles> userRoles) { this.userRoles = userRoles; }
+    public Integer getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Integer roleId) {
+        this.roleId = roleId;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
+
+    public List<Users> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<Users> users) {
+        this.users = users;
+    }
+
+    public List<UserRoles> getUserRoles() {
+        return userRoles;
+    }
+
+    public void setUserRoles(List<UserRoles> userRoles) {
+        this.userRoles = userRoles;
+    }
 }

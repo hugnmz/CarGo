@@ -1,13 +1,21 @@
 package model;
 
+import util.di.annotation.Column;
+import util.di.annotation.Nested;
+
 
 public class UserRoles {
-    private Integer userId;          // ID nguoi dung
-    private Integer roleId;          // ID vai trò
-    
-    // Các đối tượng liên quan
-    private Users user;              // Nguoi dung
-    private Roles role;              // Vai trò
+    @Column(name = "user_id")
+    private Integer userId;
+
+    @Column(name = "role_id")
+    private Integer roleId;
+
+    @Nested
+    private Users user;
+
+    @Nested
+    private Roles role;
     
     // Constructors
     public UserRoles() {}

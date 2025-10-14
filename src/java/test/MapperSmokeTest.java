@@ -113,7 +113,7 @@ public class MapperSmokeTest {
 		user.setPhone("0900000000");
 		user.setEmail("huy@example.com");
 		user.setDateOfBirth(LocalDate.of(2000, 1, 1));
-		user.setCreateAt(LocalDateTime.of(2024, 1, 1, 0, 0));
+		user.setCreatedAt(LocalDateTime.of(2024, 1, 1, 0, 0));
 
 		Locations loc = new Locations();
 		loc.setCity("Da Nang");

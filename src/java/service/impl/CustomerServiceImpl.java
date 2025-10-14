@@ -50,7 +50,7 @@ public class CustomerServiceImpl implements CustomerService {
             if (!customer.isIsVerified()) {
                 return Optional.empty();
             }
-            
+
             // Bước 2: Xác thực mật khẩu (so sánh password nhập vào với hash trong DB)
             boolean passwordValid = PasswordUtil.verifyPassword(password, customer.getPasswordHash(), customer.getPasswordSalt());
             if (!passwordValid) {
@@ -305,8 +305,8 @@ public class CustomerServiceImpl implements CustomerService {
             }
 
             Customers c = oc.get();
-            
-            boolean check = !c.isIsVerified() 
+
+            boolean check = !c.isIsVerified()
                     && c.getVerifyCode() != null
                     && c.getVerifyCode().equals(code)
                     && c.getVerifyCodeExpire() != null
