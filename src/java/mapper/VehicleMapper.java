@@ -52,15 +52,13 @@ public class VehicleMapper {
             }
             
             // Car prices (current price)
-            if (car.getCarPrices() != null && !car.getCarPrices().isEmpty()) {
-                // Find current price (endDate is null)
-                car.getCarPrices().stream()
-                    .filter(price -> price.getEndDate() == null)
-                    .findFirst()
-                    .ifPresent(price -> {
-                        dto.setCurrentPrice(price.getDailyPrice());
-                        dto.setDepositAmount(price.getDepositAmount());
-                    });
+            if (car.getCarPrices() != null) {
+                if (car.getCarPrices().getDailyPrice() != null) {
+                    dto.setCurrentPrice(car.getCarPrices().getDailyPrice());
+                }
+                if (car.getCarPrices().getDepositAmount() != null) {
+                    dto.setDepositAmount(car.getCarPrices().getDepositAmount());
+                }
             }
         }
 
@@ -68,7 +66,6 @@ public class VehicleMapper {
         if (vehicle.getLocation() != null) {
             Locations location = vehicle.getLocation();
             dto.setCity(location.getCity());
-            dto.setAddress(location.getAddress());
         }
 
         return dto;
@@ -102,11 +99,10 @@ public class VehicleMapper {
         }
 
         // Create nested Location object if location info is provided
-        if (dto.getCity() != null || dto.getAddress() != null) {
+        if (dto.getCity() != null) {
             Locations location = new Locations();
             location.setLocationId(dto.getLocationId());
             location.setCity(dto.getCity());
-            location.setAddress(dto.getAddress());
             vehicle.setLocation(location);
         }
 

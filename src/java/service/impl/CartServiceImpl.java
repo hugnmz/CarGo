@@ -7,23 +7,28 @@ package service.impl;
 import dao.CartsDAO;
 import dao.OrdersDAO;
 import dao.VehiclesDAO;
+import dao.CarPricesDAO;
 import dto.CartDTO;
 import dto.OrderDTO;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import mapper.CartMapper;
+import mapper.OrderMapper;
 import model.Carts;
 import model.Orders;
 import model.Vehicles;
 import service.CartService;
 import util.di.annotation.Autowired;
+import util.di.annotation.Service;
 
 /**
  *
  * @author admin
  */
+@Service
 public class CartServiceImpl implements CartService {
 
     @Autowired
@@ -36,19 +41,25 @@ public class CartServiceImpl implements CartService {
     private VehiclesDAO vehiclesDAO;
     
     @Autowired
+    private CarPricesDAO carPricesDAO;
+    
+    @Autowired
     private CartMapper cartMapper;
+    
+    @Autowired
+    private OrderMapper orderMapper;
 
     @Override
     public boolean addToCart(Integer customerId, Integer vehicleId, LocalDateTime rentStartDate, LocalDateTime rentEndDate) {
 
         try {
 
-            // ktra xem thoi gian co hop le hay ko
-            if (rentStartDate.isAfter(rentEndDate) || rentStartDate.isBefore(rentEndDate)) {
+            // kiem tra thoi gian co hop le hay khong
+            if (rentStartDate.isAfter(rentEndDate) || rentStartDate.isEqual(rentEndDate)) {
                 return false;
             }
 
-            // ktra xem xe  co ton tai va dang hoat dong hay ko
+            // kiem tra xe co ton tai va dang hoat dong hay khong
             Optional<Vehicles> v = vehiclesDAO.getVehicleById(vehicleId);
             if (v.isEmpty()) {
                 return false;
@@ -59,7 +70,7 @@ public class CartServiceImpl implements CartService {
                 return false;
             }
 
-            // ktra ngay thue co kha dung trong thoi gian do ko
+            // kiem tra ngay thue co kha dung trong thoi gian do khong
             if (!isVehicleAvailable(vehicleId, rentStartDate, rentEndDate)) {
                 return false;
             }
@@ -74,7 +85,7 @@ public class CartServiceImpl implements CartService {
                 // lay gio hang ay ra
                 c = cartsDAO.getCartByCustomer(customerId);
                 if (c.isEmpty()) {
-                    return false; // tao gio hang ko dc
+                    return false; // tao gio hang khong duoc
                 }
             }
 
@@ -86,7 +97,7 @@ public class CartServiceImpl implements CartService {
                 return false;
             }
 
-            // tao 1 order moi t rong gio hang
+            // tao 1 order moi trong gio hang
             Orders order = new Orders();
             order.setCartId(cart.getCartId());
             order.setVehicleId(vehicleId);
@@ -107,16 +118,16 @@ public class CartServiceImpl implements CartService {
     @Override
     public boolean removeFromCart(Integer customerId, Integer cartDetailId) {
         try {
-            // kiem tra don hang co ton tai hay ko
+            // kiem tra don hang co ton tai hay khong
             Optional<Orders> o = ordersDAO.getOrderById(cartDetailId);
             if (o.isEmpty()) {
                 return false;
             }
 
-            // kiem tra xem don hang co thuoc ve gio hang cua khach hang nay ko
+            // kiem tra xem don hang co thuoc ve gio hang cua khach hang nay khong
             Orders order = o.get();
             Optional<Carts> c = cartsDAO.getCartByCustomer(customerId);
-            if (c.isEmpty() || c.get().getCartId().equals(order.getCartId())) {
+            if (c.isEmpty() || !c.get().getCartId().equals(order.getCartId())) {
                 return false;
             }
 
@@ -152,7 +163,7 @@ public class CartServiceImpl implements CartService {
                 return Optional.empty();
             }
 
-            // Chuyen doi tu Model sang DTO
+            // chuyen doi tu Model sang DTO
             CartDTO dto = cartMapper.toDTO(cartOptional.get());
             return Optional.of(dto);
         } catch (Exception e) {
@@ -163,17 +174,112 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public List<OrderDTO> getCartItems(Integer customerId) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        
+        try {
+            Optional<Carts> c = cartsDAO.getCartByCustomer(customerId);
+            if(c.isEmpty()){
+                return new ArrayList<>();
+            }
+            
+           Carts cart = c.get();
+           List<Orders> listOrders = ordersDAO.getOrdersByCart(cart.getCartId());
+           List<OrderDTO> listDTO  = new ArrayList<>();
+           for(Orders o : listOrders){
+               OrderDTO dto = orderMapper.toDTO(o);
+               listDTO.add(dto);
+           }
+           
+           return listDTO;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+        
     }
 
     @Override
     public boolean isVehicleAvailable(Integer vehicleId, LocalDateTime startDate, LocalDateTime endDate) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        try {
+            // kiem tra thoi gian co phu hop hay khong
+            if(startDate.isAfter(endDate) || endDate.isBefore(startDate)){
+                return false;
+            }
+            
+            Optional<Vehicles> v = vehiclesDAO.getVehicleById(vehicleId);
+            if(v.isEmpty()){
+                return false; // xe khong ton tai
+            }
+            
+            Vehicles vehicle = v.get();
+            
+            // kiem tra xe co active khong
+            if (!vehicle.getIsActive()) {
+                return false;
+            }
+            
+            // kiem tra xe co bi thue trong khoang thoi gian nay khong
+            // su dung method co san trong VehiclesDAO
+            List<Vehicles> availableVehicles = vehiclesDAO.getAvailableVehiclesByCar(
+                vehicle.getCarId(), startDate, endDate);
+            
+            // kiem tra xem vehicleId co trong danh sach xe available khong
+            for (Vehicles vh : availableVehicles) {
+                if (vh.getVehicleId().equals(vehicleId)) {
+                    return true;
+                }
+            }
+            return false;
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
     public BigDecimal calculateRentalPrice(Integer vehicleId, LocalDateTime startDate, LocalDateTime endDate) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        try {
+            // 1. lay thong tin xe
+            Optional<Vehicles> vehicleOpt = vehiclesDAO.getVehicleById(vehicleId);
+            if (vehicleOpt.isEmpty()) {
+                return null; // xe khong ton tai
+            }
+            
+            Vehicles vehicle = vehicleOpt.get();
+            Integer carId = vehicle.getCarId();
+            
+            // 2. lay gia hien tai cua model xe
+            Optional<BigDecimal> dailyPriceOpt = carPricesDAO.getCurrentDailyPrice(carId);
+            if (dailyPriceOpt.isEmpty()) {
+                return null; // khong co gia
+            }
+            
+            BigDecimal dailyPrice = dailyPriceOpt.get();
+            
+            // 3. tinh so ngay thue
+            long days = java.time.Duration.between(startDate, endDate).toDays();
+            if (days <= 0) {
+                return BigDecimal.ZERO; // thoi gian khong hop le
+            }
+            
+            // 4. tinh tong tien
+            BigDecimal totalPrice = dailyPrice.multiply(BigDecimal.valueOf(days));
+            
+            // 5. co the them logic giam gia theo so ngay
+            if (days >= 7) {
+                // giam 10% neu thue tu 7 ngay tro len
+                totalPrice = totalPrice.multiply(BigDecimal.valueOf(0.9));
+            } else if (days >= 3) {
+                // giam 5% neu thue tu 3 ngay tro len
+                totalPrice = totalPrice.multiply(BigDecimal.valueOf(0.95));
+            }
+            
+            return totalPrice;
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

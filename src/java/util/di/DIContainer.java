@@ -134,7 +134,14 @@ public final class DIContainer {
 
         // Nếu impl đang được tạo ở cấp cao hơn trong thread -> vòng phụ thuộc
         if (stack.contains(impl)) {
-            String path = String.join(" -> ", stack.stream().map(Class::getSimpleName).toList());
+            StringBuilder pathBuilder = new StringBuilder();
+            int index = 0;
+            for (Class<?> clazz : stack) {
+                if (index > 0) pathBuilder.append(" -> ");
+                pathBuilder.append(clazz.getSimpleName());
+                index++;
+            }
+            String path = pathBuilder.toString();
             throw new RuntimeException("[DI] Circular dependency phát hiện: " + path + " -> " + impl.getSimpleName());
         }
 

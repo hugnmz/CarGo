@@ -1,4 +1,4 @@
-package controller;
+package controller.auth;
 
 import dto.CustomerDTO;
 import jakarta.servlet.ServletException;
@@ -17,8 +17,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        super.init(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
-
+        super.init();
         try {
             customerService = DIContainer.get(CustomerService.class);
         } catch (Exception e) {
@@ -30,67 +29,62 @@ public class LoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        //chi lay session neu da ton tai
+        // Chi lay session neu da ton tai
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("customerId") != null) {
-
-            // da login
-            response.sendRedirect("home.jsp");
+            // Da login
+            response.sendRedirect(request.getContextPath() + "/home");
             return;
         }
 
-        // chua login -> check cookie
+        // Chua login -> check cookie
         String rememberUsername = null;
 
-        // doc cookie tu  request
+        // Doc cookie tu request
         Cookie[] cookies = request.getCookies();
 
         if (cookies != null) {
-
-            // duyet tat ca cac cookie hien co de tim dung ten cookie
+            // Duyet tat ca cac cookie hien co de tim dung ten cookie
             for (Cookie c : cookies) {
-                if ("rememberUsername".equals(c.getName())) {
-
-                    // lay gia tri username da luu
+                if ("rememberMeUser".equals(c.getName())) { // SUA: rememberUsername -> rememberMeUser
+                    // Lay gia tri username da luu
                     rememberUsername = c.getValue();
-                    break; // thoat khoi vong lap khi tim thay
+                    break; // Thoat khoi vong lap khi tim thay
                 }
             }
 
-            // neu co username tu cookie
+            // Neu co username tu cookie
             if (rememberUsername != null) {
-
-                // tim user trong cookie theo username
+                // Tim user trong cookie theo username
                 Optional<CustomerDTO> customerOpt = customerService.getCustomerByUsername(rememberUsername);
 
                 if (customerOpt.isPresent()) {
                     CustomerDTO customer = customerOpt.get();
 
-                    // tao session moi neu chua co
+                    // Tao session moi neu chua co
                     session = request.getSession(true);
-                    // gan cac thuc tinh phien cho nguoi dung
+                    // Gan cac thuoc tinh phien cho nguoi dung
                     setSessionAttributes(session, customer);
-                    response.sendRedirect("home.jsp");
+                    response.sendRedirect(request.getContextPath() + "/home");
                     return;
                 }
-
             }
-
-            // ko co cookie -> ve login 
-            response.sendRedirect("login.jsp");
         }
+
+        // Ko co cookie -> ve login 
+        response.sendRedirect("login.jsp");
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // lay tham so tu form
+        // Lay tham so tu form
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String rememberMe = request.getParameter("rememberMe");
 
-        // check du lieu dau vao
+        // Check du lieu dau vao
         if (username == null || username.trim().isEmpty()
                 || password == null || password.trim().isEmpty()) {
             request.setAttribute("error", "Vui lòng nhập đầy đủ thông tin");
@@ -99,47 +93,50 @@ public class LoginServlet extends HttpServlet {
         }
 
         try {
-
-            // thuc hien dang nhap
-            // xac thuc dang nhap qua service va tra ve Optional( tranh null)
+            // Thuc hien dang nhap
+            // Xac thuc dang nhap qua service va tra ve Optional (tranh null)
             Optional<CustomerDTO> customerOpt = customerService.loginCustomer(username, password);
 
             if (customerOpt.isPresent()) {
                 CustomerDTO customer = customerOpt.get();
 
-                // huy session cu
+                // Huy session cu
                 HttpSession old = request.getSession(false);
+                String redirectURL = null;
                 if (old != null) {
+                    redirectURL = (String) old.getAttribute("redirectAfterLogin");
                     old.invalidate();
                 }
 
-                // tao session moi va gan thuoc tinh vao
+                // Tao session moi va gan thuoc tinh vao
                 HttpSession session = request.getSession(true);
                 setSessionAttributes(session, customer);
+                if (redirectURL != null) {
+                    session.setAttribute("redirectAfterLogin", redirectURL);
+                }
 
-                // neu nguoi dung tick on
-                // tao cookie luu username
+                // Neu nguoi dung tick on
+                // Tao cookie luu username
                 if ("on".equals(rememberMe)) {
-
-                    // tao cookie
+                    // Tao cookie
                     Cookie userCookie = new Cookie("rememberMeUser", customer.getUsername());
 
-                    // han luu cookie la 30 ngay
+                    // Han luu cookie la 30 ngay
                     userCookie.setMaxAge(30 * 24 * 60 * 60);
 
-                    // chi cho server doc
+                    // Chi cho server doc
                     userCookie.setHttpOnly(true);
 
                     String ctxPath = request.getContextPath();
                     userCookie.setPath((ctxPath == null || ctxPath.isEmpty()) ? "/" : ctxPath);
 
                     response.addCookie(userCookie);
-                } //neu nguoi dung ko tick chon
+                } // Neu nguoi dung ko tick chon
                 else {
                     Cookie[] cookies = request.getCookies();
                     if (cookies != null) {
                         for (Cookie c : cookies) {
-                            if ("rememberMeUser".equals(customer.getUsername())) {
+                            if ("rememberMeUser".equals(c.getName())) { // SUA: so sanh ten cookie, khong phai username
                                 c.setMaxAge(0);
                                 c.setPath("/");
                                 response.addCookie(c);
@@ -149,32 +146,49 @@ public class LoginServlet extends HttpServlet {
                     }
                 }
 
-                response.sendRedirect(response.encodeRedirectURL("home.jsp?login=success"));
+                session.removeAttribute("redirectURL");
+
+                String currURL = (String) session.getAttribute("redirectAfterLogin");
+                // Chỉ cho phép path nội bộ để tránh open-redirect
+                String targetPath = (isSafeInternalPath(currURL) ? currURL : "/home?login=success");
+                response.sendRedirect(request.getContextPath() + targetPath);
                 return;
             } else {
-                request.setAttribute("errorMessage", "tk mk ko dung");
+                request.setAttribute("errorMessage", "Tài khoản hoặc mật khẩu không đúng");
                 request.getRequestDispatcher("login.jsp").forward(request, response);
-
             }
 
         } catch (Exception e) {
-
-            e.printStackTrace(); // Log server-side; thực tế nên log chuẩn (SLF4J, JUL, v.v.)
-            request.setAttribute("errorMessage", "co loi xay ra khi dang nhap");
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "Có lỗi xảy ra khi đăng nhập");
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }
     }
 
-    // set attribute cho session
+    // Set attribute cho session
     private void setSessionAttributes(HttpSession session, CustomerDTO customer) {
         session.setAttribute("customerId", customer.getCustomerId());
-        session.setAttribute("useranme", customer.getUsername());
+        session.setAttribute("username", customer.getUsername());
         session.setAttribute("fullName", customer.getFullName());
         session.setAttribute("email", customer.getEmail());
         session.setAttribute("phone", customer.getPhone());
         session.setAttribute("city", customer.getCity());
         session.setAttribute("loginTime", Long.valueOf(System.currentTimeMillis()));
 
-        session.setMaxInactiveInterval(60 * 60); // 60p ay
+        session.setMaxInactiveInterval(60 * 60); // 60 phut
+    }
+
+    private boolean isSafeInternalPath(String url) {
+        if (url == null || url.isEmpty()) {
+            return false;
+        }
+        if (!url.startsWith("/")) {
+            return false;
+        }
+        // chặn chuỗi có "://" hoặc mã độc kiểu CR/LF
+        if (url.contains("://") || url.contains("\r") || url.contains("\n")) {
+            return false;
+        }
+        return true;
     }
 }

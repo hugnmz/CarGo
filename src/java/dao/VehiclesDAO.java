@@ -14,13 +14,23 @@ import model.Vehicles;
  * @author admin
  */
 public interface VehiclesDAO {
+
     List<Vehicles> getAllVehicles();
+
     Optional<Vehicles> getVehicleById(Integer vehicleId);
+
     Optional<Vehicles> getVehicleyPlateNumber(String plateNumber);
+
     boolean addVehicle(Vehicles vehicle);
+
     boolean updateVehicle(Vehicles vehicle);
+
     boolean deleteVehicle(Integer vehicleId);
+
     List<Vehicles> getVehiclesByCar(Integer CarId);
-    List<Vehicles> getAvailableVehiclesByCar(Integer carId, LocalDateTime startDate
-    ,LocalDateTime endDate);
+
+    List<Vehicles> getAvailableVehiclesByCar(Integer carId, LocalDateTime startDate,
+             LocalDateTime endDate);
+
+    boolean isVehicleAvailable(Integer vehicleId, LocalDateTime startDate, LocalDateTime endDate);
 }
