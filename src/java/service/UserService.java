@@ -5,12 +5,25 @@
 package service;
 
 import dto.*;
-import java.util.Optional;
+import java.util.*;
 
 /**
  *
  * @author DELL
  */
 public interface UserService {
+
     Optional<UserDTO> loginUser(String username, String password);
+
+    List<UserDTO> getAllUser();
+    
+    List<LocationDTO> getAllLocation();
+    
+    UserDTO getUserById(Integer userId);
+
+    void addUser(UserDTO user, String password);
+
+    void updateUser(UserDTO user);
+
+    void deleteUser(Integer userId);
 }

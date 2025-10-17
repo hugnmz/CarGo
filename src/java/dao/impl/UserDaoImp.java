@@ -13,7 +13,10 @@ public class UserDaoImp implements UsersDAO {
 
     @Override
     public List<Users> getAllUsers() {
-        String sql = "SELECT * FROM Users";
+        String sql = "SELECT u.*, l.city, r.roleName\n" +
+"        FROM Users u\n" +
+"        LEFT JOIN Locations l ON u.locationId = l.locationId\n" +
+"        LEFT JOIN Roles r ON u.roleId = r.roleId";
         return JdbcTemplateUtil.query(sql, Users.class);
     }
 
@@ -32,38 +35,25 @@ public class UserDaoImp implements UsersDAO {
     @Override
     public Optional<Users> getUserByUsername(String username) {
         String sql = """
-            SELECT u.*, l.city
-            FROM Users u
-            LEFT JOIN Locations l ON u.locationId = l.locationId
-            WHERE u.username = ?
+            SELECT u.*, l.city, r.roleName
+                    FROM Users u
+                    LEFT JOIN Locations l ON u.locationId = l.locationId
+                    LEFT JOIN Roles r ON u.roleId = r.roleId
+                    WHERE u.username = ?
         """;
         Users one = JdbcTemplateUtil.queryOne(sql, Users.class, username);
         return Optional.ofNullable(one);
     }
-    
-//    public static void main(String[] args) {
-//        UserDaoImp user = new UserDaoImp();
-//        Optional<Users> list = user.getUserByUsername("admin");
-//        
-//
-//        if (list.isPresent()) {
-//            System.out.println("Tìm thấy user:");
-//            System.out.println("ID: " + list.get().getUserId());
-//            System.out.println("Username: " + list.get().getUsername());
-//            System.out.println("Role: " + list.get().getRoles());
-//        } else { 
-//            System.out.println("Không tìm thấy user 'admin'");
-//        }
-//    }
 
     @Override
     public boolean createUser(Users user) {
         String sql = """
         INSERT INTO Users (
             username, password_hash, password_salt,
-            fullName, phone, email, dateOfBirth, locationId
+            fullName, phone, email, dateOfBirth,
+            locationId, roleId, createAt
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """;
 
         int id = JdbcTemplateUtil.insertAndReturnKey(
@@ -75,7 +65,9 @@ public class UserDaoImp implements UsersDAO {
                 user.getPhone(),
                 user.getEmail(),
                 user.getDateOfBirth() != null ? java.sql.Date.valueOf(user.getDateOfBirth()) : null,
-                user.getLocationId()
+                user.getLocationId(),
+                user.getRoleId(), // ✅ thêm dòng này
+                user.getCreateAt() != null ? Timestamp.valueOf(user.getCreateAt()) : new Timestamp(System.currentTimeMillis())
         );
 
         if (id > 0) {
@@ -89,8 +81,7 @@ public class UserDaoImp implements UsersDAO {
     public boolean updateUser(Users user) {
         String sql = """
             UPDATE Users SET
-                fullName = ?, phone = ?, email = ?, dateOfBirth = ?,
-                locationId = ?, verifyCode = ?, verifyCodeExpire = ?, isVerified = ?
+                fullName = ?, phone = ?, email = ?, dateOfBirth = ?, locationId = ?
             WHERE userId = ?
         """;
 
@@ -101,9 +92,6 @@ public class UserDaoImp implements UsersDAO {
                 user.getEmail(),
                 user.getDateOfBirth() != null ? java.sql.Date.valueOf(user.getDateOfBirth()) : null,
                 user.getLocationId(),
-                //                user.getVerifyCode(),
-                //                user.getVerifyCodeExpire() != null ? Timestamp.valueOf(user.getVerifyCodeExpire()) : null,
-                //                user.getIsVerified(),
                 user.getUserId()
         );
 
@@ -139,5 +127,24 @@ public class UserDaoImp implements UsersDAO {
         String sql = "DELETE FROM UserRoles WHERE userId = ? AND roleId = ?";
         int affected = JdbcTemplateUtil.update(sql, userId, roleId);
         return affected > 0;
+    }
+    
+    public static void main(String[] args) {
+        UserDaoImp user = new UserDaoImp();
+        Optional<Users> list = user.getUserByUsername("admin");
+
+        if (list.isPresent()) {
+            System.out.println("Tìm thấy user:");
+            System.out.println("ID: " + list.get().getUserId());
+            System.out.println("Username: " + list.get().getUsername());
+            System.out.println("RoleName: " + list.get().getRole());
+        } else {
+            System.out.println("Không tìm thấy user 'admin'");
+        }
+
+//        List<Users> list = user.getAllUsers();
+//        for (Users users : list) {
+//            System.out.println(users.toString());
+//        }
     }
 }

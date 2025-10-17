@@ -7,6 +7,8 @@ package util;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import model.Locations;
 
 /*
  *
@@ -108,5 +110,13 @@ public class JdbcTemplateUtil {
   
     // sau to viet them
 //    public static <T> T inTransaction(SQLFunction<Connection, T> work) { ... }
+
+    public Optional<Locations> queryForObject(String sql, Class<Locations> aClass, Integer id) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public Integer queryForScalar(String checkSql, Class<Integer> aClass, String city) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 
 }

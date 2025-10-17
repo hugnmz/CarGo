@@ -5,8 +5,6 @@ import model.Users;
 import model.Locations;
 import model.Roles;
 import util.di.annotation.Component;
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * UserMapper - Chuyển đổi giữa UserDTO và Users Model
@@ -14,67 +12,75 @@ import java.util.ArrayList;
 @Component
 public class UserMapper {
 
-    // Chuyen tu Model sang DTO
+    // ===== Chuyển từ Model -> DTO =====
     public UserDTO toDTO(Users user) {
-        // Kiem tra null
         if (user == null) {
             return null;
         }
 
         UserDTO dto = new UserDTO();
-        
-        // Gan cac truong co ban cua user
+
+        // Thông tin cơ bản
         dto.setUserId(user.getUserId());
         dto.setUsername(user.getUsername());
         dto.setFullName(user.getFullName());
         dto.setPhone(user.getPhone());
         dto.setEmail(user.getEmail());
         dto.setDateOfBirth(user.getDateOfBirth());
-        dto.setCreateAt(user.getCreatedAt());
+        dto.setCreateAt(user.getCreateAt());
 
-        // Thong tin dia diem (nested)
+        // Thông tin địa điểm
         if (user.getLocation() != null) {
-            Locations location = user.getLocation();
-            dto.setCity(location.getCity());
-            dto.setAddress(location.getAddress());
+            dto.setLocationId(user.getLocation().getLocationId());
+            dto.setCity(user.getLocation().getCity());
+            dto.setAddress(user.getLocation().getAddress());
         }
 
-        // Thong tin vai tro (nested)
-        if (user.getRoles() != null) {
-            List<String> roleNames = new ArrayList<>();
-            for (Roles role : user.getRoles()) {
-                roleNames.add(role.getRoleName());
-            }
-            dto.setRoles(roleNames);
+        // Thông tin vai trò
+        if (user.getRole() != null) {
+            dto.setRoleId(user.getRole().getRoleId());
+            dto.setRoleName(user.getRole().getRoleName());
         }
 
         return dto;
     }
 
-    // Chuyen tu DTO sang Model
+    // ===== Chuyển từ DTO -> Model =====
     public Users toModel(UserDTO dto) {
-        // Kiem tra null
         if (dto == null) {
             return null;
         }
 
         Users user = new Users();
-        
-        // Gan cac truong co ban cua user
+
+        // Thông tin cơ bản
         user.setUserId(dto.getUserId());
         user.setUsername(dto.getUsername());
         user.setFullName(dto.getFullName());
         user.setPhone(dto.getPhone());
         user.setEmail(dto.getEmail());
         user.setDateOfBirth(dto.getDateOfBirth());
-        user.setCreatedAt(dto.getCreateAt());
+        user.setCreateAt(dto.getCreateAt());
 
-        // Tao doi tuong Location neu co thong tin dia diem
-        if (dto.getCity() != null || dto.getAddress() != null) {
+        // Gán trực tiếp FK
+        user.setLocationId(dto.getLocationId());
+        user.setRoleId(dto.getRoleId());
+
+        // Địa điểm (optional)
+        if (dto.getLocationId() != null || dto.getCity() != null || dto.getAddress() != null) {
             Locations location = new Locations();
+            location.setLocationId(dto.getLocationId());
             location.setCity(dto.getCity());
             location.setAddress(dto.getAddress());
             user.setLocation(location);
+        }
+
+        // Vai trò (optional)
+        if (dto.getRoleId() != null || dto.getRoleName() != null) {
+            Roles role = new Roles();
+            role.setRoleId(dto.getRoleId());
+            role.setRoleName(dto.getRoleName());
+            user.setRole(role);
         }
 
         return user;

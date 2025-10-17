@@ -1,21 +1,16 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import util.di.annotation.Column;
 import util.di.annotation.Nested;
 
 public class Users {
 
-    @Column(name = "user_id")
+    @Column(name = "userId")
     private Integer userId;
 
-    @Column()
+    @Column(name = "username")
     private String username;
 
     @Column(name = "password_hash")
@@ -24,37 +19,36 @@ public class Users {
     @Column(name = "password_salt")
     private byte[] passwordSalt;
 
-    @Column(name = "full_name")
+    @Column(name = "fullName")
     private String fullName;
 
-    @Column()
+    @Column(name = "phone")
     private String phone;
 
-    @Column()
+    @Column(name = "email")
     private String email;
 
-    @Column(name = "date_of_birth")
+    @Column(name = "dateOfBirth")
     private LocalDate dateOfBirth;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "createAt")
+    private LocalDateTime createAt = LocalDateTime.now();
 
-    @Column(name = "location_id")
+    @Column(name = "locationId")
     private Integer locationId;
 
+    @Column(name = "roleId")
+    private Integer roleId;
+
+    // QUAN HỆ 1-1 (User -> Location)
     @Nested
     private Locations location;
 
+    // QUAN HỆ 1-N (Role -> Users)
     @Nested
-    private List<Roles> roles;
+    private Roles role;
 
-    @Nested
-    private List<UserRoles> userRoles;
-
-    @Nested
-    private List<Contracts> contracts;
-
-    // Constructors
+    // CONSTRUCTOR
     public Users() {
     }
 
@@ -63,10 +57,10 @@ public class Users {
         this.fullName = fullName;
         this.phone = phone;
         this.email = email;
-        this.createdAt = LocalDateTime.now();
+        this.createAt = LocalDateTime.now();
     }
 
-    // Getters and Setters
+    // GETTERS & SETTERS
     public Integer getUserId() {
         return userId;
     }
@@ -131,12 +125,12 @@ public class Users {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public LocalDateTime getCreateAt() {
+        return createAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setCreateAt(LocalDateTime createAt) {
+        this.createAt = createAt;
     }
 
     public Integer getLocationId() {
@@ -147,6 +141,14 @@ public class Users {
         this.locationId = locationId;
     }
 
+    public Integer getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Integer roleId) {
+        this.roleId = roleId;
+    }
+
     public Locations getLocation() {
         return location;
     }
@@ -155,41 +157,28 @@ public class Users {
         this.location = location;
     }
 
-    public List<Roles> getRoles() {
-        return roles;
+    public Roles getRole() {
+        return role;
     }
 
-    public void setRoles(List<Roles> roles) {
-        this.roles = roles;
+    public void setRole(Roles role) {
+        this.role = role;
     }
-
-    public List<UserRoles> getUserRoles() {
-        return userRoles;
-    }
-
-    public void setUserRoles(List<UserRoles> userRoles) {
-        this.userRoles = userRoles;
-    }
-
-    public List<Contracts> getContracts() {
-        return contracts;
-    }
-
-    public void setContracts(List<Contracts> contracts) {
-        this.contracts = contracts;
-    }
-
 
     @Override
     public String toString() {
-        return "Users{" + "userId=" + userId + ", username=" + username + 
-                ", passwordHash=" + passwordHash + ", passwordSalt=" + passwordSalt + 
-                ", fullName=" + fullName + ", phone=" + phone + ", email=" + email + 
-                ", dateOfBirth=" + dateOfBirth + ", createdAt=" + createdAt + 
-                ", locationId=" + locationId + ", location=" + location + ", roles=" + 
-                roles + ", userRoles=" + userRoles + ", contracts=" + contracts + '}';
+        return "Users{" +
+                "userId=" + userId +
+                ", username='" + username + '\'' +
+                ", fullName='" + fullName + '\'' +
+                ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", createAt=" + createAt +
+                ", locationId=" + locationId +
+                ", roleId=" + roleId +
+                ", location=" + location +
+                ", role=" + role +
+                '}';
     }
-    
-    
-    
 }

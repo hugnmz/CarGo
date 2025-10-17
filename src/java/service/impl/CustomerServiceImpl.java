@@ -95,7 +95,7 @@ public class CustomerServiceImpl implements CustomerService {
             Customers customer = customerMapper.toUsers(customerDTO);
             customer.setPasswordHash(passwordHash); // Lưu hash password (byte[])
             customer.setPasswordSalt(passwordSalt); // Lưu salt (byte[])
-            customer.setLocationId(locationId);
+                customer.setLocationId(locationId);
 
             customer.setIsVerified(false);
             customer.setVerifyCode(code);
