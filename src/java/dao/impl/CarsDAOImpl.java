@@ -13,14 +13,37 @@ public class CarsDAOImpl implements CarsDAO {
 
     @Override
     public List<Cars> getAllCars() {
-        String sql = "SELECT * FROM dbo.Cars";
+        String sql = "SELECT " +
+                "c.carId, c.name, c.year, c.description, c.image, c.categoryId, c.fuelId, c.seatingId, " +
+                "cat.categoryId, cat.categoryName, " +
+                "f.fuelId, f.fuelType, " +
+                "s.seatingId, s.seatingType, " +
+                "cp.priceId as cp_priceId, cp.dailyPrice as cp_dailyPrice, cp.depositAmount as cp_depositAmount, " +
+                "cp.startDate as cp_startDate, cp.endDate as cp_endDate, cp.createAt as cp_createAt " +
+                "FROM dbo.Cars c " +
+                "LEFT JOIN dbo.Categories cat ON c.categoryId = cat.categoryId " +
+                "LEFT JOIN dbo.Fuels f ON c.fuelId = f.fuelId " +
+                "LEFT JOIN dbo.Seatings s ON c.seatingId = s.seatingId " +
+                "LEFT JOIN dbo.CarPrices cp ON c.carId = cp.carId AND cp.endDate IS NULL";
 
         return JdbcTemplateUtil.query(sql, Cars.class);
     }
 
     @Override
     public Optional<Cars> getCarById(Integer carId) {
-        String sql = "SELECT * FROM dbo.Cars where CarId = ?";
+        String sql = "SELECT " +
+                "c.carId, c.name, c.year, c.description, c.image, c.categoryId, c.fuelId, c.seatingId, " +
+                "cat.categoryId, cat.categoryName, " +
+                "f.fuelId, f.fuelType, " +
+                "s.seatingId, s.seatingType, " +
+                "cp.priceId as cp_priceId, cp.dailyPrice as cp_dailyPrice, cp.depositAmount as cp_depositAmount, " +
+                "cp.startDate as cp_startDate, cp.endDate as cp_endDate, cp.createAt as cp_createAt " +
+                "FROM dbo.Cars c " +
+                "LEFT JOIN dbo.Categories cat ON c.categoryId = cat.categoryId " +
+                "LEFT JOIN dbo.Fuels f ON c.fuelId = f.fuelId " +
+                "LEFT JOIN dbo.Seatings s ON c.seatingId = s.seatingId " +
+                "LEFT JOIN dbo.CarPrices cp ON c.carId = cp.carId AND cp.endDate IS NULL " +
+                "WHERE c.carId = ?";
 
         Cars c = JdbcTemplateUtil.queryOne(sql, Cars.class, carId);
         
@@ -29,7 +52,7 @@ public class CarsDAOImpl implements CarsDAO {
 
     @Override
     public boolean addCar(Cars car) {
-        String sql = "INSERT INTO dbo.Cars (name, year, description, image, categoryId, fuelId, seatingId, locationId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO dbo.Cars (name, year, description, image, categoryId, fuelId, seatingId) VALUES (?, ?, ?, ?, ?, ?, ?)";
         
         int result = JdbcTemplateUtil.update(sql, 
             car.getName(), 
@@ -38,8 +61,7 @@ public class CarsDAOImpl implements CarsDAO {
             car.getImage(), 
             car.getCategoryId(), 
             car.getFuelId(), 
-            car.getSeatingId(), 
-            car.getLocationId()
+            car.getSeatingId()
         );
         
         return result > 0;
@@ -47,7 +69,7 @@ public class CarsDAOImpl implements CarsDAO {
 
     @Override
     public boolean updateCar(Cars car) {
-        String sql = "UPDATE dbo.Cars SET name = ?, year = ?, description = ?, image = ?, categoryId = ?, fuelId = ?, seatingId = ?, locationId = ? WHERE carId = ?";
+        String sql = "UPDATE dbo.Cars SET name = ?, year = ?, description = ?, image = ?, categoryId = ?, fuelId = ?, seatingId = ? WHERE carId = ?";
         
         int result = JdbcTemplateUtil.update(sql, 
             car.getName(), 
@@ -56,8 +78,7 @@ public class CarsDAOImpl implements CarsDAO {
             car.getImage(), 
             car.getCategoryId(), 
             car.getFuelId(), 
-            car.getSeatingId(), 
-            car.getLocationId(),
+            car.getSeatingId(),
             car.getCarId()
         );
         

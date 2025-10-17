@@ -1,4 +1,4 @@
-package controller;
+package controller.auth;
 
 import dto.CustomerDTO;
 import jakarta.servlet.ServletException;

@@ -14,45 +14,10 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    <style>
-      /* Nền gradient toàn màn hình */
-      body {
-        background: linear-gradient(135deg, #74ebd5 0%, #acb6e5 100%);
-        min-height: 100vh;
-      }
-      /* Hiệu ứng fadeIn */
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(-20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-      .fade-in {
-        animation: fadeIn 1s ease-in-out;
-      }
-      /* Style riêng cho nút Facebook */
-      .btn-facebook {
-        background-color: #3b5998;
-        color: white;
-      }
-      .btn-facebook:hover {
-        background-color: #2d4373;
-        color: white;
-      }
-      /* Style riêng cho nút Google */
-      .btn-google {
-        background-color: #db4437;
-        color: white;
-      }
-      .btn-google:hover {
-        background-color: #a33224;
-        color: white;
-      }
-    </style>
+    <link
+      href="${pageContext.request.contextPath}/css/login.css"
+      rel="stylesheet"
+    />
   </head>
   <body class="d-flex justify-content-center align-items-center">
     <!-- Card login -->
@@ -106,14 +71,19 @@
             required
           />
         </div>
-        
-            <!-- Remember Me -->
-    <div class="mb-3 form-check text-start">
-        <input type="checkbox" name="rememberMe" class="form-check-input" id="rememberMe" />
-        <label class="form-check-label" for="rememberMe">
+
+        <!-- Remember Me -->
+        <div class="mb-3 form-check text-start">
+          <input
+            type="checkbox"
+            name="rememberMe"
+            class="form-check-input"
+            id="rememberMe"
+          />
+          <label class="form-check-label" for="rememberMe">
             Ghi nhớ đăng nhập
-        </label>
-    </div>
+          </label>
+        </div>
         <!-- Submit -->
         <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
       </form>

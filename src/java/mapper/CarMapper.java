@@ -5,12 +5,7 @@ import model.Cars;
 import model.Categories;
 import model.Fuels;
 import model.Seatings;
-import model.Locations;
-import model.CarPrices;
-import model.Vehicles;
 import util.di.annotation.Component;
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * CarMapper - Chuyển đổi giữa CarDTO và Cars Model
@@ -34,52 +29,24 @@ public class CarMapper {
         dto.setDescription(car.getDescription());
         dto.setImage(car.getImage());
 
-        // Thong tin danh muc xe (nested)
+        // Map nested objects nếu có
         if (car.getCategory() != null) {
-            Categories category = car.getCategory();
-            dto.setCategoryName(category.getCategoryName());
+            dto.setCategoryName(car.getCategory().getCategoryName());
         }
-
-        // Thong tin loai nhien lieu (nested)
+        
         if (car.getFuel() != null) {
-            Fuels fuel = car.getFuel();
-            dto.setFuelType(fuel.getFuelType());
+            dto.setFuelType(car.getFuel().getFuelType());
         }
-
-        // Thong tin so cho ngoi (nested)
+        
         if (car.getSeating() != null) {
-            Seatings seating = car.getSeating();
-            dto.setSeatingType(seating.getSeatingType());
+            dto.setSeatingType(car.getSeating().getSeatingType());
         }
-
-        // Thong tin dia diem (nested)
-        if (car.getLocation() != null) {
-            Locations location = car.getLocation();
-            dto.setCity(location.getCity());
-            dto.setAddress(location.getAddress());
-        }
-
-        // Thong tin gia hien tai (nested)
-        if (car.getCarPrices() != null && !car.getCarPrices().isEmpty()) {
-            // Tim gia hien tai (endDate la null)
-            for (CarPrices price : car.getCarPrices()) {
-                if (price.getEndDate() == null) {
-                    dto.setCurrentPrice(price.getDailyPrice());
-                    dto.setDepositAmount(price.getDepositAmount());
-                    break; // Chi lay gia hien tai dau tien
-                }
-            }
-        }
-
-        // Danh sach xe co san (bien so)
-        if (car.getVehicles() != null) {
-            List<String> plateNumbers = new ArrayList<>();
-            for (Vehicles vehicle : car.getVehicles()) {
-                if (vehicle.getIsActive() != null && vehicle.getIsActive()) {
-                    plateNumbers.add(vehicle.getPlateNumber());
-                }
-            }
-            dto.setAvailableVehicles(plateNumbers);
+        
+        // Location - tạm thời set N/A
+        dto.setLocationCity("N/A");
+        
+        if (car.getCarPrices() != null && car.getCarPrices().getDailyPrice() != null) {
+            dto.setDailyPrice(car.getCarPrices().getDailyPrice().doubleValue());
         }
 
         return dto;
@@ -122,13 +89,8 @@ public class CarMapper {
             car.setSeating(seating);
         }
 
-        // Tao doi tuong Location neu co thong tin dia diem
-        if (dto.getCity() != null || dto.getAddress() != null) {
-            Locations location = new Locations();
-            location.setCity(dto.getCity());
-            location.setAddress(dto.getAddress());
-            car.setLocation(location);
-        }
+        // Location - tạm thời bỏ vì LocationsDAO thiếu method
+        // TODO: Implement location mapping khi có getLocationById
 
         return car;
     }

@@ -14,13 +14,10 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
-    <style>
-      /* Toàn bộ nền của trang sẽ là màu gradient xanh */
-      body {
-        background: linear-gradient(135deg, #74ebd5 0%, #acb6e5 100%);
-        min-height: 100vh; /* cao bằng toàn màn hình */
-      }
-    </style>
+    <link
+      href="${pageContext.request.contextPath}/css/register.css"
+      rel="stylesheet"
+    />
   </head>
   <body class="d-flex justify-content-center align-items-center">
     <!-- Card chính chứa form đăng ký -->
