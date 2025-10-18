@@ -1,15 +1,19 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ page import="javax.servlet.http.*, javax.servlet.*" %>
 <%
-    String username = (String) session.getAttribute("loggedInUser");
-    String avatar = (String) session.getAttribute("userAvatar");
+    String username = (String) session.getAttribute("useranme");
+    String fullName = (String) session.getAttribute("fullName");
+    String email = (String) session.getAttribute("email");
+    String phone = (String) session.getAttribute("phone");
+    String city = (String) session.getAttribute("city");
+    String avatar = (String) session.getAttribute("avatar");
 
-    // Nếu chưa đăng nhập → chuyển về login
     if (username == null) {
         response.sendRedirect("login.jsp");
         return;
     }
 %>
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -20,8 +24,8 @@
     <style>
         body { background-color: #f9f9f9; }
         .profile-card {
-            max-width: 500px;
-            margin: 80px auto;
+            max-width: 600px;
+            margin: 60px auto;
             background: #fff;
             padding: 30px;
             border-radius: 15px;
@@ -36,16 +40,32 @@
             margin-bottom: 20px;
             border: 4px solid #4CAF50;
         }
+        .profile-info {
+            text-align: left;
+            margin-top: 20px;
+        }
+        .profile-info p {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="profile-card">
         <img src="<%= avatar != null ? avatar : "https://cdn-icons-png.flaticon.com/512/3135/3135715.png" %>" alt="Avatar">
-        <h3 class="fw-bold"><%= username %></h3>
-        <p>Chào mừng bạn đến với CarRental!</p>
+        <h3 class="fw-bold"><%= fullName != null ? fullName : username %></h3>
+        <p class="text-muted">Chào mừng bạn đến với CarRental!</p>
+
+        <div class="profile-info">
+            <p><strong>Username:</strong> <%= username %></p>
+            <p><strong>Email:</strong> <%= email %></p>
+            <p><strong>Số điện thoại:</strong> <%= phone %></p>
+            <p><strong>Thành phố:</strong> <%= city %></p>
+            <p><strong>ID khách hàng:</strong> <%= session.getAttribute("customerId") %></p>
+        </div>
 
         <div class="d-flex justify-content-center gap-3 mt-4">
-            <a href="index.jsp" class="btn btn-outline-success"><i class="fa fa-home"></i> Trang chủ</a>
+            <a href="home.jsp" class="btn btn-outline-success"><i class="fa fa-home"></i> Trang chủ</a>
             <a href="LogoutServlet" class="btn btn-success"><i class="fa fa-sign-out-alt"></i> Đăng xuất</a>
         </div>
     </div>
