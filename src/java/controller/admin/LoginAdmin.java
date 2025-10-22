@@ -65,8 +65,8 @@ public class LoginAdmin extends HttpServlet {
                 }
 
                 // Tạo session mới
-                HttpSession session = request.getSession(true);
-                setSessionAttributes(session, admin);
+                HttpSession sessionadmin = request.getSession(true);
+                setSessionAttributes(sessionadmin, admin);
 
                 response.sendRedirect("HomeAdmin");
             } else {
@@ -83,7 +83,7 @@ public class LoginAdmin extends HttpServlet {
 
     private void setSessionAttributes(HttpSession session, UserDTO admin) {
         session.setAttribute("userId", admin.getUserId());
-        session.setAttribute("username", admin.getUsername());
+        session.setAttribute("usernamead", admin.getUsername());
         session.setAttribute("fullName", admin.getFullName());
         session.setAttribute("email", admin.getEmail());
         session.setAttribute("roleName", admin.getRoleName());

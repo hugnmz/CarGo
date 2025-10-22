@@ -20,7 +20,7 @@ public class RolesDaoImpl implements RolesDao{
 
     @Override
     public List<Roles> getAllRoles() {
-        String sql = "SELECT * FROM Roles";
+        String sql = "SELECT * FROM Roles WHERE roleId = 1 OR roleId = 2";
         return JdbcTemplateUtil.query(sql, Roles.class);
     }
     

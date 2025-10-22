@@ -1,12 +1,14 @@
 package controller.auth;
 
 import dto.CustomerDTO;
+import dto.UserDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.Optional;
 import service.CustomerService;
+import service.UserService;
 import service.impl.CustomerServiceImpl;
 import util.di.DIContainer;
 
@@ -14,14 +16,16 @@ import util.di.DIContainer;
 public class LoginServlet extends HttpServlet {
 
     private CustomerService customerService;
+    private UserService userService;
 
     @Override
     public void init() throws ServletException {
         super.init();
         try {
             customerService = DIContainer.get(CustomerService.class);
+            userService = DIContainer.get(UserService.class);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Dependency injection error", e);
         }
     }
 
@@ -29,6 +33,15 @@ public class LoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        HttpSession session = request.getSession(false);
+        if (session != null && session.getAttribute("username") != null) {
+            // Đã đăng nhập thì về home
+            response.sendRedirect(request.getContextPath() + "/home");
+            return;
+        }
+
+        request.getRequestDispatcher("login.jsp").forward(request, response);
+        /*
         // Chi lay session neu da ton tai
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("customerId") != null) {
@@ -73,6 +86,7 @@ public class LoginServlet extends HttpServlet {
 
         // Ko co cookie -> ve login 
         response.sendRedirect("login.jsp");
+         */
     }
 
     @Override
@@ -93,91 +107,90 @@ public class LoginServlet extends HttpServlet {
         }
 
         try {
-            // Thuc hien dang nhap
-            // Xac thuc dang nhap qua service va tra ve Optional (tranh null)
+            // 🔹 1. Đăng nhập với vai trò Customer
             Optional<CustomerDTO> customerOpt = customerService.loginCustomer(username, password);
-
             if (customerOpt.isPresent()) {
                 CustomerDTO customer = customerOpt.get();
-
-                // Huy session cu
-                HttpSession old = request.getSession(false);
-                String redirectURL = null;
-                if (old != null) {
-                    redirectURL = (String) old.getAttribute("redirectAfterLogin");
-                    old.invalidate();
-                }
-
-                // Tao session moi va gan thuoc tinh vao
                 HttpSession session = request.getSession(true);
-                setSessionAttributes(session, customer);
-                if (redirectURL != null) {
-                    session.setAttribute("redirectAfterLogin", redirectURL);
-                }
-
-                // Neu nguoi dung tick on
-                // Tao cookie luu username
-                if ("on".equals(rememberMe)) {
-                    // Tao cookie
-                    Cookie userCookie = new Cookie("rememberMeUser", customer.getUsername());
-
-                    // Han luu cookie la 30 ngay
-                    userCookie.setMaxAge(30 * 24 * 60 * 60);
-
-                    // Chi cho server doc
-                    userCookie.setHttpOnly(true);
-
-                    String ctxPath = request.getContextPath();
-                    userCookie.setPath((ctxPath == null || ctxPath.isEmpty()) ? "/" : ctxPath);
-
-                    response.addCookie(userCookie);
-                } // Neu nguoi dung ko tick chon
-                else {
-                    Cookie[] cookies = request.getCookies();
-                    if (cookies != null) {
-                        for (Cookie c : cookies) {
-                            if ("rememberMeUser".equals(c.getName())) { // SUA: so sanh ten cookie, khong phai username
-                                c.setMaxAge(0);
-                                c.setPath("/");
-                                response.addCookie(c);
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                session.removeAttribute("redirectURL");
-
-                String currURL = (String) session.getAttribute("redirectAfterLogin");
-                // Chỉ cho phép path nội bộ để tránh open-redirect
-                String targetPath = (isSafeInternalPath(currURL) ? currURL : "/home?login=success");
-                response.sendRedirect(request.getContextPath() + targetPath);
+                setCustomerSession(session, customer);
+                handleRememberMe(response, username, request.getContextPath(), rememberMe);
+                redirectByRole(response, request, "CUSTOMER");
                 return;
-            } else {
-                request.setAttribute("errorMessage", "Tài khoản hoặc mật khẩu không đúng");
-                request.getRequestDispatcher("login.jsp").forward(request, response);
             }
+
+            // 🔹 2. Đăng nhập với vai trò Staff / Manager
+            Optional<UserDTO> userOpt = userService.loginUser(username, password);
+            if (userOpt.isPresent()) {
+                UserDTO user = userOpt.get();
+
+                HttpSession session = request.getSession(true);
+                setUserSession(session, user);
+                handleRememberMe(response, username, request.getContextPath(), rememberMe);
+                redirectByRole(response, request, user.getRoleName());
+                return;
+            }
+
+            // 🔹 3. Sai thông tin đăng nhập
+            request.setAttribute("errorMessage", "Sai tên đăng nhập hoặc mật khẩu.");
+            request.getRequestDispatcher("login.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Có lỗi xảy ra khi đăng nhập");
+            request.setAttribute("errorMessage", "Đã xảy ra lỗi khi đăng nhập.");
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }
     }
 
     // Set attribute cho session
-    private void setSessionAttributes(HttpSession session, CustomerDTO customer) {
+    private void setCustomerSession(HttpSession session, CustomerDTO customer) {
+        session.setAttribute("userType", "CUSTOMER");
         session.setAttribute("customerId", customer.getCustomerId());
         session.setAttribute("username", customer.getUsername());
         session.setAttribute("fullName", customer.getFullName());
         session.setAttribute("email", customer.getEmail());
         session.setAttribute("phone", customer.getPhone());
         session.setAttribute("city", customer.getCity());
-        session.setAttribute("loginTime", Long.valueOf(System.currentTimeMillis()));
-
-        session.setMaxInactiveInterval(60 * 60); // 60 phut
+        session.setMaxInactiveInterval(60 * 60);
     }
 
+    private void setUserSession(HttpSession session, UserDTO user) {
+        session.setAttribute("userType", user.getRoleName());
+        session.setAttribute("userId", user.getUserId());
+        session.setAttribute("username", user.getUsername());
+        session.setAttribute("fullName", user.getFullName());
+        session.setAttribute("email", user.getEmail());
+        session.setAttribute("roleName", user.getRoleName());
+        session.setMaxInactiveInterval(60 * 60);
+    }
+    
+    private void handleRememberMe(HttpServletResponse response, String username, String contextPath, String rememberMe) {
+        if ("on".equals(rememberMe)) {
+            Cookie cookie = new Cookie("rememberMeUser", username);
+            cookie.setMaxAge(30 * 24 * 60 * 60);
+            cookie.setHttpOnly(true);
+            cookie.setPath((contextPath == null || contextPath.isEmpty()) ? "/" : contextPath);
+            response.addCookie(cookie);
+        }
+    }
+
+    private void redirectByRole(HttpServletResponse response, HttpServletRequest request, String role)
+            throws IOException, ServletException {
+        String path = request.getContextPath();
+
+        switch (role.toUpperCase()) {
+            case "MANAGER":
+                response.sendRedirect(path + "/home");
+                break;
+            case "STAFF":
+                response.sendRedirect(path + "/staff/home");
+                break;
+            case "CUSTOMER":
+                response.sendRedirect(path + "/home");
+                break;
+            default:
+                response.sendRedirect(path + "/error403.jsp");
+        }
+    }
     private boolean isSafeInternalPath(String url) {
         if (url == null || url.isEmpty()) {
             return false;
