@@ -34,9 +34,9 @@ public class VehicleServiceImpl implements VehicleService {
         List<VehicleDTO> vehicleDTO = new ArrayList<>();
 
         for (Vehicles v : vehicles) {
-            vehicleDTO.add(vehicleMapper.toDTO(v));
+            VehicleDTO dto = vehicleMapper.toDTO(v);
+            vehicleDTO.add(dto);
         }
-
         return vehicleDTO;
     }
 

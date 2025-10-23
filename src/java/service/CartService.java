@@ -29,3 +29,4 @@ public interface CartService {
     BigDecimal calculateRentalPrice(Integer vehicleId, LocalDateTime startDate, LocalDateTime endDate);
 }
 
+

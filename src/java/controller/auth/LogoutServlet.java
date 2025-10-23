@@ -5,12 +5,14 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 
+// servlet xu ly dang xuat
 @WebServlet("/LogoutServlet")
 public class LogoutServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // get cung xu ly nhu post
         doPost(request, response);
     }
 
@@ -18,14 +20,16 @@ public class LogoutServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        // lay session hien tai
         HttpSession session = request.getSession(false);
         
         if (session != null) {
             String username = (String) session.getAttribute("username");
+            // huy session
             session.invalidate();
         }
         
-        // Xóa remember me cookie
+        // xoa remember me cookie
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -38,6 +42,7 @@ public class LogoutServlet extends HttpServlet {
             }
         }
         
-        response.sendRedirect("home?logout=success");
+        // chuyen huong ve trang chu voi thong bao logout thanh cong
+        response.sendRedirect(request.getContextPath() + "/home?logout=success");
     }
 }

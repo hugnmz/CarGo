@@ -54,7 +54,6 @@ public class RoleMapper {
         if (dto != null && role.getUsers() != null) {
             // Convert Users to UserDTOs (assuming UserMapper exists)
             // This would require UserMapper to be injected
-            // For now, we'll just set the count
             dto.setUserCount(role.getUsers().size());
         }
 

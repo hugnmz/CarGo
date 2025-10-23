@@ -117,21 +117,27 @@ public class VehiclesDAOImpl implements VehiclesDAO {
     }
 
     @Override
-    public boolean isVehicleAvailable(Integer vehicleId, LocalDateTime startDate, LocalDateTime endDate) {
-        String sql = "SELECT COUNT(*) FROM dbo.Vehicles v "
-                + "WHERE v.vehicleId = ? AND v.isActive = 1 "
-                + "AND v.vehicleId NOT IN ("
-                + "    SELECT DISTINCT cd.vehicleId FROM dbo.ContractDetails cd "
-                + "    INNER JOIN dbo.Contracts ct ON ct.contractId = cd.contractId "
-                + "    WHERE ct.status = 'ACTIVE' "
-                + "    AND ("
-                + "        (ct.startDate <= ? AND ct.endDate >= ?) OR "
-                + "        (ct.startDate <= ? AND ct.endDate >= ?) OR "
-                + "        (ct.startDate >= ? AND ct.endDate <= ?)"
-                + "    )"
-                + ")";
+public boolean isVehicleAvailable(Integer vehicleId, LocalDateTime startDate, LocalDateTime endDate) {
+    // bận nếu có ContractDetail overlap trong các trạng thái giữ chỗ
+    final String busySql =
+        "SELECT COUNT(*) " +
+        "FROM dbo.ContractDetails cd " +
+        "JOIN dbo.Contracts ct ON ct.contractId = cd.contractId " +
+        "WHERE cd.vehicleId = ? " +
+        "  AND ct.status IN ('PENDING','ACCEPTED','IN_PROGRESS','ACTIVE') " +
+        "  AND (cd.rentStartDate < ? AND cd.rentEndDate > ?)";
 
-        int count = JdbcTemplateUtil.count(sql, vehicleId, startDate, startDate, endDate, endDate, startDate, endDate);
-        return count > 0;
-    }
+    int busy = JdbcTemplateUtil.count(busySql, vehicleId, endDate, startDate);
+
+    // xe phải tồn tại + active (và nếu DB bạn có cột status thì lọc AVAILABLE luôn)
+    final String vehSql =
+        "SELECT COUNT(*) FROM dbo.Vehicles WHERE vehicleId = ? AND isActive = 1" 
+         + " AND status = 'AVAILABLE'" // bật dòng này nếu bảng Vehicles đã có cột status
+        ;
+    int okVeh = JdbcTemplateUtil.count(vehSql, vehicleId);
+
+    return (okVeh > 0 && busy == 0);
+}
+
+
 }

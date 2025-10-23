@@ -12,6 +12,7 @@ import service.CustomerService;
 import util.EmailUtil;
 import util.di.DIContainer;
 
+// servlet xu ly dang ky tai khoan
 @WebServlet("/RegisterServlet")
 public class RegisterServlet extends HttpServlet {
 
@@ -19,7 +20,8 @@ public class RegisterServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        super.init(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+        super.init();
+        // khoi tao customerservice tu di container
         try {
             customerService = DIContainer.get(CustomerService.class);
         } catch (Exception e) {
@@ -31,8 +33,8 @@ public class RegisterServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Redirect GET requests to register page
-        response.sendRedirect("register.jsp");
+        // redirect get requests to register page
+        response.sendRedirect(request.getContextPath() + "/auth/register.jsp");
     }
 
     @Override

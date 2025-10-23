@@ -34,7 +34,7 @@ public class LoginAdmin extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("admin_login.jsp").forward(req, resp);
+        req.getRequestDispatcher("/admin/admin_login.jsp").forward(req, resp);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class LoginAdmin extends HttpServlet {
         //Kiểm tra đầu vào
         if (username == null || username.isBlank() || password == null || password.isBlank()) {
             request.setAttribute("error", "Vui lòng nhập đầy đủ thông tin");
-            request.getRequestDispatcher("admin_login.jsp").forward(request, response);
+            request.getRequestDispatcher("/admin/admin_login.jsp").forward(request, response);
             return;
         }
 
@@ -66,16 +66,16 @@ public class LoginAdmin extends HttpServlet {
 
                 //Điều hướng tới dashboard admin
                 //response.sendRedirect(response.encodeRedirectURL("admin/dashboard.jsp"));
-                response.sendRedirect("home.jsp");
+                response.sendRedirect(request.getContextPath() + "/admin/user.jsp");
             } else {
                 request.setAttribute("error", "Tài khoản hoặc mật khẩu không đúng hoặc không có quyền quản trị");
-                request.getRequestDispatcher("admin_login.jsp").forward(request, response);
+                request.getRequestDispatcher("/admin/admin_login.jsp").forward(request, response);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Đã xảy ra lỗi khi đăng nhập");
-            request.getRequestDispatcher("admin_login.jsp").forward(request, response);
+            request.getRequestDispatcher("/admin/admin_login.jsp").forward(request, response);
         }
     }
 
