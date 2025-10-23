@@ -36,7 +36,7 @@ public class ResendCodeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         // Redirect GET requests to verify page
-        req.getRequestDispatcher("verify.jsp").forward(req, resp);
+        req.getRequestDispatcher("/auth/verify.jsp").forward(req, resp);
     }
 
     @Override
@@ -76,6 +76,6 @@ public class ResendCodeServlet extends HttpServlet {
             req.setAttribute("errorMessage", "Phiên làm việc đã hết hạn. Vui lòng đăng ký lại.");
         }
         
-        req.getRequestDispatcher("verify.jsp").forward(req, resp);
+        req.getRequestDispatcher("/auth/verify.jsp").forward(req, resp);
     }
 }

@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller.cart;
 
 import java.io.IOException;
@@ -15,11 +11,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import service.CartService;
 import util.di.DIContainer;
+import util.AuthUtil;
 
-/**
- *
- * @author admin
- */
+// Servlet xu ly them san pham vao gio hang
 @WebServlet(name = "CartServlet", urlPatterns = {"/Cart"})
 public class CartServlet extends HttpServlet {
 
@@ -27,7 +21,8 @@ public class CartServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        super.init(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+        super.init();
+        // Khoi tao CartService tu DI Container
         try {
             cartService = DIContainer.get(CartService.class);
         } catch (Exception e) {
@@ -40,80 +35,130 @@ public class CartServlet extends HttpServlet {
             throws ServletException, IOException {
     }
 
-    /*
-    ktra dang nhap
-    lay validate parameter
-    add san pham vao gio hang
-    redirect voi thong bao ket qua
-     */
+    // Xu ly them san pham vao gio hang
+    // Kiem tra dang nhap, lay va validate tham so, them san pham vao gio hang, redirect voi thong bao ket qua
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         try {
-            // ktra login
-            HttpSession session = request.getSession(false);
-
-            if (session == null || session.getAttribute("customerId") == null) {
-
-                String ctx = request.getContextPath();                     // "/CarGo"
-                String path = request.getRequestURI().substring(ctx.length()); // "/booking"
-                String qs = request.getQueryString();                      // "vehicleId=5"
-                String carId = request.getParameter("carId");
-                String currURL = "/car-detail?carId=" + carId;
-                session = request.getSession(true);
-                session.setAttribute("redirectAfterLogin", currURL);
-                response.sendRedirect(request.getContextPath() + "/login.jsp");
+            // Kiem tra trang thai dang nhap
+            if (!AuthUtil.requireLogin(request, response)) {
                 return;
             }
 
-            //lay customer tu session
-            Integer customerId = (Integer) session.getAttribute("customerId");
+            // Lay thong tin customer tu session
+            Integer customerId = AuthUtil.getCustomerId(request);
 
-            // lay cac them so
+            // Lay cac tham so tu request
             String vehicleIdStr = request.getParameter("vehicleId");
             String carIdStr = request.getParameter("carId");
             String startDateStr = request.getParameter("startDate");
             String endDateStr = request.getParameter("endDate");
+            String startTimeStr = request.getParameter("startTime");
+            String endTimeStr = request.getParameter("endTime");
 
+            // Kiem tra tham so bat buoc
             if (vehicleIdStr == null || carIdStr == null) {
-                response.sendRedirect(request.getContextPath() + "car-detail?carId=" + carIdStr
-                        + "&erorr=missing_params");
+                response.sendRedirect(request.getContextPath() + "/car-detail?carId=" + (carIdStr != null ? carIdStr : "")
+                        + "&error=missing_params");
                 return;
             }
 
-            // parse
-            Integer carId = Integer.parseInt(carIdStr);
-            Integer vehicleId = Integer.parseInt(vehicleIdStr);
+            // Chuyen doi tham so sang Integer
+            Integer carId;
+            Integer vehicleId;
+            try {
+                carId = Integer.valueOf(carIdStr);
+                vehicleId = Integer.valueOf(vehicleIdStr);
+            } catch (NumberFormatException nfe) {
+                response.sendRedirect(request.getContextPath() + "/car-detail?carId=" + carIdStr + "&error=invalid_params");
+                return;
+            }
 
+            // Xu ly thoi gian thue xe
             LocalDateTime startDate, endDate;
             if (startDateStr != null && endDateStr != null
                     && !startDateStr.trim().isEmpty() && !endDateStr.trim().isEmpty()) {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                startDate = LocalDateTime.parse(startDateStr + "T00:00:00");
-                endDate = LocalDateTime.parse(endDateStr + "T23:59:59");
+                // Neu co gio:phut thi dung, nguoc lai mac dinh 09:00 - 17:00
+                String startTime = (startTimeStr != null && !startTimeStr.trim().isEmpty()) ? startTimeStr : "09:00";
+                String endTime = (endTimeStr != null && !endTimeStr.trim().isEmpty()) ? endTimeStr : "17:00";
+                startDate = LocalDateTime.parse(startDateStr + "T" + startTime + ":00");
+                endDate = LocalDateTime.parse(endDateStr + "T" + endTime + ":00");
             } else {
-
-                // ko co date dung defaule
+                // Khong co date: dung thoi gian mac dinh
                 startDate = LocalDateTime.now().plusDays(1).withHour(9).withMinute(0).withSecond(0);
                 endDate = startDate.plusDays(1).withHour(17).withMinute(0).withSecond(0);
             }
 
-            // them vao gio hang
+            // Kiem tra thoi gian thue toi thieu 1 gio
+            if (java.time.Duration.between(startDate, endDate).toMinutes() < 60) {
+                String back = request.getContextPath() + "/customer/booking-form.jsp?carId=" + carId
+                        + "&vehicleId=" + vehicleId + "&error=min_1h"
+                        + "&startDate=" + startDateStr + "&endDate=" + endDateStr
+                        + "&startTime=" + startTimeStr + "&endTime=" + endTimeStr
+                        + "&pickupLocation=" + request.getParameter("pickupLocation")
+                        + "&returnLocation=" + request.getParameter("returnLocation");
+                response.sendRedirect(back);
+                return;
+            }
+            
+            // Kiem tra thoi gian dat phai trong tuong lai
+            LocalDateTime now = LocalDateTime.now();
+            if (startDate.isBefore(now)) {
+                String back = request.getContextPath() + "/customer/booking-form.jsp?carId=" + carId
+                        + "&vehicleId=" + vehicleId + "&error=past_time"
+                        + "&startDate=" + startDateStr + "&endDate=" + endDateStr
+                        + "&startTime=" + startTimeStr + "&endTime=" + endTimeStr
+                        + "&pickupLocation=" + request.getParameter("pickupLocation")
+                        + "&returnLocation=" + request.getParameter("returnLocation");
+                response.sendRedirect(back);
+                return;
+            }
+
+            // Kiem tra trung lap cung vehicle trong gio hang cua user truoc khi them
+            java.util.List<dto.OrderDTO> items = cartService.getCartItems(customerId);
+            boolean overlapInCart = false;
+            for (dto.OrderDTO it : items) {
+                if (it.getVehicleId().equals(vehicleId)) {
+                    boolean noOverlap = endDate.isEqual(it.getRentStartDate()) || endDate.isBefore(it.getRentStartDate())
+                            || startDate.isEqual(it.getRentEndDate()) || startDate.isAfter(it.getRentEndDate());
+                    if (!noOverlap) { overlapInCart = true; break; }
+                }
+            }
+            if (overlapInCart) {
+                // Co trung lap: redirect ve booking form voi thong bao loi
+                String back = request.getContextPath() + "/customer/booking-form.jsp?carId=" + carId
+                        + "&vehicleId=" + vehicleId + "&error=overlap"
+                        + "&startDate=" + startDateStr + "&endDate=" + endDateStr
+                        + "&startTime=" + startTimeStr + "&endTime=" + endTimeStr
+                        + "&pickupLocation=" + request.getParameter("pickupLocation")
+                        + "&returnLocation=" + request.getParameter("returnLocation");
+                response.sendRedirect(back);
+                return;
+            }
+
+            // Them san pham vao gio hang
             boolean ok = cartService.addToCart(customerId, vehicleId, startDate, endDate);
 
             if (ok) {
-                // Thành công -> redirect với thông báo success
-                response.sendRedirect(request.getContextPath() + "/car-detail?carId=" + carId + "&added=true");
+                // Thanh cong: quay lai car-detail voi thong bao success
+                response.sendRedirect(request.getContextPath() + "/car-detail?carId=" + carId + "&vehicleId=" + vehicleId + "&add=true");
             } else {
-                // Thất bại -> redirect với thông báo error
-                response.sendRedirect(request.getContextPath() + "/car-detail?carId=" + carId + "&error=add_failed");
+                // That bai chung (khong khang dinh overlap)
+                String back = request.getContextPath() + "/customer/booking-form.jsp?carId=" + carId
+                        + "&vehicleId=" + vehicleId + "&error=add_failed"
+                        + "&startDate=" + startDateStr + "&endDate=" + endDateStr
+                        + "&startTime=" + startTimeStr + "&endTime=" + endTimeStr
+                        + "&pickupLocation=" + request.getParameter("pickupLocation")
+                        + "&returnLocation=" + request.getParameter("returnLocation");
+                response.sendRedirect(back);
             }
 
         } catch (Exception e) {
-            // Lỗi khác
+            // Xu ly loi he thong
             e.printStackTrace();
-            String carId = request.getContextPath() + "/car-detail?carId=" + request.getParameter("carId") + "&error=system_error";
+            response.sendRedirect(request.getContextPath() + "/car-detail?carId=" + request.getParameter("carId") + "&error=system_error");
         }
     }
 

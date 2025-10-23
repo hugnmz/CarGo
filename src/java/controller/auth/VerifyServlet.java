@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.io.PrintWriter;
 
 import service.CustomerService;
 import util.di.DIContainer;
@@ -40,7 +39,7 @@ public class VerifyServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         // Redirect GET requests to verify page
-        req.getRequestDispatcher("verify.jsp").forward(req, resp);
+        req.getRequestDispatcher("/auth/verify.jsp").forward(req, resp);
     }
     
     @Override
@@ -67,7 +66,7 @@ public class VerifyServlet extends HttpServlet {
                 }
                 
                 req.setAttribute("successMessage", "Xác minh thành công! Bạn có thể đăng nhập ngay bây giờ.");
-                req.getRequestDispatcher("login.jsp").forward(req, resp);
+                req.getRequestDispatcher("/auth/login.jsp").forward(req, resp);
                 return;
             } else {
                 req.setAttribute("errorMessage", "Mã xác minh không đúng hoặc đã hết hạn. Vui lòng thử lại.");
@@ -76,7 +75,7 @@ public class VerifyServlet extends HttpServlet {
             req.setAttribute("errorMessage", "Thông tin xác minh không hợp lệ. Vui lòng đăng ký trước.");
         }
         
-        req.getRequestDispatcher("verify.jsp").forward(req, resp);
+        req.getRequestDispatcher("/auth/verify.jsp").forward(req, resp);
     }
     
 }

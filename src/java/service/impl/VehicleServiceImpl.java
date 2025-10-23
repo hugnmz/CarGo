@@ -6,6 +6,7 @@ package service.impl;
 
 import dao.VehiclesDAO;
 import dto.VehicleDTO;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,9 +35,9 @@ public class VehicleServiceImpl implements VehicleService {
         List<VehicleDTO> vehicleDTO = new ArrayList<>();
 
         for (Vehicles v : vehicles) {
-            vehicleDTO.add(vehicleMapper.toDTO(v));
+            VehicleDTO dto = vehicleMapper.toDTO(v);
+            vehicleDTO.add(dto);
         }
-
         return vehicleDTO;
     }
 
@@ -48,6 +49,19 @@ public class VehicleServiceImpl implements VehicleService {
             return Optional.of(dto);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public List<VehicleDTO> getAvailableVehiclesByCar(Integer carId, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Vehicles> vehicles = vehiclesDAO.getAvailableVehiclesByCar(carId, startDate, endDate);
+        List<VehicleDTO> vehicleDTOs = new ArrayList<>();
+        
+        for (Vehicles v : vehicles) {
+            VehicleDTO dto = vehicleMapper.toDTO(v);
+            vehicleDTOs.add(dto);
+        }
+        
+        return vehicleDTOs;
     }
 
 }

@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpSession;
 import java.util.Optional;
 import model.Users;
 import service.UserService;
+import util.JdbcTemplateUtil;
 import util.di.DIContainer;
 
 /**
@@ -34,7 +35,7 @@ public class LoginAdmin extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("admin_login.jsp").forward(req, resp);
+        req.getRequestDispatcher("/admin/admin_login.jsp").forward(req, resp);
     }
 
     @Override
@@ -46,7 +47,7 @@ public class LoginAdmin extends HttpServlet {
         //Kiểm tra đầu vào
         if (username == null || username.isBlank() || password == null || password.isBlank()) {
             request.setAttribute("error", "Vui lòng nhập đầy đủ thông tin");
-            request.getRequestDispatcher("admin_login.jsp").forward(request, response);
+            request.getRequestDispatcher("/admin/admin_login.jsp").forward(request, response);
             return;
         }
 
@@ -57,25 +58,54 @@ public class LoginAdmin extends HttpServlet {
             if (adminOpt.isPresent()) {
                 UserDTO admin = adminOpt.get();
 
+                // Truy vấn role của user từ DB
+                class RoleRow { @util.di.annotation.Column(name = "roleName") public String roleName; }
+                var roleRows = JdbcTemplateUtil.query(
+                        "SELECT r.roleName FROM Roles r JOIN UserRoles ur ON ur.roleId=r.roleId WHERE ur.userId=?",
+                        RoleRow.class,
+                        admin.getUserId()
+                );
+
+                java.util.List<String> roles = new java.util.ArrayList<>();
+                for (RoleRow rr : roleRows) { if (rr.roleName != null) roles.add(rr.roleName); }
+
+                if (roles.isEmpty()) {
+                    request.setAttribute("error", "Tài khoản không có quyền (ADMIN/MANAGER/STAFF)");
+                    request.getRequestDispatcher("/admin/admin_login.jsp").forward(request, response);
+                    return;
+                }
+
+                // Ưu tiên role: ADMIN > MANAGER > STAFF
+                String primaryRole = roles.contains("ADMIN") ? "ADMIN"
+                        : roles.contains("MANAGER") ? "MANAGER"
+                        : roles.contains("STAFF") ? "STAFF" : roles.get(0);
+
                 // Tạo session
                 HttpSession session = request.getSession(true);
                 session.setAttribute("userId", admin.getUserId());
                 session.setAttribute("username", admin.getUsername());
-                session.setAttribute("role", "ADMIN");
+                session.setAttribute("role", primaryRole);
+                session.setAttribute("roles", roles);
                 session.setMaxInactiveInterval(60 * 60); // 60 phút
 
-                //Điều hướng tới dashboard admin
-                //response.sendRedirect(response.encodeRedirectURL("admin/dashboard.jsp"));
-                response.sendRedirect("home.jsp");
+                // Điều hướng theo role
+                if ("ADMIN".equals(primaryRole)) {
+                    response.sendRedirect(request.getContextPath() + "/admin/user.jsp");
+                } else if ("MANAGER".equals(primaryRole) || "STAFF".equals(primaryRole)) {
+                    // TODO: tạo dashboard riêng cho MANAGER/STAFF nếu cần
+                    response.sendRedirect(request.getContextPath() + "/home");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/home");
+                }
             } else {
                 request.setAttribute("error", "Tài khoản hoặc mật khẩu không đúng hoặc không có quyền quản trị");
-                request.getRequestDispatcher("admin_login.jsp").forward(request, response);
+                request.getRequestDispatcher("/admin/admin_login.jsp").forward(request, response);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Đã xảy ra lỗi khi đăng nhập");
-            request.getRequestDispatcher("admin_login.jsp").forward(request, response);
+            request.getRequestDispatcher("/admin/admin_login.jsp").forward(request, response);
         }
     }
 

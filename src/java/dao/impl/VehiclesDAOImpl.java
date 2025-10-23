@@ -98,40 +98,41 @@ public class VehiclesDAOImpl implements VehiclesDAO {
 
     @Override
     public List<Vehicles> getAvailableVehiclesByCar(Integer carId, LocalDateTime startDate, LocalDateTime endDate) {
+        // A vehicle is unavailable if there exists a ContractDetail overlapping the requested window
+        // for any blocking contract status (PENDING, ACCEPTED, IN_PROGRESS)
         String sql = "SELECT v.*, l.city, c.name, c.year FROM dbo.Vehicles v "
                 + "LEFT JOIN dbo.Locations l ON l.locationId = v.locationId "
                 + "LEFT JOIN dbo.Cars c ON c.carId = v.carId "
                 + "WHERE v.carId = ? AND v.isActive = 1 "
                 + "AND v.vehicleId NOT IN ("
-                + "    SELECT DISTINCT cd.vehicleId FROM dbo.ContractDetails cd "
-                + "    INNER JOIN dbo.Contracts ct ON ct.contractId = cd.contractId "
-                + "    WHERE ct.status = 'ACTIVE' "
-                + "    AND ("
-                + "        (ct.startDate <= ? AND ct.endDate >= ?) OR "
-                + "        (ct.startDate <= ? AND ct.endDate >= ?) OR "
-                + "        (ct.startDate >= ? AND ct.endDate <= ?)"
-                + "    )"
+                + "    SELECT cd.vehicleId FROM dbo.ContractDetails cd "
+                + "    JOIN dbo.Contracts ct ON ct.contractId = cd.contractId "
+                + "    WHERE ct.status IN ('PENDING','ACCEPTED','IN_PROGRESS') "
+                + "      AND (cd.rentStartDate < ? AND cd.rentEndDate > ?)"
                 + ")";
 
-        return JdbcTemplateUtil.query(sql, Vehicles.class, carId, startDate, startDate, endDate, endDate, startDate, endDate);
+        return JdbcTemplateUtil.query(sql, Vehicles.class, carId, endDate, startDate);
     }
 
     @Override
     public boolean isVehicleAvailable(Integer vehicleId, LocalDateTime startDate, LocalDateTime endDate) {
-        String sql = "SELECT COUNT(*) FROM dbo.Vehicles v "
-                + "WHERE v.vehicleId = ? AND v.isActive = 1 "
-                + "AND v.vehicleId NOT IN ("
-                + "    SELECT DISTINCT cd.vehicleId FROM dbo.ContractDetails cd "
-                + "    INNER JOIN dbo.Contracts ct ON ct.contractId = cd.contractId "
-                + "    WHERE ct.status = 'ACTIVE' "
-                + "    AND ("
-                + "        (ct.startDate <= ? AND ct.endDate >= ?) OR "
-                + "        (ct.startDate <= ? AND ct.endDate >= ?) OR "
-                + "        (ct.startDate >= ? AND ct.endDate <= ?)"
-                + "    )"
-                + ")";
+        // A vehicle is busy if there exists an overlapping contract detail in blocking statuses
+        final String busySql =
+                "SELECT COUNT(*) "
+                + "FROM dbo.ContractDetails cd "
+                + "JOIN dbo.Contracts ct ON ct.contractId = cd.contractId "
+                + "WHERE cd.vehicleId = ? "
+                + "  AND ct.status IN ('PENDING','ACCEPTED','IN_PROGRESS') "
+                + "  AND (cd.rentStartDate < ? AND cd.rentEndDate > ?)";
 
-        int count = JdbcTemplateUtil.count(sql, vehicleId, startDate, startDate, endDate, endDate, startDate, endDate);
-        return count > 0;
+        int busy = JdbcTemplateUtil.count(busySql, vehicleId, endDate, startDate);
+
+        // Vehicle must exist and be active; do NOT rely on optional 'status' column
+        final String vehSql = "SELECT COUNT(*) FROM dbo.Vehicles WHERE vehicleId = ? AND isActive = 1";
+        int okVeh = JdbcTemplateUtil.count(vehSql, vehicleId);
+
+        return (okVeh > 0 && busy == 0);
     }
+
+
 }

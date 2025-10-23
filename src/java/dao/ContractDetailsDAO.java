@@ -22,6 +22,8 @@ public interface ContractDetailsDAO {
     boolean deleteContractDetail(Integer contractDetailId);
 
     List<ContractDetails> getContractDetailsByVehicle(Integer vehicleId);
+    
+    List<ContractDetails> getContractDetailsByContractId(Integer contractId);
 
     boolean checkVehicleAvailability(Integer vehicleId, LocalDateTime startDate, LocalDateTime endDate);
 }

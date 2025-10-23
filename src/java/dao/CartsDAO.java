@@ -19,5 +19,9 @@ public interface CartsDAO {
 
     boolean deleteCart(Integer cartId);
 
-    boolean clearCart(Integer cartId);
+    boolean clearCart(Integer customerId);
+    
+    // dao/CartsDAO.java
+boolean clearCartByCustomer(Integer customerId);
+
 }
