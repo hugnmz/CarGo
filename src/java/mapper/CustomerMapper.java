@@ -47,11 +47,12 @@ public class CustomerMapper {
         
         // tạo mới Customer
         Customers user = new Customers();
+        user.setCustomerId(dto.getCustomerId()); // Quan trọng: set customerId
         user.setUsername(dto.getUsername());       
         user.setFullName(dto.getFullName());        
         user.setPhone(dto.getPhone());              
         user.setEmail(dto.getEmail());           
-        user.setDateOfBirth(dto.getDateOfBirth());  
+        user.setDateOfBirth(dto.getDateOfBirth());
         if (dto.getCity() != null || dto.getAddress() != null) {
             Locations location = new Locations();
             location.setCity(dto.getCity());

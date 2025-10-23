@@ -8,6 +8,8 @@ public interface CustomersDAO {
     List<Customers> getAllCustomers();
     Optional<Customers> getCustomerById(Integer customerId);
     Optional<Customers> getCustomerByUserName(String username);
+        Optional<Customers> getCustomerByEmail(String email);
+
     boolean addCustomer(Customers customer);
     boolean updateCustomer(Customers customer);
     boolean deleteCustomer(Integer customerId);

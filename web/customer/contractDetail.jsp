@@ -1,27 +1,8 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%> <%@page
-import="java.time.LocalDateTime, java.time.format.DateTimeFormatter"%> <% String
-customerName = request.getParameter("customerName"); String customerPhone =
-request.getParameter("customerPhone"); String customerAddress =
-request.getParameter("customerAddress"); String carName =
-request.getParameter("carName"); String plateNumber =
-request.getParameter("plateNumber"); String rentStart =
-request.getParameter("rentStart"); String rentEnd =
-request.getParameter("rentEnd"); String pricePerDay =
-request.getParameter("pricePerDay"); String deposit =
-request.getParameter("deposit"); String staffName =
-request.getParameter("staffName"); DateTimeFormatter inputFormat =
-DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"); DateTimeFormatter
-outputFormat = DateTimeFormatter.ofPattern("HH:mm 'ngày' dd 'tháng' MM 'năm'
-yyyy"); LocalDateTime startDate = (rentStart != null && !rentStart.isEmpty()) ?
-LocalDateTime.parse(rentStart, inputFormat) : null; LocalDateTime endDate =
-(rentEnd != null && !rentEnd.isEmpty()) ? LocalDateTime.parse(rentEnd,
-inputFormat) : null; %>
-
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Hợp Đồng Thuê Xe Ô Tô</title>
+    <title>Car Rental Contract</title>
     <link
       href="${pageContext.request.contextPath}/css/admin/contractDetail.css"
       rel="stylesheet"
@@ -30,134 +11,117 @@ inputFormat) : null; %>
   <body>
     <div class="page-container">
       <div class="confirmation-box">
-        <strong>✅ Hợp đồng đã được tạo thành công!</strong><br />
-        Mã hợp đồng: <strong>HD-<%= System.currentTimeMillis() %></strong>
+        <strong>✅ Contract has been created successfully!</strong><br />
+        Contract ID: <strong>HD-1234567890</strong>
       </div>
 
       <div class="contract-header">
-        <div class="contract-title">Hợp Đồng Thuê Xe Ô Tô</div>
+        <div class="contract-title">Car Rental Contract</div>
         <div class="contract-subtitle">Car Rental Agreement</div>
-        <div class="contract-number">HD-<%= System.currentTimeMillis() %></div>
+        <div class="contract-number">HD-1234567890</div>
       </div>
 
       <div class="section">
-        <div class="section-title">Thông Tin Khách Hàng</div>
+        <div class="section-title">Customer Information</div>
         <div class="info-grid">
           <div class="info-item">
-            <span class="info-label">Họ và tên:</span>
-            <span class="info-value"
-              ><%= customerName != null ? customerName : "N/A" %></span
-            >
+            <span class="info-label">Full Name:</span>
+            <span class="info-value">John Doe</span>
           </div>
           <div class="info-item">
-            <span class="info-label">Số điện thoại:</span>
-            <span class="info-value"
-              ><%= customerPhone != null ? customerPhone : "N/A" %></span
-            >
+            <span class="info-label">Phone Number:</span>
+            <span class="info-value">+84 123 456 789</span>
           </div>
           <div class="info-item">
-            <span class="info-label">Địa chỉ:</span>
-            <span class="info-value"
-              ><%= customerAddress != null ? customerAddress : "N/A" %></span
-            >
+            <span class="info-label">Address:</span>
+            <span class="info-value">123 Main Street, Ho Chi Minh City</span>
           </div>
         </div>
       </div>
 
       <div class="section">
-        <div class="section-title">Thông Tin Xe</div>
+        <div class="section-title">Vehicle Information</div>
         <div class="info-grid">
           <div class="info-item">
-            <span class="info-label">Tên xe:</span>
-            <span class="info-value"
-              ><%= carName != null ? carName : "N/A" %></span
-            >
+            <span class="info-label">Car Name:</span>
+            <span class="info-value">Toyota Camry 2023</span>
           </div>
           <div class="info-item">
-            <span class="info-label">Biển số:</span>
-            <span class="info-value"
-              ><%= plateNumber != null ? plateNumber : "N/A" %></span
-            >
+            <span class="info-label">License Plate:</span>
+            <span class="info-value">51A-12345</span>
           </div>
           <div class="info-item">
-            <span class="info-label">Giá thuê/ngày:</span>
-            <span class="info-value"
-              ><%= pricePerDay != null ? pricePerDay + " VNĐ" : "N/A" %></span
-            >
+            <span class="info-label">Daily Rental Price:</span>
+            <span class="info-value">500,000 VND</span>
           </div>
         </div>
       </div>
 
       <div class="section">
-        <div class="section-title">Thời Gian Thuê</div>
+        <div class="section-title">Rental Period</div>
         <div class="info-grid">
           <div class="info-item">
-            <span class="info-label">Ngày bắt đầu:</span>
-            <span class="info-value"
-              ><%= startDate != null ? startDate.format(outputFormat) : "N/A"
-              %></span
-            >
+            <span class="info-label">Start Date:</span>
+            <span class="info-value">2024-01-15</span>
           </div>
           <div class="info-item">
-            <span class="info-label">Ngày kết thúc:</span>
-            <span class="info-value"
-              ><%= endDate != null ? endDate.format(outputFormat) : "N/A"
-              %></span
-            >
+            <span class="info-label">End Date:</span>
+            <span class="info-value">2024-01-20</span>
           </div>
         </div>
       </div>
 
       <div class="section">
-        <div class="section-title">Thông Tin Tài Chính</div>
+        <div class="section-title">Financial Information</div>
         <div class="info-grid">
           <div class="info-item">
-            <span class="info-label">Tiền cọc:</span>
-            <span class="info-value"
-              ><%= deposit != null ? deposit + " VNĐ" : "N/A" %></span
-            >
+            <span class="info-label">Deposit:</span>
+            <span class="info-value">1,000,000 VND</span>
           </div>
           <div class="info-item">
-            <span class="info-label">Nhân viên tạo:</span>
-            <span class="info-value"
-              ><%= staffName != null ? staffName : "N/A" %></span
-            >
+            <span class="info-label">Created by Staff:</span>
+            <span class="info-value">Jane Smith</span>
           </div>
         </div>
       </div>
 
       <div class="terms-section">
-        <div class="terms-title">Điều Khoản Và Điều Kiện</div>
+        <div class="terms-title">Terms and Conditions</div>
         <ul class="terms-list">
           <li>
-            Khách hàng cam kết sử dụng xe đúng mục đích và tuân thủ luật giao
-            thông.
+            The customer commits to using the vehicle for its intended purpose
+            and complying with traffic laws.
           </li>
-          <li>Khách hàng chịu trách nhiệm bảo quản xe trong thời gian thuê.</li>
           <li>
-            Mọi hư hỏng do sử dụng không đúng cách sẽ được khách hàng thanh
-            toán.
+            The customer is responsible for maintaining the vehicle during the
+            rental period.
           </li>
-          <li>Hợp đồng có hiệu lực từ ngày ký và kết thúc khi trả xe.</li>
+          <li>
+            Any damage caused by improper use will be paid for by the customer.
+          </li>
+          <li>
+            The contract is effective from the signing date and ends when the
+            vehicle is returned.
+          </li>
         </ul>
       </div>
 
       <div class="signature-section">
         <div class="signature-box">
-          <div class="signature-title">Khách Hàng</div>
+          <div class="signature-title">Customer</div>
           <div class="signature-line"></div>
-          <div class="signature-title">Ký tên</div>
+          <div class="signature-title">Signature</div>
         </div>
         <div class="signature-box">
-          <div class="signature-title">Nhân Viên</div>
+          <div class="signature-title">Staff</div>
           <div class="signature-line"></div>
-          <div class="signature-title">Ký tên</div>
+          <div class="signature-title">Signature</div>
         </div>
       </div>
 
       <div class="actions">
         <button class="print-btn" onclick="window.print()">
-          🖨️ In Hợp Đồng
+          🖨️ Print Contract
         </button>
       </div>
     </div>

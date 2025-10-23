@@ -4,6 +4,7 @@
  */
 package service.impl;
 
+import dao.ContractsDAO;
 import dao.CustomersDAO;
 import dao.LocationsDAO;
 import dto.CustomerDTO;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import mapper.CustomerMapper;
+import model.Contracts;
 import model.Customers;
 import util.PasswordUtil;
 import service.CustomerService;
@@ -34,6 +36,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
     private LocationsDAO locationsDAO;
+    
+    @Autowired
+    private ContractsDAO contractsDAO;
 
     @Override
     public Optional<CustomerDTO> loginCustomer(String username, String password) {
@@ -177,6 +182,12 @@ public class CustomerServiceImpl implements CustomerService {
         try {
             // Chuyển đổi DTO sang Model
             Customers customer = customerMapper.toUsers(customerDTO);
+
+            if (customerDTO.getCity() != null && !customerDTO.getCity().trim().isEmpty()) {
+                Integer locationId = locationsDAO.getOrCreateIdByCity(customerDTO.getCity());
+                customer.setLocationId(locationId);
+            }
+
             // Cập nhật trong database
             return customersDAO.updateCustomer(customer);
         } catch (Exception e) {
@@ -342,6 +353,35 @@ public class CustomerServiceImpl implements CustomerService {
 
         customersDAO.updateCustomer(c);
         return Optional.of(code);
+    }
+
+    @Override
+    public Optional<CustomerDTO> getCustomerByEmail(String email) {
+        if (email == null || email.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Optional<Customers> c = customersDAO.getCustomerByEmail(email);
+        if (c.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Customers customer = c.get();
+        CustomerDTO dto = customerMapper.toDTO(customer);
+        return Optional.of(dto);
+    }
+    
+    @Override
+    public List<Contracts> getCustomerContracts(Integer customerId) {
+        if (customerId == null) {
+            return new ArrayList<>();
+        }
+        try {
+            return contractsDAO.getContractByCustomer(customerId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
 }

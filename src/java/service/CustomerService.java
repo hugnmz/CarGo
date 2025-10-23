@@ -5,6 +5,7 @@
 package service;
 
 import dto.CustomerDTO;
+import model.Contracts;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +23,9 @@ public interface CustomerService {
 
     //quản lí customer
     Optional<CustomerDTO> getCustomerByUsername(String username);
+    
+        Optional<CustomerDTO> getCustomerByEmail(String email);
+
 
     List<CustomerDTO> getAllCustomers();
 
@@ -46,4 +50,7 @@ public interface CustomerService {
     boolean verifyAccount(String username, String code);
 
     Optional<String> generateAndStoreVerificationCode(String username);
+    
+    // contract methods
+    List<Contracts> getCustomerContracts(Integer customerId);
 }

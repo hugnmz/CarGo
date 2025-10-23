@@ -38,7 +38,7 @@
                                 <span class="ms-1"><%= username %></span>
                             </a>
                              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                 <li><a class="dropdown-item" href="${pageContext.request.contextPath}/admin/user.jsp">Thông tin cá nhân</a></li>
+                                 <li><a class="dropdown-item" href="${pageContext.request.contextPath}/customer/profile.jsp">Thông tin cá nhân</a></li>
                                  <li><a class="dropdown-item" href="${pageContext.request.contextPath}/LogoutServlet">Đăng xuất</a></li>
                              </ul>
                         </li>

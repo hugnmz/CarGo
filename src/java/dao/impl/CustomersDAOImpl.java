@@ -5,6 +5,7 @@
 package dao.impl;
 
 import dao.CustomersDAO;
+import dao.LocationsDAO;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +19,8 @@ import util.di.annotation.Repository;
  */
 @Repository
 public class CustomersDAOImpl implements CustomersDAO {
+    private LocationsDAO locationDAO;
+    
     @Override
     public List<Customers> getAllCustomers() {
         String sql = "select * from Customers";
@@ -62,6 +65,7 @@ public class CustomersDAOImpl implements CustomersDAO {
 
     @Override
     public boolean updateCustomer(Customers customer) {
+        
         String sql = "update Customers set fullName = ?, phone = ?, email = ?, dateOfBirth = ?,"
                 + "locationId = ?, verifyCode = ?, verifyCodeExpire = ?, isVerified=?"
                 + " where customerId = ?";
@@ -124,6 +128,14 @@ public class CustomersDAOImpl implements CustomersDAO {
         String sql = "select COUNT(*) FROM Customers WHERE phone = ?";
         int count = JdbcTemplateUtil.count(sql, phone);
         return count > 0;
+    }
+
+    @Override
+    public Optional<Customers> getCustomerByEmail(String email) {
+        String sql = "SELECT * FROM dbo.Customers WHERE email LIKE ?";
+        
+        Customers c = JdbcTemplateUtil.queryOne(sql, Customers.class, email);
+        return Optional.of(c);
     }
 
 }

@@ -46,11 +46,6 @@ public class CarDetailServlet extends HttpServlet {
 
             // Kiem tra carId co hop le khong
             if (carIdStr == null || carIdStr.trim().isEmpty()) {
-                // Them cache control headers de tranh cache
-                response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-                response.setHeader("Pragma", "no-cache");
-                response.setHeader("Expires", "0");
-                
                 response.sendRedirect(request.getContextPath() + "/home");
                 return;
             }
@@ -62,12 +57,6 @@ public class CarDetailServlet extends HttpServlet {
             Optional<CarDTO> carDTO = carService.getCarById(carId);
             if (!carDTO.isPresent()) {
                 request.setAttribute("error", "Khong tim thay xe nao");
-                
-                // Them cache control headers de tranh cache
-                response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-                response.setHeader("Pragma", "no-cache");
-                response.setHeader("Expires", "0");
-                
                 request.getRequestDispatcher("/customer/car-detail.jsp").forward(request, response);
                 return;
             }
@@ -79,22 +68,13 @@ public class CarDetailServlet extends HttpServlet {
             request.setAttribute("car", carDTO.get());
             request.setAttribute("vehicles", vehicles);
 
-            // Them cache control headers de tranh cache
-            response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-            response.setHeader("Pragma", "no-cache");
-            response.setHeader("Expires", "0");
-
             // Forward den trang car-detail.jsp
             request.getRequestDispatcher("/customer/car-detail.jsp").forward(request, response);
         } catch (Exception e) {
             // Xu ly loi he thong
             e.printStackTrace();
             request.setAttribute("error", "Khong the tai thong tin xe: " + e.getMessage());
-            
-            // Them cache control headers de tranh cache
-            response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-            response.setHeader("Pragma", "no-cache");
-            response.setHeader("Expires", "0");
+
             
             request.getRequestDispatcher("/customer/car-detail.jsp").forward(request, response);
         }
