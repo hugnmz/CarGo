@@ -8,11 +8,13 @@ import model.Cars;
 import util.JdbcTemplateUtil;
 import util.di.annotation.Repository;
 
+// lop trien khai dao cho cars
 @Repository
 public class CarsDAOImpl implements CarsDAO {
 
     @Override
     public List<Cars> getAllCars() {
+        // lay danh sach tat ca xe
         String sql = "SELECT " +
                 "c.carId, c.name, c.year, c.description, c.image, c.categoryId, c.fuelId, c.seatingId, " +
                 "cat.categoryId, cat.categoryName, " +
@@ -31,6 +33,7 @@ public class CarsDAOImpl implements CarsDAO {
 
     @Override
     public Optional<Cars> getCarById(Integer carId) {
+        // lay xe theo id
         String sql = "SELECT " +
                 "c.carId, c.name, c.year, c.description, c.image, c.categoryId, c.fuelId, c.seatingId, " +
                 "cat.categoryId, cat.categoryName, " +

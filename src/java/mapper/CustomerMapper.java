@@ -32,26 +32,31 @@ public class CustomerMapper {
         dto.setEmail(customer.getEmail());
         dto.setDateOfBirth(customer.getDateOfBirth());
         dto.setCreateAt(customer.getCreateAt());
-       
-        if(customer.getLocationId() != null && customer.getLocation() != null){
+        dto.setIsVerified(customer.isIsVerified());
+
+        if (customer.getLocationId() != null && customer.getLocation() != null) {
             dto.setCity(customer.getLocation().getCity());
             dto.setAddress(customer.getLocation().getAddress());
         }
-        
+
         return dto;
     }
-    
+
     // từ dto sang model
-    public Customers toUsers(CustomerDTO dto){
-        if(dto == null) return null;
-        
+    public Customers toUsers(CustomerDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
         // tạo mới Customer
         Customers user = new Customers();
-        user.setUsername(dto.getUsername());       
-        user.setFullName(dto.getFullName());        
-        user.setPhone(dto.getPhone());              
-        user.setEmail(dto.getEmail());           
-        user.setDateOfBirth(dto.getDateOfBirth());  
+        user.setCustomerId(dto.getCustomerId());
+        user.setUsername(dto.getUsername());
+        user.setFullName(dto.getFullName());
+        user.setPhone(dto.getPhone());
+        user.setEmail(dto.getEmail());
+        user.setDateOfBirth(dto.getDateOfBirth());
+        user.setIsVerified(dto.getIsVerified()); // Thêm mapping cho isVerified
         if (dto.getCity() != null || dto.getAddress() != null) {
             Locations location = new Locations();
             location.setCity(dto.getCity());

@@ -131,6 +131,28 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public Optional<CustomerDTO> getCustomerById(Integer customerId) {
+        // Lấy thông tin khách hàng theo ID
+        try {
+            if (customerId == null) {
+                return Optional.empty(); // ID không hợp lệ
+            }
+
+            // Tìm khách hàng trong database
+            Optional<Customers> oc = customersDAO.getCustomerById(customerId);
+            if (!oc.isPresent()) {
+                return Optional.empty(); // Không tìm thấy khách hàng
+            }
+
+            // Chuyen doi tu Model sang DTO va tra ve
+            return Optional.of(customerMapper.toDTO(oc.get()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Optional.empty(); // Có lỗi xảy ra
+        }
+    }
+
+    @Override
     public List<CustomerDTO> getAllCustomers() {
         // Lấy danh sách tất cả khách hàng
         try {
@@ -175,10 +197,42 @@ public class CustomerServiceImpl implements CustomerService {
             return false; // Dữ liệu không hợp lệ
         }
         try {
-            // Chuyển đổi DTO sang Model
-            Customers customer = customerMapper.toUsers(customerDTO);
-            // Cập nhật trong database
-            return customersDAO.updateCustomer(customer);
+            // Lấy thông tin customer hiện tại để preserve các trường quan trọng
+            Optional<Customers> existingCustomer = customersDAO.getCustomerById(customerDTO.getCustomerId());
+            if (existingCustomer.isEmpty()) {
+                return false;
+            }
+            
+            // Lấy customer hiện tại từ database
+            Customers existing = existingCustomer.get();
+            
+            // Chỉ update các trường cần thiết
+            if (customerDTO.getFullName() != null) {
+                existing.setFullName(customerDTO.getFullName());
+            }
+            if (customerDTO.getEmail() != null) {
+                existing.setEmail(customerDTO.getEmail());
+            }
+            if (customerDTO.getPhone() != null) {
+                existing.setPhone(customerDTO.getPhone());
+            }
+            if (customerDTO.getDateOfBirth() != null) {
+                existing.setDateOfBirth(customerDTO.getDateOfBirth());
+            }
+            
+            // Chỉ update isVerified nếu có trong DTO
+            if (customerDTO.getIsVerified() != null) {
+                existing.setIsVerified(customerDTO.getIsVerified());
+            }
+            // Nếu không có trong DTO, giữ nguyên giá trị hiện tại
+            
+            // Cập nhật locationId nếu có
+            if (customerDTO.getCity() != null) {
+                Integer locationId = locationsDAO.getOrCreateIdByCity(customerDTO.getCity());
+                existing.setLocationId(locationId);
+            }
+
+            return customersDAO.updateCustomer(existing);
         } catch (Exception e) {
             e.printStackTrace();
             return false; // Có lỗi xảy ra
@@ -233,6 +287,7 @@ public class CustomerServiceImpl implements CustomerService {
             return false; // Có lỗi xảy ra
         }
     }
+    
 
     @Override
     public boolean changeCustomerPassword(Integer customerId, String oldPassword, String newPassword) {

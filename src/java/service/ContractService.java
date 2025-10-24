@@ -1,21 +1,21 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package service;
 
 import dto.ContractDTO;
+import dto.ContractDetailDTO;
 import java.util.List;
 import java.util.Optional;
 
 /**
- *
- * @author Admin
+ * ContractService - Service layer cho Contract business logic
  */
 public interface ContractService {
-    //lay tat ca hop dong thue xe
-    List<ContractDTO> getAllContracts();
-    
-    //tim hop dong theo id
+
+    List<ContractDTO> getContractsByCustomer(Integer customerId);
+
     Optional<ContractDTO> getContractById(Integer contractId);
+
+    List<ContractDetailDTO> getContractDetails(Integer contractId);
+
+    boolean updateContractStatus(Integer contractId, String status);
+
 }

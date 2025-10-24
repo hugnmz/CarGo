@@ -105,8 +105,8 @@ public class MapResultSet {
 
             return instance;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Mapping error: " + e.getMessage(), e);
-
         }
 
     }

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.List;
 import dto.CarDTO;
 
+// servlet hien thi trang chu
 @WebServlet("/home")
 public class HomeServlet extends HttpServlet {
 
@@ -19,6 +20,7 @@ public class HomeServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
+        // khoi tao carservice tu di container
         try {
             carService = DIContainer.get(CarService.class);
         } catch (Exception e) {
@@ -30,22 +32,27 @@ public class HomeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
+            // lay danh sach tat ca xe
             List<CarDTO> allCars = carService.getAllCars();
             
+            // truyen danh sach xe xuong jsp
             request.setAttribute("allCars", allCars);
             
-            request.getRequestDispatcher("home.jsp").forward(request, response);
+            // forward den trang home.jsp
+            request.getRequestDispatcher("/customer/home.jsp").forward(request, response);
             
         } catch (Exception e) {
+            // xu ly loi he thong
             e.printStackTrace();
-            request.setAttribute("error", "Không thể tải danh sách xe: " + e.getMessage());
-            request.getRequestDispatcher("home.jsp").forward(request, response);
+            request.setAttribute("error", "khong the tai danh sach xe: " + e.getMessage());
+            request.getRequestDispatcher("/customer/home.jsp").forward(request, response);
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // post cung xu ly nhu get
         doGet(request, response);
     }
 }

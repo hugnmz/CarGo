@@ -14,7 +14,6 @@ import util.di.annotation.Repository;
  *
  * @author admin
  */
-
 @Repository
 public class CartsDAOImpl implements CartsDAO {
 
@@ -30,7 +29,7 @@ public class CartsDAOImpl implements CartsDAO {
         String sql = "INSERT INTO dbo.Carts(customerId,createAt) VALUES (?,GETDATE())";
         int result = JdbcTemplateUtil.insertAndReturnKey(sql, customerId);
         return result > 0;
-    
+
     }
 
     @Override
@@ -41,9 +40,17 @@ public class CartsDAOImpl implements CartsDAO {
     }
 
     @Override
-    public boolean clearCart(Integer cartId) {
+    public boolean clearCart(Integer customerId) {
         String sql = "DELETE FROM dbo.Orders WHERE cartId IN (SELECT cartId FROM dbo.Carts WHERE customerId = ?)";
-        int result = JdbcTemplateUtil.update(sql, cartId);
+        int result = JdbcTemplateUtil.update(sql, customerId);
+        return result >= 0;
+    }
+
+    // dao/impl/CartsDAOImpl.java
+    @Override
+    public boolean clearCartByCustomer(Integer customerId) {
+        String sql = "DELETE FROM dbo.Orders WHERE cartId IN (SELECT cartId FROM dbo.Carts WHERE customerId = ?)";
+        int result = JdbcTemplateUtil.update(sql, customerId);
         return result >= 0;
     }
 

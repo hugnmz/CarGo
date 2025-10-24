@@ -164,11 +164,11 @@ public class Customers {
         this.cart = cart;
     }
 
-    public boolean isIsVerified() {
+    public Boolean isIsVerified() {
         return isVerified;
     }
 
-    public void setIsVerified(boolean isVerified) {
+    public void setIsVerified(Boolean isVerified) {
         this.isVerified = isVerified;
     }
 

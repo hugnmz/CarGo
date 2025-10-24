@@ -1,39 +1,85 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package service.impl;
 
+import dao.ContractsDAO;
+import dao.ContractDetailsDAO;
+import dao.CustomersDAO;
 import dto.ContractDTO;
+import dto.ContractDetailDTO;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import service.ContractService;
 import mapper.ContractMapper;
+import mapper.ContractDetailMapper;
+import service.ContractService;
 import util.di.annotation.Autowired;
-import dao.ContractsDAO;
+import util.di.annotation.Service;
 
-/**
- *
- * @author Admin
- */
-public class ContractServiceImpl implements ContractService{
+@Service
+public class ContractServiceImpl implements ContractService {
 
     @Autowired
-    private ContractsDAO contractDAO;
+    private ContractsDAO contractsDAO;
+    
+    @Autowired
+    private ContractDetailsDAO contractDetailsDAO;
+    
+    @Autowired
+    private CustomersDAO customersDAO;
     
     @Autowired
     private ContractMapper contractMapper;
     
+    @Autowired
+    private ContractDetailMapper contractDetailMapper;
+
     @Override
-    public List<ContractDTO> getAllContracts() {
+    public List<ContractDTO> getContractsByCustomer(Integer customerId) {
+        List<ContractDTO> contractDTOs = new ArrayList<>();
         
+        // Lấy danh sách contracts từ DAO
+        List<model.Contracts> contracts = contractsDAO.getContractByCustomer(customerId);
         
-  }
+        for (model.Contracts contract : contracts) {
+            ContractDTO dto = contractMapper.toDTO(contract);
+            contractDTOs.add(dto);
+        }
+        
+        return contractDTOs;
+    }
 
     @Override
     public Optional<ContractDTO> getContractById(Integer contractId) {
+        Optional<model.Contracts> contract = contractsDAO.getContractById(contractId);
+        if (contract.isPresent()) {
+            ContractDTO dto = contractMapper.toDTO(contract.get());
+            
+            // Lấy tên khách hàng
+            Optional<model.Customers> customer = customersDAO.getCustomerById(dto.getCustomerId());
+            if (customer.isPresent() && customer.get().getFullName() != null) {
+                dto.setCustomerName(customer.get().getFullName());
+            }
+            
+            return Optional.of(dto);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public List<ContractDetailDTO> getContractDetails(Integer contractId) {
+        List<ContractDetailDTO> detailDTOs = new ArrayList<>();
         
+        List<model.ContractDetails> details = contractDetailsDAO.getContractDetailsByContractId(contractId);
         
-  }
-    
+        for (model.ContractDetails detail : details) {
+            ContractDetailDTO dto = contractDetailMapper.toDTO(detail);
+            detailDTOs.add(dto);
+        }
+        
+        return detailDTOs;
+    }
+
+    @Override
+    public boolean updateContractStatus(Integer contractId, String status) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

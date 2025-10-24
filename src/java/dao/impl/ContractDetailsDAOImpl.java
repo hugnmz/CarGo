@@ -1,0 +1,55 @@
+package dao.impl;
+
+import dao.ContractDetailsDAO;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import model.ContractDetails;
+import util.JdbcTemplateUtil;
+import util.di.annotation.Repository;
+
+@Repository
+public class ContractDetailsDAOImpl implements ContractDetailsDAO {
+
+    @Override
+    public List<ContractDetails> getAllContractDetails() {
+        String sql = "SELECT * FROM dbo.ContractDetails";
+        return JdbcTemplateUtil.query(sql, ContractDetails.class);
+    }
+
+    @Override
+    public Optional<ContractDetails> getContractDetailById(Integer contractDetailId) {
+        String sql = "SELECT * FROM dbo.ContractDetails WHERE contractDetailId = ?";
+        ContractDetails detail = JdbcTemplateUtil.queryOne(sql, ContractDetails.class, contractDetailId);
+        return Optional.ofNullable(detail);
+    }
+
+    @Override
+    public boolean deleteContractDetail(Integer contractDetailId) {
+        String sql = "DELETE FROM dbo.ContractDetails WHERE contractDetailId = ?";
+        int result = JdbcTemplateUtil.update(sql, contractDetailId);
+        return result > 0;
+    }
+
+    @Override
+    public List<ContractDetails> getContractDetailsByVehicle(Integer vehicleId) {
+        String sql = "SELECT * FROM dbo.ContractDetails WHERE vehicleId = ?";
+        return JdbcTemplateUtil.query(sql, ContractDetails.class, vehicleId);
+    }
+    
+    @Override
+    public List<ContractDetails> getContractDetailsByContractId(Integer contractId) {
+        String sql = "SELECT * FROM dbo.ContractDetails WHERE contractId = ? ORDER BY contractDetailId";
+        return JdbcTemplateUtil.query(sql, ContractDetails.class, contractId);
+    }
+
+    @Override
+    public boolean checkVehicleAvailability(Integer vehicleId, LocalDateTime startDate, LocalDateTime endDate) {
+        String sql = "SELECT COUNT(*) FROM dbo.ContractDetails cd " +
+                    "JOIN dbo.Contracts c ON cd.contractId = c.contractId " +
+                    "WHERE cd.vehicleId = ? AND c.status IN ('PENDING', 'ACCEPTED', 'IN_PROGRESS') " +
+                    "AND (cd.rentStartDate < ? AND cd.rentEndDate > ?)";
+        int count = JdbcTemplateUtil.count(sql, vehicleId, endDate, startDate);
+        return count == 0;
+    }
+}

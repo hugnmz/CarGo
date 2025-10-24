@@ -1,0 +1,44 @@
+body {
+  font-family: sans-serif;
+  max-width: 500px;
+  margin: 40px auto;
+}
+
+.msg {
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.err {
+  background: #ffe6e6;
+  color: #b30000;
+}
+
+.ok {
+  background: #e8fff0;
+  color: #0a7a35;
+}
+
+form {
+  display: flex;
+  gap: 8px;
+}
+
+input[type="text"] {
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
+}
+
+button {
+  padding: 10px 16px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
