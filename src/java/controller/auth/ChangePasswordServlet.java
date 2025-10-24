@@ -2,7 +2,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 package controller.auth;
 
 import java.io.IOException;
@@ -18,9 +17,9 @@ import util.di.DIContainer;
  *
  * @author admin
  */
-@WebServlet(name="ChangePasswordServlet", urlPatterns={"/ChangePasswordServlet"})
+@WebServlet(name = "ChangePasswordServlet", urlPatterns = {"/ChangePasswordServlet"})
 public class ChangePasswordServlet extends HttpServlet {
-    
+
     private CustomerService customerService;
 
     @Override
@@ -28,24 +27,31 @@ public class ChangePasswordServlet extends HttpServlet {
         super.init(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
         try {
             customerService = DIContainer.get(CustomerService.class);
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
-    
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        
-    } 
+            throws ServletException, IOException {
+        request.getRequestDispatcher("/CustomerServlet").forward(request, response);
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         String oldPass = request.getParameter("old");
         String newPass = request.getParameter("new");
+        Integer customerId = Integer.valueOf(request.getParameter("customerId"));
+
+        if (customerService.changeCustomerPassword(customerId, oldPass, newPass)) {
+            request.setAttribute("ok", "thay đổi mật khẩu thành công");
+        } else {
+            request.setAttribute("errorMess", "Thay đổi mật khẩu ko thành công");
+        }
+
+        request.getRequestDispatcher("/CustomerServlet").forward(request, response);
     }
 }

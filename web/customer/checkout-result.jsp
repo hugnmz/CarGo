@@ -67,7 +67,8 @@ contentType="text/html; charset=UTF-8" language="java" %>
                       ><strong>Khách hàng:</strong> ${c.customerName}
                     </div>
                     <div class="invoice-date">
-                      <i class="far fa-calendar me-2"></i>${c.start} → ${c.end}
+                      <i class="far fa-calendar me-2"></i>${c.startDate} →
+                      ${c.endDate}
                     </div>
                   </div>
                   <div>
@@ -94,7 +95,7 @@ contentType="text/html; charset=UTF-8" language="java" %>
                   </tr>
                 </thead>
                 <tbody>
-                  <c:forEach var="d" items="${c.details}">
+                  <c:forEach var="d" items="${c.contractDetails}">
                     <tr>
                       <td>
                         <span class="badge bg-dark">#${d.vehicleId}</span>
@@ -113,13 +114,13 @@ contentType="text/html; charset=UTF-8" language="java" %>
                     <div class="mb-2">
                       <i class="fas fa-money-bill-wave me-2 text-primary"></i>
                       <strong>Tổng tiền thuê:</strong>
-                      <span class="ms-2">${c.total} VNĐ</span>
+                      <span class="ms-2">${c.totalAmount} VNĐ</span>
                     </div>
                     <div class="mb-2">
                       <i class="fas fa-wallet me-2 text-warning"></i>
                       <strong>Tiền đặt cọc:</strong>
                       <span class="ms-2 text-warning"
-                        ><strong>${c.deposit} VNĐ</strong></span
+                        ><strong>${c.depositAmount} VNĐ</strong></span
                       >
                     </div>
                     <div class="text-muted" style="font-size: 0.85rem">
@@ -131,7 +132,7 @@ contentType="text/html; charset=UTF-8" language="java" %>
                     <div class="text-muted mb-1" style="font-size: 0.9rem">
                       Tổng thanh toán
                     </div>
-                    <div class="total-amount">${c.total} VNĐ</div>
+                    <div class="total-amount">${c.totalAmount} VNĐ</div>
                   </div>
                 </div>
               </div>

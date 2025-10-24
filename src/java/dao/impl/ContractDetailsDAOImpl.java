@@ -52,4 +52,18 @@ public class ContractDetailsDAOImpl implements ContractDetailsDAO {
         int count = JdbcTemplateUtil.count(sql, vehicleId, endDate, startDate);
         return count == 0;
     }
+
+    @Override
+    public boolean addContractDetail(ContractDetails contractDetail) {
+        String sql = "INSERT INTO dbo.ContractDetails(contractId, vehicleId, price, rentStartDate, rentEndDate, note) " +
+                    "VALUES (?, ?, ?, ?, ?, ?)";
+        int result = JdbcTemplateUtil.insertAndReturnKey(sql,
+                contractDetail.getContractId(),
+                contractDetail.getVehicleId(),
+                contractDetail.getPrice(),
+                contractDetail.getRentStartDate(),
+                contractDetail.getRentEndDate(),
+                contractDetail.getNote());
+        return result > 0;
+    }
 }

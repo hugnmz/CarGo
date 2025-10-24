@@ -39,8 +39,13 @@ public class CarMapper {
         }
 
         dto.setLocationCity("N/A");
-        if (car.getCarPrices() != null && car.getCarPrices().getDailyPrice() != null) {
-            dto.setDailyPrice(car.getCarPrices().getDailyPrice().doubleValue());
+        if (car.getCarPrices() != null) {
+            if (car.getCarPrices().getDailyPrice() != null) {
+                dto.setDailyPrice(car.getCarPrices().getDailyPrice().doubleValue());
+            }
+            if (car.getCarPrices().getDepositAmount() != null) {
+                dto.setDepositAmount(car.getCarPrices().getDepositAmount().doubleValue());
+            }
         }
 
         return dto;
@@ -98,10 +103,15 @@ public class CarMapper {
             car.setSeatingId(dto.getSeatingId());
         }
 
-        //Price
-        if (dto.getDailyPrice() != null) {
+        // Price & Deposit
+        if (dto.getDailyPrice() != null || dto.getDepositAmount() != null) {
             CarPrices price = new CarPrices();
-            price.setDailyPrice(BigDecimal.valueOf(dto.getDailyPrice()));
+            if (dto.getDailyPrice() != null) {
+                price.setDailyPrice(BigDecimal.valueOf(dto.getDailyPrice()));
+            }
+            if (dto.getDepositAmount() != null) {
+                price.setDepositAmount(BigDecimal.valueOf(dto.getDepositAmount()));
+            }
             car.setCarPrices(price);
         }
 

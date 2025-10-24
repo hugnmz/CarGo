@@ -293,6 +293,10 @@ public class CustomerServiceImpl implements CustomerService {
     public boolean changeCustomerPassword(Integer customerId, String oldPassword, String newPassword) {
         // Thay đổi mật khẩu khách hàng
         try {
+            if(oldPassword.equals(newPassword)){
+                return false;
+            }
+            
             // Bước 1: Lấy thông tin khách hàng từ database
             Optional<Customers> oc = customersDAO.getCustomerById(customerId);
             if (!oc.isPresent()) {
@@ -307,6 +311,7 @@ public class CustomerServiceImpl implements CustomerService {
                 return false; // Mật khẩu cũ không đúng
             }
 
+            
             // Bước 3: Mã hóa mật khẩu mới
             byte[] newSalt = PasswordUtil.generateSalt(); // Tạo salt mới
             byte[][] newHash = PasswordUtil.hashPassword(newPassword, newSalt); // Hash mật khẩu mới
