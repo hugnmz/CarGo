@@ -13,6 +13,7 @@ public class CustomerDTO {
     private LocalDateTime createAt;  // Ngày tạo
     private String city;             // Thành phố
     private String address;          // Dia chi
+    private Boolean isVerified;
     
     // Constructors
     public CustomerDTO() {}
@@ -44,4 +45,14 @@ public class CustomerDTO {
     
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
+
+    public Boolean getIsVerified() {
+        return isVerified;
+    }
+
+    public void setIsVerified(Boolean isVerified) {
+        this.isVerified = isVerified;
+    }
+    
+    
 }

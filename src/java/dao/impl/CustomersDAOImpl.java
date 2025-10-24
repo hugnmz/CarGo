@@ -86,6 +86,7 @@ public class CustomersDAOImpl implements CustomersDAO {
         int affected = JdbcTemplateUtil.update(sql, customerId);
         return affected > 0;
     }
+    
 
     @Override
     public boolean changePassword(Integer customerId, byte[] newHash, byte[] newSalt) {

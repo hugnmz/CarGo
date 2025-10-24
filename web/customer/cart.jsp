@@ -5,52 +5,9 @@ contentType="text/html; charset=UTF-8" language="java" %>
   <head>
     <meta charset="UTF-8" />
     <title>Giỏ hàng - CarGo</title>
-    <link href="${pageContext.request.contextPath}/css/customer/cart.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <style>
-      .empty-cart {
-        text-align: center;
-        padding: 60px 20px;
-      }
-      .empty-cart-content {
-        max-width: 400px;
-        margin: 0 auto;
-      }
-      .date-group-header {
-        background: #10b981;
-        color: white;
-        padding: 0.75rem 1rem;
-        font-weight: 700;
-        border-radius: 8px 8px 0 0;
-        margin-top: 1.5rem;
-      }
-      .date-group-header:first-child {
-        margin-top: 0;
-      }
-      .info-box {
-        background: #f0fdf4;
-        border-left: 4px solid #10b981;
-        padding: 1rem;
-        margin: 1rem 0;
-        border-radius: 8px;
-      }
-      .info-box i {
-        color: #10b981;
-        margin-right: 0.5rem;
-      }
-      .warning-box {
-        background: #fef3c7;
-        border-left: 4px solid #f59e0b;
-        padding: 1rem;
-        margin: 1rem 0;
-        border-radius: 8px;
-      }
-      .warning-box i {
-        color: #f59e0b;
-        margin-right: 0.5rem;
-      }
-    </style>
+    <link href="${pageContext.request.contextPath}/css/customer/cart.css" rel="stylesheet" />
   </head>
   <body>
     <div class="cart-wrapper">

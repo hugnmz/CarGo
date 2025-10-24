@@ -107,7 +107,8 @@ public class LoginServlet extends HttpServlet {
         session.setAttribute("email", customer.getEmail());
         session.setAttribute("phone", customer.getPhone());
         session.setAttribute("city", customer.getCity());
-        session.setAttribute("loginTime", Long.valueOf(System.currentTimeMillis()));
+        session.setAttribute("dateOfBirth", customer.getDateOfBirth());
+        session.setAttribute("loginTime", System.currentTimeMillis());
 
         session.setMaxInactiveInterval(60 * 60); // 60 phut
     }

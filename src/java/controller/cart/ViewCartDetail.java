@@ -55,11 +55,6 @@ public class ViewCartDetail extends HttpServlet {
             request.setAttribute("vehicleId", vehicleId);
         }
         
-        // Them cache control headers de tranh cache
-        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        response.setHeader("Pragma", "no-cache");
-        response.setHeader("Expires", "0");
-        
         // Forward den trang cart.jsp
         request.getRequestDispatcher("/customer/cart.jsp").forward(request, response);
     }

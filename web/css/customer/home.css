@@ -1,63 +1,247 @@
+:root {
+  --primary: #10b981;
+  --primary-dark: #059669;
+  --primary-light: #d1fae5;
+  --dark: #1f2937;
+  --gray: #6b7280;
+  --light-gray: #f3f4f6;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 body {
-    background-color: #f9f9f9;
+  font-family: "Inter", sans-serif;
+  color: var(--dark);
+  line-height: 1.6;
 }
 
-.navbar {
-    background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+/* Modern Navbar */
+.navbar-modern {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 1rem 0;
+  transition: all 0.3s;
+}
+.navbar-modern .navbar-brand {
+  font-size: 1.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--primary) 0%, #059669 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.navbar-modern .nav-link {
+  color: var(--dark);
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+.navbar-modern .nav-link:hover {
+  background: var(--light-gray);
+  color: var(--primary);
+}
+.navbar-modern .btn-primary-custom {
+  background: var(--primary);
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  transition: all 0.3s;
+}
+.navbar-modern .btn-primary-custom:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
-.hero {
-    background: url('https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif') center/cover no-repeat;
-    color: white;
-    text-align: center;
-    padding: 120px 20px;
-    border-radius: 15px;
-    margin-top: 20px;
+/* Hero Section */
+.hero-modern {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  padding: 8rem 0 4rem;
+  margin-top: 70px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-modern::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>')
+    no-repeat bottom;
+  background-size: cover;
+}
+.hero-modern h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.hero-modern p {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 2rem;
 }
 
-.search-box {
-    background-color: white;
-    padding: 25px;
-    border-radius: 15px;
-    margin-top: -60px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+/* Search Box */
+.search-modern {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  margin-top: -50px;
+  position: relative;
+  z-index: 10;
+}
+.search-modern .form-control,
+.search-modern .form-select {
+  border: 2px solid #e5e7eb;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  transition: all 0.3s;
+}
+.search-modern .form-control:focus,
+.search-modern .form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+.search-modern .btn-search {
+  background: var(--primary);
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: 10px;
+  font-weight: 600;
+  border: none;
+  transition: all 0.3s;
+}
+.search-modern .btn-search:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
 }
 
-.brand-logo img {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
+/* Car Cards */
+.car-card-modern {
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  height: 100%;
+}
+.car-card-modern:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+.car-card-modern .card-img-top {
+  height: 220px;
+  object-fit: cover;
+  transition: all 0.3s;
+}
+.car-card-modern:hover .card-img-top {
+  transform: scale(1.05);
+}
+.car-card-modern .badge-modern {
+  background: var(--primary);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.car-card-modern .price-modern {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+.car-card-modern .price-old {
+  text-decoration: line-through;
+  color: var(--gray);
+  font-size: 1rem;
 }
 
-.brand-logo {
-    border: 1px solid #eee;
-    border-radius: 12px;
-    background: #fff;
-    padding: 20px;
-    transition: 0.2s;
+/* Stats Section */
+.stats-modern {
+  background: var(--light-gray);
+  padding: 3rem 0;
+  margin: 4rem 0;
+}
+.stat-item {
+  text-align: center;
+}
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  display: block;
+}
+.stat-label {
+  color: var(--gray);
+  font-weight: 500;
 }
 
-.brand-logo:hover {
-    transform: scale(1.05);
-    border-color: #4CAF50;
+/* Testimonials */
+.testimonial-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s;
+  height: 100%;
+}
+.testimonial-card:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
-.car-card img {
-    height: 180px;
-    object-fit: cover;
-    border-radius: 12px 12px 0 0;
+/* Footer */
+.footer-modern {
+  background: #1f2937;
+  color: white;
+  padding: 3rem 0 1.5rem;
+  margin-top: 4rem;
+}
+.footer-modern a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: all 0.3s;
+}
+.footer-modern a:hover {
+  color: var(--primary);
 }
 
-.car-card:hover {
-    transform: scale(1.03);
-    transition: 0.2s;
+/* Section Titles */
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 3rem;
+  text-align: center;
+  position: relative;
+}
+.section-title::after {
+  content: "";
+  display: block;
+  width: 80px;
+  height: 4px;
+  background: var(--primary);
+  margin: 1rem auto 0;
+  border-radius: 2px;
 }
 
-footer {
-    margin-top: 80px;
-    padding: 30px 0;
-    background-color: #fff;
-    text-align: center;
-    border-top: 1px solid #ddd;
+@media (max-width: 768px) {
+  .hero-modern h1 {
+    font-size: 2rem;
+  }
+  .section-title {
+    font-size: 1.75rem;
+  }
 }

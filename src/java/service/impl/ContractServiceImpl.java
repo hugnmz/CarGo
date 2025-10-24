@@ -77,4 +77,9 @@ public class ContractServiceImpl implements ContractService {
         
         return detailDTOs;
     }
+
+    @Override
+    public boolean updateContractStatus(Integer contractId, String status) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

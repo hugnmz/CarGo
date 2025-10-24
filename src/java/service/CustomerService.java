@@ -22,6 +22,8 @@ public interface CustomerService {
 
     //quản lí customer
     Optional<CustomerDTO> getCustomerByUsername(String username);
+    
+    Optional<CustomerDTO> getCustomerById(Integer customerId);
 
     List<CustomerDTO> getAllCustomers();
 
