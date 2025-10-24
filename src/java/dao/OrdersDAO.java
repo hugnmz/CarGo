@@ -27,4 +27,11 @@ public interface OrdersDAO {
     boolean clearOrdersByCart(Integer cartId);
 
     boolean convertCartToContract(Integer cartId, Integer contractId);
+    
+    /**
+     * Lấy tất cả orders của một customer
+     * @param customerId - ID khách hàng
+     * @return List<Orders> - Danh sách orders của customer
+     */
+    List<Orders> getOrdersByCustomer(Integer customerId);
 }

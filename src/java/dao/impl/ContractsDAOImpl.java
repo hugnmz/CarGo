@@ -95,8 +95,6 @@ public class ContractsDAOImpl implements ContractsDAO {
 
     @Override
     public boolean calculateTotalAmout(Integer contractId) {
-        // This method would calculate total amount based on contract details
-        // Implementation depends on business logic
         return true;
     }
 }

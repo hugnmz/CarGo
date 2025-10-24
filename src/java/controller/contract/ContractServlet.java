@@ -1,0 +1,155 @@
+package controller.contract;
+
+import dto.ContractDTO;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import service.ContractService;
+import util.di.DIContainer;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+@WebServlet("/ContractServlet")
+public class ContractServlet extends HttpServlet {
+    
+    private ContractService contractService;
+    
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        try {
+            contractService = DIContainer.get(ContractService.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize ContractService", e);
+        }
+    }
+    
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        String action = request.getParameter("action");
+        
+        if ("list".equals(action)) {
+            // Hiển thị danh sách hợp đồng
+            List<ContractDTO> contracts = contractService.getAllContracts();
+            request.setAttribute("contracts", contracts);
+            request.getRequestDispatcher("/staff/contracts.jsp").forward(request, response);
+            
+        } else if ("view".equals(action)) {
+            // Xem chi tiết hợp đồng
+            String contractIdStr = request.getParameter("contractId");
+            if (contractIdStr != null) {
+                try {
+                    Integer contractId = Integer.parseInt(contractIdStr);
+                    contractService.getContractById(contractId).ifPresent(contract -> {
+                        request.setAttribute("contract", contract);
+                    });
+                    request.getRequestDispatcher("/staff/contract-detail.jsp").forward(request, response);
+                } catch (NumberFormatException e) {
+                    response.sendRedirect(request.getContextPath() + "/staff/staff.jsp?error=invalid_contract_id");
+                }
+            } else {
+                response.sendRedirect(request.getContextPath() + "/staff/staff.jsp?error=missing_contract_id");
+            }
+        } else {
+            // Mặc định hiển thị form tạo hợp đồng
+            request.getRequestDispatcher("/staff/create-contract.jsp").forward(request, response);
+        }
+    }
+    
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("staffId") == null) {
+            response.sendRedirect(request.getContextPath() + "/admin/admin_login.jsp");
+            return;
+        }
+        
+        String action = request.getParameter("action");
+        
+        if ("create".equals(action)) {
+            createContract(request, response);
+        } else if ("update_status".equals(action)) {
+            updateContractStatus(request, response);
+        } else {
+            response.sendRedirect(request.getContextPath() + "/staff/staff.jsp?error=invalid_action");
+        }
+    }
+    
+    private void createContract(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        try {
+            // Lấy thông tin từ form
+            Integer customerId = Integer.parseInt(request.getParameter("customerId"));
+            Integer staffId = (Integer) request.getSession().getAttribute("staffId");
+            
+            String startDateStr = request.getParameter("startDate");
+            String endDateStr = request.getParameter("endDate");
+            String totalAmountStr = request.getParameter("totalAmount");
+            String depositAmountStr = request.getParameter("depositAmount");
+            
+            // Parse dates
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+            LocalDateTime startDate = LocalDateTime.parse(startDateStr, formatter);
+            LocalDateTime endDate = LocalDateTime.parse(endDateStr, formatter);
+            
+            // Parse amounts
+            BigDecimal totalAmount = new BigDecimal(totalAmountStr);
+            BigDecimal depositAmount = new BigDecimal(depositAmountStr);
+            
+            // Tạo ContractDTO
+            ContractDTO contractDTO = new ContractDTO();
+            contractDTO.setCustomerId(customerId);
+            contractDTO.setStaffId(staffId);
+            contractDTO.setStartDate(startDate);
+            contractDTO.setEndDate(endDate);
+            contractDTO.setTotalAmount(totalAmount);
+            contractDTO.setDepositAmount(depositAmount);
+            contractDTO.setStatus("pending");
+            
+            // Tạo hợp đồng
+            boolean success = contractService.createContract(contractDTO);
+            
+            if (success) {
+                response.sendRedirect(request.getContextPath() + "/staff/staff.jsp?success=contract_created");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/staff/staff.jsp?error=contract_creation_failed");
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/staff/staff.jsp?error=contract_creation_error");
+        }
+    }
+    
+    private void updateContractStatus(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        try {
+            Integer contractId = Integer.parseInt(request.getParameter("contractId"));
+            String status = request.getParameter("status");
+            
+            boolean success = contractService.updateContractStatus(contractId, status);
+            
+            if (success) {
+                response.sendRedirect(request.getContextPath() + "/ContractServlet?action=view&contractId=" + contractId + "&success=status_updated");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/ContractServlet?action=view&contractId=" + contractId + "&error=status_update_failed");
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/staff/staff.jsp?error=status_update_error");
+        }
+    }
+}

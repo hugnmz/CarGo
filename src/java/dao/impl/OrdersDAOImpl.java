@@ -82,4 +82,14 @@ public class OrdersDAOImpl implements OrdersDAO {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
+    @Override
+    public List<Orders> getOrdersByCustomer(Integer customerId) {
+        String sql = "SELECT o.*, v.plateNumber, c.name FROM dbo.Orders o "
+                + "LEFT JOIN dbo.Vehicles v ON v.vehicleId = o.vehicleId "
+                + "LEFT JOIN dbo.Cars c ON c.carId = v.carId "
+                + "LEFT JOIN dbo.Carts cart ON cart.cartId = o.cartId "
+                + "WHERE cart.customerId = ?";
+        return JdbcTemplateUtil.query(sql, Orders.class, customerId);
+    }
+
 }

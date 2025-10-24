@@ -28,10 +28,10 @@
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg fixed-top">
             <div class="container">
-                <a class="navbar-brand fw-bold text-success" href="${pageContext.request.contextPath}/HomeServlet">🚗 CarRental</a>
+                <a class="navbar-brand fw-bold text-success" href="${pageContext.request.contextPath}/home">🚗 CarRental</a>
                 <div class="collapse navbar-collapse">
                     <ul class="navbar-nav ms-auto">
-                        <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/HomeServlet">Trang chủ</a></li>
+                        <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/home">Trang chủ</a></li>
                         <li class="nav-item"><a class="nav-link" href="#">Về chúng tôi</a></li>
                         <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/contact.jsp">Liên hệ</a></li>
                             <c:choose>
@@ -44,7 +44,7 @@
                                         <span class="ms-1">${username}</span>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/customer/profile.jsp">Thông tin cá nhân</a></li>
+                                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/CustomerServlet">Thông tin cá nhân</a></li>
                                         <li><a class="dropdown-item" href="${pageContext.request.contextPath}/LogoutServlet">Đăng xuất</a></li>
                                     </ul>
                                 </li>
@@ -274,7 +274,7 @@
                                 </div>
 
                                 <div class="booking-list">
-                                    <!-- Real contracts data from servlet -->
+                                   
                                     <c:choose>
                                         <c:when test="${not empty listContract}">
                                             <c:forEach var="contract" items="${listContract}">
@@ -363,18 +363,52 @@
                                     <h4><i class="fa fa-cog text-primary"></i> Cài đặt tài khoản</h4>
                                 </div>
 
+                                <!-- Thêm hiển thị kết quả đổi password -->
+                                <c:if test="${not empty ok}">
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                        <i class="fa fa-check-circle"></i> ${ok}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                </c:if>
+
+                                <c:if test="${not empty errorMess}">
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                        <i class="fa fa-exclamation-circle"></i> ${errorMess}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                </c:if>
+
                                 <div class="settings-section">
                                     <h6>Bảo mật</h6>
-                                    <form method="POST" action="ChangePasswordServlet">
+                                    <form method="POST" action="${pageContext.request.contextPath}/ChangePasswordServlet">
                                         <div class="setting-item">
-                                            <div>
-                                                <input type="password" name="old" value="" />
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label for="oldPassword" class="form-label">Mật khẩu cũ</label>
+                                                        <input type="password" class="form-control" id="oldPassword" name="old" 
+                                                               placeholder="Nhập mật khẩu cũ" required>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label for="newPassword" class="form-label">Mật khẩu mới</label>
+                                                        <input type="password" class="form-control" id="newPassword" name="new" 
+                                                               placeholder="Nhập mật khẩu mới" required>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <input type="password" name="new" value="" />
+                                            
+                                            <!-- Thêm hidden field cho customerId -->
+                                            <input type="hidden" name="customerId" value="${not empty customer.customerId ? customer.customerId : sessionScope.customerId}">
+                                            
+                                            <div class="mb-3">
                                                 <p class="text-muted">Cập nhật mật khẩu để bảo vệ tài khoản</p>
                                             </div>
-                                            <button class="btn btn-outline-primary">Đổi mật khẩu</button>
+                                            
+                                            <button type="submit" class="btn btn-outline-primary">
+                                                <i class="fa fa-key"></i> Đổi mật khẩu
+                                            </button>
                                         </div>
                                     </form>
 

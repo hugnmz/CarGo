@@ -84,7 +84,7 @@ public class ViewCartDetail extends HttpServlet {
             // Xoa cac san pham da chon
             for (String id : selected) {
                 try {
-                    boolean result = cartService.removeFromCart(customerId, Integer.parseInt(id));
+                    boolean result = cartService.removeFromCart(customerId, Integer.valueOf(id));
                     if (result) success = true;
                 } catch (NumberFormatException e) {
                     // Bo qua cac ID khong hop le
