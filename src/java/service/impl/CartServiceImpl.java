@@ -228,18 +228,19 @@ public class CartServiceImpl implements CartService {
                 return false;
             }
 
-            // kiem tra xe co bi thue trong khoang thoi gian nay khong
-            // su dung method co san trong VehiclesDAO
-            List<Vehicles> availableVehicles = vehiclesDAO.getAvailableVehiclesByCar(
-                    vehicle.getCarId(), startDate, endDate);
-
-            // kiem tra xem vehicleId co trong danh sach xe available khong
-            for (Vehicles vh : availableVehicles) {
-                if (vh.getVehicleId().equals(vehicleId)) {
-                    return true;
-                }
-            }
-            return false;
+//            // kiem tra xe co bi thue trong khoang thoi gian nay khong
+//            // su dung method co san trong VehiclesDAO
+//            List<Vehicles> availableVehicles = vehiclesDAO.getAvailableVehiclesByCar(
+//                    vehicleId, startDate, endDate);
+//
+//            // kiem tra xem vehicleId co trong danh sach xe available khong
+//            for (Vehicles vh : availableVehicles) {
+//                if (vh.getVehicleId().equals(vehicleId)) {
+//                    return true;
+//                }
+//            }
+//            return false;
+            return vehiclesDAO.isVehicleAvailable(vehicleId, startDate, endDate);
 
         } catch (Exception e) {
             e.printStackTrace();
