@@ -9,7 +9,7 @@ import java.util.Optional;
  * ContractService - Service layer cho Contract business logic
  */
 public interface ContractService {
-
+    
     List<ContractDTO> getContractsByCustomer(Integer customerId);
 
     Optional<ContractDTO> getContractById(Integer contractId);
@@ -17,6 +17,7 @@ public interface ContractService {
     List<ContractDetailDTO> getContractDetails(Integer contractId);
 
     boolean updateContractStatus(Integer contractId, String status);
+<<<<<<< Updated upstream
     // Tính tổng tiền hợp đồng
 
     boolean calculateTotalAmount(Integer contractId);
@@ -38,4 +39,8 @@ public interface ContractService {
      */
     List<ContractDTO> createContractsFromCart(Integer customerId, Integer[] selectedOrderIds);
 
+=======
+    
+    List<ContractDTO> getAllContracts();
+>>>>>>> Stashed changes
 }

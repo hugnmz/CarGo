@@ -17,7 +17,10 @@ import java.util.Map;
 import java.util.Optional;
 import mapper.ContractMapper;
 import mapper.ContractDetailMapper;
+<<<<<<< Updated upstream
 import mapper.OrderMapper;
+=======
+>>>>>>> Stashed changes
 import model.Contracts;
 import service.ContractService;
 import util.di.annotation.Autowired;
@@ -44,9 +47,12 @@ public class ContractServiceImpl implements ContractService {
     @Autowired
     private ContractDetailMapper contractDetailMapper;
     
+<<<<<<< Updated upstream
     @Autowired
     private OrderMapper orderMapper;
 
+=======
+>>>>>>> Stashed changes
     @Override
     public List<ContractDTO> getContractsByCustomer(Integer customerId) {
         List<ContractDTO> contractDTOs = new ArrayList<>();
@@ -99,6 +105,7 @@ public class ContractServiceImpl implements ContractService {
     }
 
     @Override
+<<<<<<< Updated upstream
     public boolean calculateTotalAmount(Integer contractId) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
@@ -314,5 +321,16 @@ public class ContractServiceImpl implements ContractService {
                                    .multiply(new BigDecimal("1000"));
         
         return depositAmount;
+=======
+    public List<ContractDTO> getAllContracts() {
+        List<ContractDTO> contractDTOs = new ArrayList<>();
+        List<model.Contracts> contracts = contractsDAO.getAllContracts();
+        
+        for (Contracts contract : contracts) {
+           ContractDTO dto = contractMapper.toDTO(contract);
+           contractDTOs.add(dto);
+        }
+        return contractDTOs;
+>>>>>>> Stashed changes
     }
 }

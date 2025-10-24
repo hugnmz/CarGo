@@ -9,5 +9,5 @@ package constant;
  * @author admin
  */
 public enum ConstractStatus {
-    PENDING, ACCEPTED, REJECTED;
+    PENDING, ACCEPTED, REJECTED,COMPLETED;
 }
