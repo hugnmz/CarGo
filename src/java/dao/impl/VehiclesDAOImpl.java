@@ -13,7 +13,7 @@ public class VehiclesDAOImpl implements VehiclesDAO {
 
     @Override
     public List<Vehicles> getAllVehicles() {
-        String sql = "SELECT v.*, l.city, c.name, c.year FROM dbo.Vehicles v LEFT JOIN dbo.Locations l ON l.locationId = v.locationId LEFT JOIN dbo.Cars c ON c.carId = v.carId";
+        String sql = "SELECT v.*, l.city, c.name, c.year FROM dbo.Vehicles v LEFT JOIN dbo.Locations l ON l.locationId = v.locationId LEFT JOIN dbo.Cars c ON c.carId = v.carId ";
         return JdbcTemplateUtil.query(sql, Vehicles.class);
     }
 

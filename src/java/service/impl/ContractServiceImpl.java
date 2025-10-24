@@ -18,6 +18,7 @@ import java.util.Optional;
 import mapper.ContractMapper;
 import mapper.ContractDetailMapper;
 import mapper.OrderMapper;
+import model.Contracts;
 import service.ContractService;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
@@ -53,7 +54,7 @@ public class ContractServiceImpl implements ContractService {
         // Lấy danh sách contracts từ DAO
         List<model.Contracts> contracts = contractsDAO.getContractByCustomer(customerId);
         
-        for (model.Contracts contract : contracts) {
+        for (Contracts contract : contracts) {
             ContractDTO dto = contractMapper.toDTO(contract);
             contractDTOs.add(dto);
         }

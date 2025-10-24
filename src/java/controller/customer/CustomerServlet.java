@@ -69,12 +69,12 @@ public class CustomerServlet extends HttpServlet {
             request.setAttribute("listContract", listContract);
 
             // Forward đến trang profile
-            request.getRequestDispatcher("/CustomerServlet").forward(request, response);
+            request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
             // Vẫn forward đến profile, sử dụng session data
-            request.getRequestDispatcher("/CustomerServlet").forward(request, response);
+            request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
         }
 
     }

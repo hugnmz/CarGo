@@ -274,6 +274,7 @@
                                 </div>
 
                                 <div class="booking-list">
+                                   
                                     <c:choose>
                                         <c:when test="${not empty listContract}">
                                             <c:forEach var="contract" items="${listContract}">

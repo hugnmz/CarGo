@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import mapper.CartMapper;
 import mapper.OrderMapper;
@@ -87,13 +88,17 @@ public class CartServiceImpl implements CartService {
 
             // (4) Không trùng trong giỏ (cùng vehicleId + overlap)
             List<OrderDTO> items = getCartItems(customerId); // dùng DTO sẵn có
-            boolean overlapInCart = items.stream().anyMatch(o
-                    -> o.getVehicleId() == vehicleId
-                    && o.getRentStartDate() != null
-                    && o.getRentEndDate() != null
-                    && o.getRentStartDate().isBefore(rentEndDate)
-                    && o.getRentEndDate().isAfter(rentStartDate)
-            );
+            boolean overlapInCart = false;
+            for (OrderDTO o : items) {
+                if (Objects.equals(o.getVehicleId(), vehicleId)
+                        && o.getRentStartDate() != null
+                        && o.getRentEndDate() != null
+                        && o.getRentStartDate().isBefore(rentEndDate)
+                        && o.getRentEndDate().isAfter(rentStartDate)) {
+                    overlapInCart = true;
+                    break;
+                }
+            }
             if (overlapInCart) {
                 return false;
             }
@@ -271,7 +276,7 @@ public class CartServiceImpl implements CartService {
             if (days <= 0) {
                 days = 1;
             }
-            
+
             // 4. tinh tong tien
             BigDecimal totalPrice = dailyPrice.multiply(BigDecimal.valueOf(days));
 

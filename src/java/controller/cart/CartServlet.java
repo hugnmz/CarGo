@@ -102,7 +102,7 @@ public class CartServlet extends HttpServlet {
                 response.sendRedirect(back);
                 return;
             }
-            
+
             // Kiem tra thoi gian dat phai trong tuong lai
             LocalDateTime now = LocalDateTime.now();
             if (startDate.isBefore(now)) {
@@ -115,29 +115,6 @@ public class CartServlet extends HttpServlet {
                 response.sendRedirect(back);
                 return;
             }
-
-            // Kiem tra trung lap cung vehicle trong gio hang cua user truoc khi them
-            java.util.List<dto.OrderDTO> items = cartService.getCartItems(customerId);
-            boolean overlapInCart = false;
-            for (dto.OrderDTO it : items) {
-                if (it.getVehicleId().equals(vehicleId)) {
-                    boolean noOverlap = endDate.isEqual(it.getRentStartDate()) || endDate.isBefore(it.getRentStartDate())
-                            || startDate.isEqual(it.getRentEndDate()) || startDate.isAfter(it.getRentEndDate());
-                    if (!noOverlap) { overlapInCart = true; break; }
-                }
-            }
-            if (overlapInCart) {
-                // Co trung lap: redirect ve booking form voi thong bao loi
-                String back = request.getContextPath() + "/customer/booking-form.jsp?carId=" + carId
-                        + "&vehicleId=" + vehicleId + "&error=overlap"
-                        + "&startDate=" + startDateStr + "&endDate=" + endDateStr
-                        + "&startTime=" + startTimeStr + "&endTime=" + endTimeStr
-                        + "&pickupLocation=" + request.getParameter("pickupLocation")
-                        + "&returnLocation=" + request.getParameter("returnLocation");
-                response.sendRedirect(back);
-                return;
-            }
-
             // Them san pham vao gio hang
             boolean ok = cartService.addToCart(customerId, vehicleId, startDate, endDate);
 
