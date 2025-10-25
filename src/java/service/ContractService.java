@@ -17,7 +17,7 @@ public interface ContractService {
     List<ContractDetailDTO> getContractDetails(Integer contractId);
 
     boolean updateContractStatus(Integer contractId, String status);
-<<<<<<< Updated upstream
+
     // Tính tổng tiền hợp đồng
 
     boolean calculateTotalAmount(Integer contractId);
@@ -30,17 +30,8 @@ public interface ContractService {
     List<ContractDTO> getAllContracts();
 
     boolean createContract(ContractDTO contractDTO);
-    
-    /**
-     * Tạo hợp đồng từ giỏ hàng (checkout)
-     * @param customerId - ID khách hàng
-     * @param selectedOrderIds - Danh sách ID orders được chọn (null = tất cả)
-     * @return List<ContractDTO> - Danh sách hợp đồng đã tạo
-     */
+
     List<ContractDTO> createContractsFromCart(Integer customerId, Integer[] selectedOrderIds);
 
-=======
-    
-    List<ContractDTO> getAllContracts();
->>>>>>> Stashed changes
+
 }

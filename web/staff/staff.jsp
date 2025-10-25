@@ -1,8 +1,4 @@
-<%-- 
-    Document   : staff
-    Created on : 23 thg 10, 2025, 11:31:55
-    Author     : HOANGNAM
---%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -17,17 +13,17 @@
                 background-color: #f8f9fa;
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             }
-            
+
             .navbar {
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             }
-            
+
             .navbar-brand {
                 font-weight: bold;
                 color: white !important;
             }
-            
+
             .staff-header {
                 background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
                 color: white;
@@ -35,7 +31,7 @@
                 margin-bottom: 2rem;
                 border-radius: 15px;
             }
-            
+
             .contract-card {
                 background: white;
                 border-radius: 15px;
@@ -44,66 +40,67 @@
                 margin-bottom: 1.5rem;
                 overflow: hidden;
             }
-            
+
             .contract-card:hover {
                 transform: translateY(-5px);
                 box-shadow: 0 8px 25px rgba(0,0,0,0.15);
             }
-            
+
             .status-badge {
+                align-items: center;
                 padding: 0.5rem 1rem;
                 border-radius: 25px;
                 font-weight: bold;
                 font-size: 0.85rem;
             }
-            
+
             .status-pending {
                 background-color: #fff3cd;
                 color: #856404;
                 border: 1px solid #ffeaa7;
             }
-            
+
             .status-accepted {
                 background-color: #d4edda;
                 color: #155724;
                 border: 1px solid #c3e6cb;
             }
-            
+
             .status-rejected {
                 background-color: #f8d7da;
                 color: #721c24;
                 border: 1px solid #f5c6cb;
             }
-            
+
             .btn-action {
                 border-radius: 25px;
                 padding: 0.5rem 1.5rem;
                 font-weight: bold;
                 transition: all 0.3s ease;
             }
-            
+
             .btn-view {
                 background: linear-gradient(45deg, #667eea, #764ba2);
                 border: none;
                 color: white;
             }
-            
+
             .btn-view:hover {
                 transform: scale(1.05);
                 color: white;
             }
-            
+
             .btn-update {
                 background: linear-gradient(45deg, #43e97b, #38f9d7);
                 border: none;
                 color: white;
             }
-            
+
             .btn-update:hover {
                 transform: scale(1.05);
                 color: white;
             }
-            
+
             .stats-card {
                 background: white;
                 border-radius: 15px;
@@ -112,29 +109,29 @@
                 text-align: center;
                 margin-bottom: 1rem;
             }
-            
+
             .stats-number {
                 font-size: 2rem;
                 font-weight: bold;
                 color: #667eea;
             }
-            
+
             .alert {
                 border-radius: 10px;
                 border: none;
             }
-            
+
             .form-control {
                 border-radius: 10px;
                 border: 1px solid #e0e0e0;
                 padding: 0.75rem 1rem;
             }
-            
+
             .form-control:focus {
                 border-color: #667eea;
                 box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
             }
-            
+
             .filter-tabs {
                 background: white;
                 border-radius: 15px;
@@ -142,7 +139,7 @@
                 margin-bottom: 2rem;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             }
-            
+
             .filter-tab {
                 padding: 0.75rem 1.5rem;
                 border-radius: 25px;
@@ -153,12 +150,12 @@
                 margin-right: 0.5rem;
                 margin-bottom: 0.5rem;
             }
-            
+
             .filter-tab.active {
                 background: linear-gradient(45deg, #667eea, #764ba2);
                 color: white;
             }
-            
+
             .filter-tab:hover {
                 transform: scale(1.05);
             }
@@ -182,13 +179,26 @@
             </div>
         </nav>
 
+
+        <c:forEach var="e" items="${errors}">
+            <p>${e}</p>
+        </c:forEach>
+        <c:if test="${not empty message}">
+            <p>${message}</p>
+        </c:if>
+        <form action="${pageContext.request.contextPath}/returncar" method="post">
+            <label>Mã HĐ:</label>
+            <input type="text" name="contractId" placeholder="VD: 297" required>
+            <button type="submit">Gửi yêu cầu trả xe</button>
+        </form>
+
         <div class="container mt-4">
             <!-- Header -->
             <div class="staff-header text-center">
                 <h1><i class="fas fa-tachometer-alt"></i> Staff Dashboard</h1>
                 <p class="mb-0">Xem và xử lý hợp đồng từ khách hàng</p>
             </div>
-
+          
             <!-- Statistics -->
             <div class="row mb-4">
                 <div class="col-md-3">
@@ -274,14 +284,14 @@
                                 <i class="fas fa-calendar-end"></i> 05/01/2025 18:00
                             </div>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-1">
                             <h6 class="mb-1">Số tiền</h6>
                             <div class="fw-bold text-success">
                                 <i class="fas fa-dollar-sign"></i> $500
                             </div>
                             <small class="text-muted">Cọc: $100</small>
                         </div>
-                        <div class="col-md-1">
+                        <div class="col-md-2">
                             <h6 class="mb-1">Trạng thái</h6>
                             <span class="status-badge status-pending">Chờ xử lý</span>
                         </div>
@@ -328,14 +338,14 @@
                                 <i class="fas fa-calendar-end"></i> 15/01/2025 17:00
                             </div>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-1">
                             <h6 class="mb-1">Số tiền</h6>
                             <div class="fw-bold text-success">
                                 <i class="fas fa-dollar-sign"></i> $800
                             </div>
                             <small class="text-muted">Cọc: $160</small>
                         </div>
-                        <div class="col-md-1">
+                        <div class="col-md-2">
                             <h6 class="mb-1">Trạng thái</h6>
                             <span class="status-badge status-accepted">Đã chấp nhận</span>
                         </div>
@@ -374,14 +384,14 @@
                                 <i class="fas fa-calendar-end"></i> 25/01/2025 16:00
                             </div>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-1">
                             <h6 class="mb-1">Số tiền</h6>
                             <div class="fw-bold text-success">
                                 <i class="fas fa-dollar-sign"></i> $1200
                             </div>
                             <small class="text-muted">Cọc: $240</small>
                         </div>
-                        <div class="col-md-1">
+                        <div class="col-md-2">
                             <h6 class="mb-1">Trạng thái</h6>
                             <span class="status-badge status-pending">Chờ xử lý</span>
                         </div>
@@ -402,8 +412,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>       
         </div>
+        <jsp:include page="returncar.jsp" />
+
 
         <!-- Scripts -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

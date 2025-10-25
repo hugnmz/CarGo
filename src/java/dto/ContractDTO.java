@@ -2,6 +2,7 @@ package dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 
@@ -66,4 +67,14 @@ public class ContractDTO {
     
     public List<PaymentDTO> getPayments() { return payments; }
     public void setPayments(List<PaymentDTO> payments) { this.payments = payments; }
+    
+    public String startDateToString() {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy");
+        return startDate.format(fmt);
+    }
+    
+    public String endDateToString() {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy");
+        return endDate.format(fmt);
+    }
 }

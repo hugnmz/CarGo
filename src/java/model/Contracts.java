@@ -2,6 +2,7 @@ package model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import util.di.annotation.Column;
 import util.di.annotation.Nested;
@@ -153,4 +154,6 @@ public class Contracts {
     public void setPayments(List<Payments> payments) {
         this.payments = payments;
     }
+
+  
 }
