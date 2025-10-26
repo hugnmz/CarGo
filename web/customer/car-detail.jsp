@@ -17,7 +17,11 @@
         <title>Chi tiết xe - CarRental</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<<<<<<< HEAD:web/customer/car-detail.jsp
     <link href="${pageContext.request.contextPath}/css/customer/car-detail.css" rel="stylesheet">
+=======
+    <link href="${pageContext.request.contextPath}/CSS/car-detail.css" rel="stylesheet">
+>>>>>>> origin/main:web/car-detail.jsp
     </head>
     <body>
         <!-- Navbar -->

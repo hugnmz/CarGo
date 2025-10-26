@@ -73,6 +73,18 @@ public class VehiclesDAOImpl implements VehiclesDAO {
     }
 
     @Override
+    public boolean deleteVehicleByCarId(Integer carId) {
+        return false;
+    }
+
+    @Override
+    public boolean deleteVehiclesByCarId(Integer carId) {
+        String sql = "DELETE FROM dbo.Vehicles WHERE carId = ?";
+        int result = JdbcTemplateUtil.update(sql, carId);
+        return result >= 0;
+    }
+
+    @Override
     public List<Vehicles> getVehiclesByCar(Integer CarId) {
         String sql = "SELECT "
                 + "v.vehicleId, v.carId, v.plateNumber, v.isActive, v.locationId, "
@@ -117,8 +129,8 @@ public class VehiclesDAOImpl implements VehiclesDAO {
     @Override
     public boolean isVehicleAvailable(Integer vehicleId, LocalDateTime startDate, LocalDateTime endDate) {
         // A vehicle is busy if there exists an overlapping contract detail in blocking statuses
-        final String busySql =
-                "SELECT COUNT(*) "
+        final String busySql
+                = "SELECT COUNT(*) "
                 + "FROM dbo.ContractDetails cd "
                 + "JOIN dbo.Contracts ct ON ct.contractId = cd.contractId "
                 + "WHERE cd.vehicleId = ? "
@@ -134,5 +146,23 @@ public class VehiclesDAOImpl implements VehiclesDAO {
         return (okVeh > 0 && busy == 0);
     }
 
+    @Override
+    public boolean isPlateNumberExist(String plateNumber, Integer excludeVehicleId) {
+        String sql = "SELECT COUNT(*) FROM dbo.Vehicles WHERE plateNumber = ?";
+        Object[] params;
+        if (excludeVehicleId != null) {
+            sql += " AND vehicleId != ?";
+            params = new Object[]{plateNumber, excludeVehicleId};
+        } else {
+            params = new Object[]{plateNumber};
+        }
+        int count = JdbcTemplateUtil.count(sql, params);
+        return count > 0;
+    }
 
+    @Override
+    public int countVehicles() {
+        String sql = "SELECT COUNT(*) FROM dbo.Vehicles";
+        return JdbcTemplateUtil.count(sql);
+    }
 }

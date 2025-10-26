@@ -4,11 +4,11 @@
  */
 package service;
 
+import dto.LocationDTO;
 import dto.VehicleDTO;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
 
 /**
  *
@@ -20,5 +20,17 @@ public interface VehicleService {
 
     Optional<VehicleDTO> getVehicleById(Integer vehicleId);
     
+
     List<VehicleDTO> getAvailableVehiclesByCar(Integer carId, LocalDateTime startDate, LocalDateTime endDate);
+
+    List<LocationDTO> getAllLocation();
+
+    boolean addVehicle(VehicleDTO vehicleDTO) throws Exception;
+
+    boolean updateVehicle(VehicleDTO vehicleDTO) throws Exception;
+    
+    boolean deleteVehicle(Integer vehicleId);
+    
+    int countVehical();
+
 }

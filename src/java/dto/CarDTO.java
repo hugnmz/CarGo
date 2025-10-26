@@ -137,7 +137,5 @@ public class CarDTO {
     public void setDepositAmount(Double depositAmount) {
         this.depositAmount = depositAmount;
     }
-
-    
-
 }
+

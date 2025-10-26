@@ -19,10 +19,6 @@ public class RoleDTO {
         this.roleName = roleName;
     }
     
-    public RoleDTO(Integer roleId, String roleName) {
-        this.roleId = roleId;
-        this.roleName = roleName;
-    }
     
     // Getters and Setters
     public Integer getRoleId() { return roleId; }

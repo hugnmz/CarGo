@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
 import java.util.List;
@@ -10,20 +6,16 @@ import util.di.annotation.Nested;
 
 public class Roles {
 
-    @Column(name = "role_id")
+    @Column(name = "roleId")
     private Integer roleId;
 
-    @Column(name = "role_name")
+    @Column(name = "roleName")
     private String roleName;
 
+    // QUAN HỆ 1-N: 1 role có thể có nhiều user
     @Nested
     private List<Users> users;
 
-    // XÓA: Không còn sử dụng UserRoles
-    // @Nested
-    // private List<UserRoles> userRoles;
-
-    // Constants for predefined roles
     public static final String ADMIN = "ADMIN";
     public static final String MANAGER = "MANAGER";
     public static final String STAFF = "STAFF";
@@ -36,7 +28,7 @@ public class Roles {
         this.roleName = roleName;
     }
 
-    // Getters and Setters
+    // Getters & Setters
     public Integer getRoleId() {
         return roleId;
     }
@@ -61,7 +53,4 @@ public class Roles {
         this.users = users;
     }
 
-    // XÓA: Không còn sử dụng
-    // public List<UserRoles> getUserRoles() { return userRoles; }
-    // public void setUserRoles(List<UserRoles> userRoles) { this.userRoles = userRoles; }
 }

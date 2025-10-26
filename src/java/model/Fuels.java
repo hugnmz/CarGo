@@ -43,4 +43,11 @@ public class Fuels {
     public void setCars(List<Cars> cars) {
         this.cars = cars;
     }
+
+    @Override
+    public String toString() {
+        return "Fuels{" + "fuelId=" + fuelId + ", fuelType=" + fuelType + ", cars=" + cars + '}';
+    }
+    
+    
 }

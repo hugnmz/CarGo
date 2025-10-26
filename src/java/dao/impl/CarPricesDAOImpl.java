@@ -36,33 +36,34 @@ public class CarPricesDAOImpl implements CarPricesDAO {
 
     @Override
     public boolean addCarPrice(CarPrices carPrice) {
-        String sql = "INSERT INTO dbo.CarPrices(carId, dailyPrice, depositAmount, startDate, endDate, createAt) VALUES (?, ?, ?, ?, ?, ?)";
-        
+        String sql = "INSERT INTO dbo.CarPrices(carId, dailyPrice, depositAmount, startDate, endDate, createAt)"
+                + " VALUES (?, ?, ?, ?, ?, ?)";
+
         int result = JdbcTemplateUtil.update(sql,
-            carPrice.getCarId(),
-            carPrice.getDailyPrice(),
-            carPrice.getDepositAmount(),
-            carPrice.getStartDate(),
-            carPrice.getEndDate(),
-            carPrice.getCreateAt()
+                carPrice.getCarId(),
+                carPrice.getDailyPrice(),
+                carPrice.getDepositAmount(),
+                carPrice.getStartDate(),
+                carPrice.getEndDate(),
+                carPrice.getCreateAt()
         );
-        
+
         return result > 0;
     }
 
     @Override
     public boolean updateCarPrice(CarPrices carPrice) {
         String sql = "UPDATE dbo.CarPrices SET carId = ?, dailyPrice = ?, depositAmount = ?, startDate = ?, endDate = ? WHERE priceId = ?";
-        
+
         int result = JdbcTemplateUtil.update(sql,
-            carPrice.getCarId(),
-            carPrice.getDailyPrice(),
-            carPrice.getDepositAmount(),
-            carPrice.getStartDate(),
-            carPrice.getEndDate(),
-            carPrice.getPriceId()
+                carPrice.getCarId(),
+                carPrice.getDailyPrice(),
+                carPrice.getDepositAmount(),
+                carPrice.getStartDate(),
+                carPrice.getEndDate(),
+                carPrice.getPriceId()
         );
-        
+
         return result > 0;
     }
 
@@ -71,6 +72,13 @@ public class CarPricesDAOImpl implements CarPricesDAO {
         String sql = "DELETE FROM dbo.CarPrices WHERE priceId = ?";
         int result = JdbcTemplateUtil.update(sql, priceId);
         return result > 0;
+    }
+
+    @Override
+    public boolean deleteCarPricesByCarId(Integer carId) {
+        String sql = "DELETE FROM dbo.CarPrices WHERE carId = ?";
+        int result = JdbcTemplateUtil.update(sql, carId);
+        return result >= 0;
     }
 
     @Override

@@ -15,7 +15,11 @@
       rel="stylesheet"
     />
     <link
+<<<<<<< HEAD:web/auth/login.jsp
       href="${pageContext.request.contextPath}/css/auth/login.css"
+=======
+      href="${pageContext.request.contextPath}/CSS/login.css"
+>>>>>>> origin/main:web/login.jsp
       rel="stylesheet"
     />
   </head>

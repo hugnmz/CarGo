@@ -4,7 +4,7 @@
  */
 package service;
 
-import dto.CarDTO;
+import dto.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,4 +16,25 @@ public interface CarService {
     
 
     Optional<CarDTO> getCarById(Integer carId);
+    
+    boolean addCar(CarDTO carDTO);
+    
+    boolean updateCar(CarDTO carDTO);
+    
+    boolean deleteCar(Integer carID);
+    
+    List<CategoryDTO> getAllCategories();
+    
+    List<FuelDTO> getAllFuels();
+    
+    List<SeatingDTO> getAllSeatings();
+    
+    List<LocationDTO> getAllLocation();
+    
+    public boolean addPriceForCar(int carId, double price, double deposit);
+    
+    public int addCarAndGetId(CarDTO carDTO);
+    
+    public List<VehicleDTO> getVehicalByCarId(int carId);
+    
 }
