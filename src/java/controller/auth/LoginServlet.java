@@ -6,6 +6,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.List;
+import java.util.ArrayList;
+import util.MessageUtil;
 import service.CustomerService;
 import service.impl.CustomerServiceImpl;
 import util.di.DIContainer;
@@ -49,10 +52,22 @@ public class LoginServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
+        // Tạo list để thu thập lỗi
+        List<String> errors = new ArrayList<>();
+
         // check du lieu dau vao
-        if (username == null || username.trim().isEmpty()
-                || password == null || password.trim().isEmpty()) {
-            request.setAttribute("error", "vui long nhap day du thong tin");
+            if (username == null || username.trim().isEmpty()) {
+                errors.add(MessageUtil.getError("error.username.required"));
+            }
+
+            if (password == null || password.trim().isEmpty()) {
+                errors.add(MessageUtil.getError("error.password.required"));
+            }
+
+        // Nếu có lỗi validation, hiển thị tất cả lỗi
+        if (!errors.isEmpty()) {
+            request.setAttribute("errors", errors);
+            request.setAttribute("username", username); // Giữ lại username
             request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
             return;
         }
@@ -88,13 +103,17 @@ public class LoginServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + targetPath);
                 return;
             } else {
-                request.setAttribute("errorMessage", "tai khoan hoac mat khau khong dung");
+                errors.add(MessageUtil.getError("error.login.invalid"));
+                request.setAttribute("errors", errors);
+                request.setAttribute("username", username); // Giữ lại username
                 request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "co loi xay ra khi dang nhap");
+                errors.add(MessageUtil.getError("error.system.login"));
+            request.setAttribute("errors", errors);
+            request.setAttribute("username", username); // Giữ lại username
             request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
         }
     }

@@ -61,6 +61,5 @@ public class EmailUtil {
         message.setContent(htmlBody, "text/html; charset=UTF-8");
 
         Transport.send(message);
-        System.out.println("[EmailUtil] Mail sent to " + to);
     }
 }

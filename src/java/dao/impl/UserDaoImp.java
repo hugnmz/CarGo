@@ -2,7 +2,6 @@ package dao.impl;
 
 import dao.UsersDAO;
 import model.Users;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import util.JdbcTemplateUtil;
@@ -31,16 +30,18 @@ public class UserDaoImp implements UsersDAO {
 
     @Override
     public Optional<Users> getUserByUsername(String username) {
+        // SỬA: Cập nhật query để include role information
         String sql = """
-            SELECT u.*, l.city
+            SELECT u.*, l.city, l.address, r.roleId, r.roleName
             FROM Users u
             LEFT JOIN Locations l ON u.locationId = l.locationId
+            LEFT JOIN Roles r ON u.roleId = r.roleId
             WHERE u.username = ?
         """;
         Users one = JdbcTemplateUtil.queryOne(sql, Users.class, username);
         return Optional.ofNullable(one);
     }
-    
+
 //    public static void main(String[] args) {
 //        UserDaoImp user = new UserDaoImp();
 //        Optional<Users> list = user.getUserByUsername("admin");
@@ -55,15 +56,15 @@ public class UserDaoImp implements UsersDAO {
 //            System.out.println("Không tìm thấy user 'admin'");
 //        }
 //    }
-
     @Override
     public boolean createUser(Users user) {
+        // SỬA: Thêm roleId vào INSERT statement
         String sql = """
         INSERT INTO Users (
             username, password_hash, password_salt,
-            fullName, phone, email, dateOfBirth, locationId
+            fullName, phone, email, dateOfBirth, locationId, roleId
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """;
 
         int id = JdbcTemplateUtil.insertAndReturnKey(
@@ -75,7 +76,8 @@ public class UserDaoImp implements UsersDAO {
                 user.getPhone(),
                 user.getEmail(),
                 user.getDateOfBirth() != null ? java.sql.Date.valueOf(user.getDateOfBirth()) : null,
-                user.getLocationId()
+                user.getLocationId(),
+                user.getRoleId() // THÊM MỚI: roleId parameter
         );
 
         if (id > 0) {
@@ -87,10 +89,11 @@ public class UserDaoImp implements UsersDAO {
 
     @Override
     public boolean updateUser(Users user) {
+        // SỬA: Thêm roleId vào UPDATE statement
         String sql = """
             UPDATE Users SET
                 fullName = ?, phone = ?, email = ?, dateOfBirth = ?,
-                locationId = ?, verifyCode = ?, verifyCodeExpire = ?, isVerified = ?
+                locationId = ?, roleId = ?
             WHERE userId = ?
         """;
 
@@ -101,9 +104,7 @@ public class UserDaoImp implements UsersDAO {
                 user.getEmail(),
                 user.getDateOfBirth() != null ? java.sql.Date.valueOf(user.getDateOfBirth()) : null,
                 user.getLocationId(),
-                //                user.getVerifyCode(),
-                //                user.getVerifyCodeExpire() != null ? Timestamp.valueOf(user.getVerifyCodeExpire()) : null,
-                //                user.getIsVerified(),
+                user.getRoleId(), // THÊM MỚI: roleId parameter
                 user.getUserId()
         );
 
@@ -129,15 +130,16 @@ public class UserDaoImp implements UsersDAO {
 
     @Override
     public boolean assignRole(Integer userId, Integer roleId) {
-        String sql = "INSERT INTO UserRoles (userId, roleId) VALUES (?, ?)";
-        int affected = JdbcTemplateUtil.update(sql, userId, roleId);
+        // SỬA: Thay đổi logic vì không còn bảng UserRoles
+        String sql = "UPDATE Users SET roleId = ? WHERE userId = ?";
+        int affected = JdbcTemplateUtil.update(sql, roleId, userId);
         return affected > 0;
     }
 
     @Override
     public boolean removeRole(Integer userId, Integer roleId) {
-        String sql = "DELETE FROM UserRoles WHERE userId = ? AND roleId = ?";
-        int affected = JdbcTemplateUtil.update(sql, userId, roleId);
-        return affected > 0;
+        // SỬA: Thay đổi logic vì không còn bảng UserRoles
+        // Với database mới, không thể remove role (mỗi user phải có 1 role)
+        return false;
     }
 }

@@ -19,8 +19,9 @@ public class Roles {
     @Nested
     private List<Users> users;
 
-    @Nested
-    private List<UserRoles> userRoles;
+    // XÓA: Không còn sử dụng UserRoles
+    // @Nested
+    // private List<UserRoles> userRoles;
 
     // Constants for predefined roles
     public static final String ADMIN = "ADMIN";
@@ -60,11 +61,7 @@ public class Roles {
         this.users = users;
     }
 
-    public List<UserRoles> getUserRoles() {
-        return userRoles;
-    }
-
-    public void setUserRoles(List<UserRoles> userRoles) {
-        this.userRoles = userRoles;
-    }
+    // XÓA: Không còn sử dụng
+    // public List<UserRoles> getUserRoles() { return userRoles; }
+    // public void setUserRoles(List<UserRoles> userRoles) { this.userRoles = userRoles; }
 }

@@ -18,6 +18,7 @@ import model.Users;
 import service.UserService;
 import util.JdbcTemplateUtil;
 import util.di.DIContainer;
+import util.MessageUtil;
 
 /**
  *
@@ -46,7 +47,7 @@ public class LoginAdmin extends HttpServlet {
 
         //Kiểm tra đầu vào
         if (username == null || username.isBlank() || password == null || password.isBlank()) {
-            request.setAttribute("error", "Vui lòng nhập đầy đủ thông tin");
+            request.setAttribute("error", MessageUtil.getError("error.admin.login.required"));
             request.getRequestDispatcher("/admin/admin_login.jsp").forward(request, response);
             return;
         }
@@ -70,7 +71,7 @@ public class LoginAdmin extends HttpServlet {
                 for (RoleRow rr : roleRows) { if (rr.roleName != null) roles.add(rr.roleName); }
 
                 if (roles.isEmpty()) {
-                    request.setAttribute("error", "Tài khoản không có quyền (ADMIN/MANAGER/STAFF)");
+                    request.setAttribute("error", MessageUtil.getError("error.admin.no.permission"));
                     request.getRequestDispatcher("/admin/admin_login.jsp").forward(request, response);
                     return;
                 }
@@ -98,13 +99,13 @@ public class LoginAdmin extends HttpServlet {
                     response.sendRedirect(request.getContextPath() + "/home");
                 }
             } else {
-                request.setAttribute("error", "Tài khoản hoặc mật khẩu không đúng hoặc không có quyền quản trị");
+                request.setAttribute("error", MessageUtil.getError("error.admin.login.invalid"));
                 request.getRequestDispatcher("/admin/admin_login.jsp").forward(request, response);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Đã xảy ra lỗi khi đăng nhập");
+            request.setAttribute("error", MessageUtil.getError("error.admin.system"));
             request.getRequestDispatcher("/admin/admin_login.jsp").forward(request, response);
         }
     }

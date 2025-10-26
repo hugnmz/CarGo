@@ -39,12 +39,20 @@ public class UserMapper {
             dto.setAddress(location.getAddress());
         }
 
-        // Thong tin vai tro (nested)
-        if (user.getRoles() != null) {
+        // SỬA: Thay đổi logic xử lý roles
+        // XÓA: Không còn sử dụng List<Roles>
+        // if (user.getRoles() != null) {
+        //     List<String> roleNames = new ArrayList<>();
+        //     for (Roles role : user.getRoles()) {
+        //         roleNames.add(role.getRoleName());
+        //     }
+        //     dto.setRoles(roleNames);
+        // }
+
+        // THÊM MỚI: Xử lý single role
+        if (user.getRole() != null) {
             List<String> roleNames = new ArrayList<>();
-            for (Roles role : user.getRoles()) {
-                roleNames.add(role.getRoleName());
-            }
+            roleNames.add(user.getRole().getRoleName());
             dto.setRoles(roleNames);
         }
 

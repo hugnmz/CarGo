@@ -1,4 +1,5 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> <%@ page
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib
+prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %> <%@ page
 contentType="text/html; charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -102,7 +103,12 @@ contentType="text/html; charset=UTF-8" language="java" %>
                       </td>
                       <td>${d.rentStartDate}</td>
                       <td>${d.rentEndDate}</td>
-                      <td class="text-end"><strong>${d.price}</strong> VNĐ</td>
+                      <td class="text-end">
+                        <strong
+                          ><fmt:formatNumber value="${d.price}" pattern="#,###"
+                        /></strong>
+                        VNĐ
+                      </td>
                     </tr>
                   </c:forEach>
                 </tbody>
@@ -114,13 +120,25 @@ contentType="text/html; charset=UTF-8" language="java" %>
                     <div class="mb-2">
                       <i class="fas fa-money-bill-wave me-2 text-primary"></i>
                       <strong>Tổng tiền thuê:</strong>
-                      <span class="ms-2">${c.totalAmount} VNĐ</span>
+                      <span class="ms-2"
+                        ><fmt:formatNumber
+                          value="${c.totalAmount}"
+                          pattern="#,###"
+                        />
+                        VNĐ</span
+                      >
                     </div>
                     <div class="mb-2">
                       <i class="fas fa-wallet me-2 text-warning"></i>
                       <strong>Tiền đặt cọc:</strong>
                       <span class="ms-2 text-warning"
-                        ><strong>${c.depositAmount} VNĐ</strong></span
+                        ><strong
+                          ><fmt:formatNumber
+                            value="${c.depositAmount}"
+                            pattern="#,###"
+                          />
+                          VNĐ</strong
+                        ></span
                       >
                     </div>
                     <div class="text-muted" style="font-size: 0.85rem">
@@ -132,7 +150,13 @@ contentType="text/html; charset=UTF-8" language="java" %>
                     <div class="text-muted mb-1" style="font-size: 0.9rem">
                       Tổng thanh toán
                     </div>
-                    <div class="total-amount">${c.totalAmount} VNĐ</div>
+                    <div class="total-amount">
+                      <fmt:formatNumber
+                        value="${c.totalAmount}"
+                        pattern="#,###"
+                      />
+                      VNĐ
+                    </div>
                   </div>
                 </div>
               </div>

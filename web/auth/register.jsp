@@ -40,8 +40,16 @@
 
       <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
-      <c:if test="${not empty errorMessage}">
-        <div class="alert alert-danger">${errorMessage}</div>
+      <c:if test="${not empty errors}">
+        <div class="alert alert-danger">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          <strong>Có lỗi xảy ra:</strong>
+          <ul class="mb-0 mt-2">
+            <c:forEach var="error" items="${errors}">
+              <li>${error}</li>
+            </c:forEach>
+          </ul>
+        </div>
       </c:if>
       <c:if test="${not empty successMessage}">
         <div class="alert alert-success">${successMessage}</div>
@@ -59,6 +67,7 @@
             name="fullname"
             class="form-control"
             placeholder="Nhập họ và tên *"
+            value="${fullname != null ? fullname : ''}"
             required
           />
         </div>
@@ -70,6 +79,7 @@
             name="phone"
             class="form-control"
             placeholder="Nhập số điện thoại *"
+            value="${phone != null ? phone : ''}"
             required
           />
         </div>
@@ -81,17 +91,18 @@
             name="email"
             class="form-control"
             placeholder="Nhập email*)"
+            value="${email != null ? email : ''}"
           />
         </div>
 
         <!-- Chọn tỉnh/thành phố -->
         <div class="mb-3">
           <select name="city" class="form-select" required>
-            <option value="" disabled selected>Tỉnh/ thành phố (*)</option>
-            <option>Hà Nội</option>
-            <option>Hồ Chí Minh</option>
-            <option>Đà Nẵng</option>
-            <option>Khác...</option>
+            <option value="" disabled ${city == null ? 'selected' : ''}>Tỉnh/ thành phố (*)</option>
+            <option value="Hà Nội" ${city == 'Hà Nội' ? 'selected' : ''}>Hà Nội</option>
+            <option value="Hồ Chí Minh" ${city == 'Hồ Chí Minh' ? 'selected' : ''}>Hồ Chí Minh</option>
+            <option value="Đà Nẵng" ${city == 'Đà Nẵng' ? 'selected' : ''}>Đà Nẵng</option>
+            <option value="Khác..." ${city == 'Khác...' ? 'selected' : ''}>Khác...</option>
           </select>
         </div>
 
@@ -102,6 +113,7 @@
             name="username"
             class="form-control"
             placeholder="Tên đăng nhập *"
+            value="${username != null ? username : ''}"
             required
           />
         </div>

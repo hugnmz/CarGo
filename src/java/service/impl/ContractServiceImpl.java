@@ -300,19 +300,7 @@ public class ContractServiceImpl implements ContractService {
     }
     
     private BigDecimal calculateDepositAmount(BigDecimal total) {
-        // Tính tiền đặt cọc (30% tổng tiền thuê, tối thiểu 500k)
-        BigDecimal depositPercent = new BigDecimal("0.30");
-        BigDecimal depositAmount = total.multiply(depositPercent);
-        BigDecimal minDeposit = new BigDecimal("500000");
-        
-        if (depositAmount.compareTo(minDeposit) < 0) {
-            depositAmount = minDeposit;
-        }
-        
-        // Làm tròn đến hàng nghìn
-        depositAmount = depositAmount.divide(new BigDecimal("1000"), 0, RoundingMode.UP)
-                                   .multiply(new BigDecimal("1000"));
-        
-        return depositAmount;
+        // Cố định tiền đặt cọc 30.000.000 VNĐ
+        return new BigDecimal("30000000");
     }
 }

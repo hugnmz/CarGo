@@ -10,6 +10,7 @@ import java.util.List;
 import service.ContractService;
 import dto.ContractDTO;
 import util.AuthUtil;
+import util.MessageUtil;
 import util.di.DIContainer;
 
 @WebServlet(name = "CheckoutServlet", urlPatterns = {"/checkout"})
@@ -69,7 +70,7 @@ public class CheckoutServlet extends HttpServlet {
             
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Có lỗi xảy ra khi tạo hợp đồng: " + e.getMessage());
+            request.setAttribute("error", MessageUtil.getError("error.checkout.failed") + ": " + e.getMessage());
             response.sendRedirect(request.getContextPath() + "/ViewCartDetail");
         }
     }

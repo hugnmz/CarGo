@@ -39,8 +39,16 @@
       <%@ taglib prefix="c" uri="jakarta.tags.core" %> <%@ taglib prefix="fmt"
       uri="jakarta.tags.fmt" %>
 
-      <c:if test="${not empty errorMessage}">
-        <div class="alert alert-danger">${errorMessage}</div>
+      <c:if test="${not empty errors}">
+        <div class="alert alert-danger">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          <strong>Có lỗi xảy ra:</strong>
+          <ul class="mb-0 mt-2">
+            <c:forEach var="error" items="${errors}">
+              <li>${error}</li>
+            </c:forEach>
+          </ul>
+        </div>
       </c:if>
       <c:if test="${not empty successMessage}">
         <div class="alert alert-success">${successMessage}</div>
@@ -58,6 +66,7 @@
             name="username"
             class="form-control"
             placeholder="Tên đăng nhập"
+            value="${username != null ? username : ''}"
             required
           />
         </div>
@@ -104,7 +113,9 @@
       <!-- Liên kết -->
       <div class="d-flex justify-content-between mt-3">
         <a href="#">Quên mật khẩu?</a>
-        <a href="${pageContext.request.contextPath}/auth/register.jsp">Đăng ký tài khoản</a>
+        <a href="${pageContext.request.contextPath}/auth/register.jsp"
+          >Đăng ký tài khoản</a
+        >
       </div>
     </div>
 

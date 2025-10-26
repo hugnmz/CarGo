@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 
@@ -291,8 +292,8 @@
                                                         </span>
                                                     </div>
                                                     <div class="booking-price">
-                                                        <h6 class="text-success">${contract.totalAmount} VNĐ</h6>
-                                                        <p class="text-muted small">Cọc: ${contract.depositAmount} VNĐ</p>
+                                                        <h6 class="text-success"><fmt:formatNumber value="${contract.totalAmount}" pattern="#,###" /> VNĐ</h6>
+                                                        <p class="text-muted small">Cọc: <fmt:formatNumber value="${contract.depositAmount}" pattern="#,###" /> VNĐ</p>
                                                         <button class="btn btn-sm btn-outline-primary">Chi tiết</button>
                                                     </div>
                                                 </div>
@@ -329,7 +330,7 @@
                                                 <h6>BMW X5 2024</h6>
                                                 <p class="text-muted">SUV - 7 chỗ</p>
                                                 <div class="d-flex justify-content-between align-items-center">
-                                                    <span class="text-success fw-bold">2,500,000 VNĐ/ngày</span>
+                                                    <span class="text-success fw-bold">2.500.000 VNĐ/ngày</span>
                                                     <button class="btn btn-sm btn-outline-danger">
                                                         <i class="fa fa-heart"></i>
                                                     </button>
@@ -344,7 +345,7 @@
                                                 <h6>Mercedes C-Class 2024</h6>
                                                 <p class="text-muted">Sedan - 5 chỗ</p>
                                                 <div class="d-flex justify-content-between align-items-center">
-                                                    <span class="text-success fw-bold">1,800,000 VNĐ/ngày</span>
+                                                    <span class="text-success fw-bold">1.800.000 VNĐ/ngày</span>
                                                     <button class="btn btn-sm btn-outline-danger">
                                                         <i class="fa fa-heart"></i>
                                                     </button>

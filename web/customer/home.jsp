@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ page import="jakarta.servlet.http.*, jakarta.servlet.*" %>
 <%
@@ -281,8 +282,8 @@
                                                     <div>
                                                         <c:set var="currentPrice" value="${car.dailyPrice}" />
                                                         <c:set var="originalPrice" value="${currentPrice * 1.18}" />
-                                                        <small class="price-old d-block">${originalPrice}K</small>
-                                                        <span class="price-modern">${currentPrice}K<small class="text-muted fw-normal">/ngày</small></span>
+                                                        <small class="price-old d-block"><fmt:formatNumber value="${originalPrice}" pattern="#,###" /> VNĐ</small>
+                                                        <span class="price-modern"><fmt:formatNumber value="${currentPrice}" pattern="#,###" /> VNĐ<small class="text-muted fw-normal">/ngày</small></span>
                                                     </div>
                                                 </c:when>
                                                 <c:otherwise>

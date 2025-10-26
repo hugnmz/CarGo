@@ -12,7 +12,7 @@ import util.di.annotation.Nested;
 
 public class Users {
 
-    @Column(name = "user_id")
+    @Column
     private Integer userId;
 
     @Column()
@@ -41,15 +41,23 @@ public class Users {
 
     @Column(name = "location_id")
     private Integer locationId;
+    
+    // THÊM MỚI: Thay thế UserRoles bằng roleId trực tiếp
+    @Column(name = "roleId")
+    private Integer roleId;
 
     @Nested
     private Locations location;
 
-    @Nested
-    private List<Roles> roles;
+    // XÓA: Không còn sử dụng UserRoles
+    // @Nested
+    // private List<Roles> roles;
+    // @Nested
+    // private List<UserRoles> userRoles;
 
+    // THÊM MỚI: Thay thế bằng single role
     @Nested
-    private List<UserRoles> userRoles;
+    private Roles role;
 
     @Nested
     private List<Contracts> contracts;
@@ -155,21 +163,23 @@ public class Users {
         this.location = location;
     }
 
-    public List<Roles> getRoles() {
-        return roles;
+    // THÊM MỚI: Getters và setters cho roleId và role
+    public Integer getRoleId() {
+        return roleId;
     }
 
-    public void setRoles(List<Roles> roles) {
-        this.roles = roles;
+    public void setRoleId(Integer roleId) {
+        this.roleId = roleId;
     }
 
-    public List<UserRoles> getUserRoles() {
-        return userRoles;
+    public Roles getRole() {
+        return role;
     }
 
-    public void setUserRoles(List<UserRoles> userRoles) {
-        this.userRoles = userRoles;
+    public void setRole(Roles role) {
+        this.role = role;
     }
+
 
     public List<Contracts> getContracts() {
         return contracts;
@@ -177,17 +187,6 @@ public class Users {
 
     public void setContracts(List<Contracts> contracts) {
         this.contracts = contracts;
-    }
-
-
-    @Override
-    public String toString() {
-        return "Users{" + "userId=" + userId + ", username=" + username + 
-                ", passwordHash=" + passwordHash + ", passwordSalt=" + passwordSalt + 
-                ", fullName=" + fullName + ", phone=" + phone + ", email=" + email + 
-                ", dateOfBirth=" + dateOfBirth + ", createdAt=" + createdAt + 
-                ", locationId=" + locationId + ", location=" + location + ", roles=" + 
-                roles + ", userRoles=" + userRoles + ", contracts=" + contracts + '}';
     }
     
     

@@ -1,4 +1,5 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> <%@ page
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %> <%@ page
 contentType="text/html; charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -126,7 +127,7 @@ contentType="text/html; charset=UTF-8" language="java" %>
                     <td><strong>${item.carName}</strong></td>
                     <td>${item.rentStartDate}</td>
                     <td>${item.rentEndDate}</td>
-                    <td><strong>${item.price} VNĐ</strong></td>
+                    <td><strong><fmt:formatNumber value="${item.price}" pattern="#,###" /> VNĐ</strong></td>
                   </tr>
                   <c:set var="total" value="${total + item.price}" />
                 </c:forEach>
@@ -141,7 +142,7 @@ contentType="text/html; charset=UTF-8" language="java" %>
                 <td colspan="5" style="text-align: right; font-weight: bold; font-size: 1.1rem;">
                   <i class="fas fa-receipt me-2"></i>Tổng tiền:
                 </td>
-                <td style="font-weight: bold; font-size: 1.2rem; color: #10b981;">${total} VNĐ</td>
+                <td style="font-weight: bold; font-size: 1.2rem; color: #10b981;"><fmt:formatNumber value="${total}" pattern="#,###" /> VNĐ</td>
               </tr>
             </tfoot>
           </table>

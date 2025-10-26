@@ -11,7 +11,9 @@ import dao.CarPricesDAO;
 import dto.CartDTO;
 import dto.OrderDTO;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -54,15 +56,19 @@ public class CartServiceImpl implements CartService {
     public boolean addToCart(Integer customerId, Integer vehicleId,
             LocalDateTime rentStartDate, LocalDateTime rentEndDate) {
         try {
-            // (1) Validate thời gian
+            // (1) Validate thời gian - SỬA: Theo ngày thay vì giờ
             if (rentStartDate == null || rentEndDate == null) {
                 return false;
             }
             if (!rentEndDate.isAfter(rentStartDate)) {
                 return false;
             }
-            if (java.time.Duration.between(rentStartDate, rentEndDate).toMinutes() < 60) {
-                return false;
+            
+            // Kiểm tra tối thiểu 1 ngày (thay vì 60 phút)
+            LocalDate startDate = rentStartDate.toLocalDate();
+            LocalDate endDate = rentEndDate.toLocalDate();
+            if (startDate.isAfter(endDate) || startDate.isEqual(endDate)) {
+                return false; // Phải ít nhất 1 ngày
             }
 
             // (2) Kiểm tra vehicle có rảnh theo hợp đồng
@@ -268,14 +274,13 @@ public class CartServiceImpl implements CartService {
 
             BigDecimal dailyPrice = dailyPriceOpt.get();
 
-            // 3. tinh so ngay thue theo gio (lam tron len 24h), toi thieu 1 ngay neu >= 1 gio
-            long hours = java.time.Duration.between(startDate, endDate).toHours();
-            if (hours < 1) {
-                return BigDecimal.ZERO; // khong hop le (da chan o servlet)
-            }
-            long days = (long) Math.ceil(hours / 24.0);
+            // 3. Tính số ngày thuê trực tiếp từ LocalDateTime
+            long days = ChronoUnit.DAYS.between(
+                startDate.toLocalDate(), 
+                endDate.toLocalDate()
+            );
             if (days <= 0) {
-                days = 1;
+                days = 1; // Tối thiểu 1 ngày
             }
 
             // 4. tinh tong tien

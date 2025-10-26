@@ -50,31 +50,23 @@
             <div class="alert alert-info alert-modern" style="background: #f0f9ff; border-left: 4px solid #3b82f6;">
                 <h6 class="mb-2"><i class="fas fa-info-circle me-2"></i><strong>Quy định thuê xe</strong></h6>
                 <ul class="mb-0" style="font-size: 0.95rem; line-height: 1.8;">
+                    <li><strong>Thuê theo ngày:</strong> Thời gian thuê xe được tính theo ngày, từ 6:00 sáng đến 22:00 đêm.</li>
                     <li><strong>Cùng hợp đồng, cùng thời gian:</strong> Các xe trong cùng một hợp đồng phải có cùng ngày nhận và ngày trả.</li>
                     <li><strong>Thời điểm khác nhau:</strong> Nếu muốn thuê xe trong các thời điểm khác nhau, bạn cần tạo nhiều hợp đồng riêng biệt.</li>
-                    <li><strong>Đặt cọc khi nhận xe:</strong> Bạn cần đặt cọc 30% tổng tiền thuê (tối thiểu 500.000 VNĐ) khi đến nhận xe.</li>
+                    <li><strong>Đặt cọc khi nhận xe:</strong> Bạn cần đặt cọc 30.000.000 VNĐ khi đến nhận xe.</li>
                     <li><strong>Thanh toán:</strong> Thanh toán toàn bộ khi trả xe và nhận lại tiền cọc.</li>
                 </ul>
             </div>
 
-            <c:if test="${param.error == 'min_1h'}">
+            <c:if test="${not empty errors}">
                 <div class="alert alert-danger alert-modern">
-                    <i class="fas fa-exclamation-circle me-2"></i>Thời gian thuê tối thiểu 1 giờ.
-                </div>
-            </c:if>
-            <c:if test="${param.error == 'overlap'}">
-                <div class="alert alert-warning alert-modern">
-                    <i class="fas fa-exclamation-triangle me-2"></i>Khung giờ đã tồn tại trong giỏ hàng cho xe này.
-                </div>
-            </c:if>
-            <c:if test="${param.error == 'add_failed'}">
-                <div class="alert alert-danger alert-modern">
-                    <i class="fas fa-times-circle me-2"></i>Không thể thêm vào giỏ hàng. Vui lòng thử lại.
-                </div>
-            </c:if>
-            <c:if test="${param.error == 'past_time'}">
-                <div class="alert alert-danger alert-modern">
-                    <i class="fas fa-clock me-2"></i>Không thể đặt xe trong quá khứ. Vui lòng chọn thời gian trong tương lai.
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Có lỗi xảy ra:</strong>
+                    <ul class="mb-0 mt-2">
+                        <c:forEach var="error" items="${errors}">
+                            <li>${error}</li>
+                        </c:forEach>
+                    </ul>
                 </div>
             </c:if>
 
@@ -84,20 +76,14 @@
                 </h5>
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label class="form-label"><i class="far fa-calendar-check"></i>Ngày nhận</label>
-                        <input type="date" class="form-control" name="startDate" value="${param.startDate}" required />
+                        <label class="form-label"><i class="far fa-calendar-check"></i>Ngày nhận xe</label>
+                        <input type="date" class="form-control" name="startDate" value="${startDate != null ? startDate : param.startDate}" required />
+                        <small class="text-muted">Thời gian nhận xe: 6:00 - 22:00</small>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label"><i class="far fa-clock"></i>Giờ nhận</label>
-                        <input type="time" class="form-control" name="startTime" value="${param.startTime != null ? param.startTime : '09:00'}" required />
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label"><i class="far fa-calendar-times"></i>Ngày trả</label>
-                        <input type="date" class="form-control" name="endDate" value="${param.endDate}" required />
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label"><i class="far fa-clock"></i>Giờ trả</label>
-                        <input type="time" class="form-control" name="endTime" value="${param.endTime != null ? param.endTime : '17:00'}" required />
+                        <label class="form-label"><i class="far fa-calendar-times"></i>Ngày trả xe</label>
+                        <input type="date" class="form-control" name="endDate" value="${endDate != null ? endDate : param.endDate}" required />
+                        <small class="text-muted">Thời gian trả xe: 6:00 - 22:00</small>
                     </div>
                 </div>
             </div>

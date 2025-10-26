@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import java.util.List;
+import java.util.ArrayList;
+import util.MessageUtil;
 import service.CustomerService;
 import util.EmailUtil;
 import util.di.DIContainer;
@@ -50,33 +53,65 @@ public class RegisterServlet extends HttpServlet {
         String password = request.getParameter("password");
         String confirmPassword = request.getParameter("confirmPassword");
         
+        // Tạo list để thu thập lỗi
+        List<String> errors = new ArrayList<>();
+        
         // xac thuc du lieu
         try {
+            // Kiểm tra các trường bắt buộc
+            if (fullname == null || fullname.trim().isEmpty()) {
+                errors.add(MessageUtil.getError("error.fullname.required"));
+            }
+            
+            if (phone == null || phone.trim().isEmpty()) {
+                errors.add(MessageUtil.getError("error.phone.required"));
+            }
+            
+            if (email == null || email.trim().isEmpty()) {
+                errors.add(MessageUtil.getError("error.email.required"));
+            }
+            
+            if (username == null || username.trim().isEmpty()) {
+                errors.add(MessageUtil.getError("error.username.required"));
+            }
+            
+            if (password == null || password.trim().isEmpty()) {
+                errors.add(MessageUtil.getError("error.password.required"));
+            }
+            
+            if (confirmPassword == null || confirmPassword.trim().isEmpty()) {
+                errors.add(MessageUtil.getError("error.confirm.password.required"));
+            }
+
+            // Kiểm tra mật khẩu khớp
+            if (password != null && confirmPassword != null && !confirmPassword.equals(password)) {
+                errors.add(MessageUtil.getError("error.password.mismatch"));
+            }
+
+            // Nếu có lỗi validation, hiển thị tất cả lỗi
+            if (!errors.isEmpty()) {
+                request.setAttribute("errors", errors);
+                setFormData(request, fullname, phone, email, city, username);
+                request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
+                return;
+            }
 
             // kiem tra trung lap
             if (customerService.isEmailExists(email)) {
-                request.setAttribute("errorMessage", "Email đã tồn tại.");
-                setFormData(request, fullname, phone, email, city, username);
-                request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
-                return;
+                errors.add(MessageUtil.getError("error.email.exists"));
             }
 
             if (customerService.isPhoneExists(phone)) {
-                request.setAttribute("errorMessage", "số này đã tồn tại");
-                setFormData(request, fullname, phone, email, city, username);
-                request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
-                return;
+                errors.add(MessageUtil.getError("error.phone.exists"));
             }
 
             if (customerService.isUsernameExists(username)) {
-                request.setAttribute("errorMessage", "tên đăng nhập này đã tồn tại");
-                setFormData(request, fullname, phone, email, city, username);
-                request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
-                return;
+                errors.add(MessageUtil.getError("error.username.exists"));
             }
-            
-            if(!confirmPassword.equals(password)){
-                request.setAttribute("errorMessage", "nhập lại mk");
+
+            // Nếu có lỗi trùng lặp, hiển thị tất cả lỗi
+            if (!errors.isEmpty()) {
+                request.setAttribute("errors", errors);
                 setFormData(request, fullname, phone, email, city, username);
                 request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
                 return;
@@ -119,13 +154,15 @@ public class RegisterServlet extends HttpServlet {
                     return;
                 }
             } else {
-                request.setAttribute("errorMessage", "dki that bai");
+                errors.add(MessageUtil.getError("error.register.failed"));
+                request.setAttribute("errors", errors);
                 setFormData(request, fullname, phone, email, city, username);
                 request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Có lỗi xảy ra trong quá trình đăng ký. Vui lòng thử lại!");
+            errors.add(MessageUtil.getError("error.system.register"));
+            request.setAttribute("errors", errors);
             setFormData(request, fullname, phone, email, city, username);
             request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
         }

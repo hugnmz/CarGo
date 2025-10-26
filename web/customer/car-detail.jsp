@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ page import="jakarta.servlet.http.*, jakarta.servlet.*" %>
 <%
@@ -99,11 +100,11 @@
                         <div class="d-flex align-items-center">
                             <div class="me-4">
                                 <div class="d-flex align-items-baseline">
-                                    <span class="h2 text-warning fw-bold">${car.dailyPrice}K</span>
+                                    <span class="h2 text-warning fw-bold"><fmt:formatNumber value="${car.dailyPrice}" pattern="#,###" /> VNĐ</span>
                                     <span class="text-white ms-2">/ngày</span>
                                 </div>
                                 <small class="text-white-50 d-block">
-                                    <i class="fa fa-info-circle me-1"></i>Giá từ ${car.dailyPrice}K/ngày
+                                    <i class="fa fa-info-circle me-1"></i>Giá từ <fmt:formatNumber value="${car.dailyPrice}" pattern="#,###" /> VNĐ/ngày
                                 </small>
                             </div>
                             <a href="#vehicles-section" class="btn btn-warning btn-lg">
@@ -215,11 +216,13 @@
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Ngày nhận xe</label>
                                     <input type="date" id="startDate" name="startDate" class="form-control" required>
+                                    <small class="text-muted">Thời gian nhận: 6:00 - 22:00</small>
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Ngày trả xe</label>
                                     <input type="date" id="endDate" name="endDate" class="form-control" required>
+                                    <small class="text-muted">Thời gian trả: 6:00 - 22:00</small>
                                 </div>
 
                                 <!-- Chọn xe cụ thể -->
@@ -312,12 +315,12 @@
                                             <c:choose>
                                                 <c:when test="${minPrice == maxPrice}">
                                                     <span class="badge bg-success fs-6 mb-1">
-                                                        <i class="fa fa-money-bill-wave me-1"></i>${minPrice}K/ngày
+                                                        <i class="fa fa-money-bill-wave me-1"></i><fmt:formatNumber value="${minPrice}" pattern="#,###" /> VNĐ/ngày
                                                     </span>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <span class="badge bg-success fs-6 mb-1">
-                                                        <i class="fa fa-money-bill-wave me-1"></i>${minPrice}K - ${maxPrice}K/ngày
+                                                        <i class="fa fa-money-bill-wave me-1"></i><fmt:formatNumber value="${minPrice}" pattern="#,###" /> - <fmt:formatNumber value="${maxPrice}" pattern="#,###" /> VNĐ/ngày
                                                     </span>
                                                 </c:otherwise>
                                             </c:choose>
@@ -384,12 +387,12 @@
                                                         <div>
                                                             <span class="h5 text-success fw-bold">
                                                                 <i class="fa fa-money-bill-wave me-1"></i>
-                                                                ${car.dailyPrice}K/ngày
+                                                                <fmt:formatNumber value="${car.dailyPrice}" pattern="#,###" /> VNĐ/ngày
                                                             </span>
                                                         </div>
                                                         <c:if test="${not empty vehicle.depositAmount}">
                                                             <small class="text-muted">
-                                                                <i class="fa fa-shield-alt me-1"></i>Cọc: ${vehicle.depositAmount}K
+                                                                <i class="fa fa-shield-alt me-1"></i>Cọc: <fmt:formatNumber value="${vehicle.depositAmount}" pattern="#,###" /> VNĐ
                                                             </small>
                                                         </c:if>
                                                     </div>

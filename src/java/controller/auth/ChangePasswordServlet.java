@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.CustomerService;
 import util.di.DIContainer;
+import util.MessageUtil;
 
 /**
  *
@@ -47,9 +48,9 @@ public class ChangePasswordServlet extends HttpServlet {
         Integer customerId = Integer.valueOf(request.getParameter("customerId"));
 
         if (customerService.changeCustomerPassword(customerId, oldPass, newPass)) {
-            request.setAttribute("ok", "thay đổi mật khẩu thành công");
+            request.setAttribute("ok", MessageUtil.getMessage("password.change.success"));
         } else {
-            request.setAttribute("errorMess", "Thay đổi mật khẩu ko thành công");
+            request.setAttribute("errorMess", MessageUtil.getError("error.password.change.failed"));
         }
 
         request.getRequestDispatcher("/CustomerServlet").forward(request, response);

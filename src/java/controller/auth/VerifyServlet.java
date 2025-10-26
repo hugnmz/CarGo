@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpSession;
 
 import service.CustomerService;
 import util.di.DIContainer;
+import util.MessageUtil;
 
 /**
  *
@@ -65,14 +66,14 @@ public class VerifyServlet extends HttpServlet {
                     session.removeAttribute("pendingEmail");
                 }
                 
-                req.setAttribute("successMessage", "Xác minh thành công! Bạn có thể đăng nhập ngay bây giờ.");
+                req.setAttribute("successMessage", MessageUtil.getMessage("verification.success.login"));
                 req.getRequestDispatcher("/auth/login.jsp").forward(req, resp);
                 return;
             } else {
-                req.setAttribute("errorMessage", "Mã xác minh không đúng hoặc đã hết hạn. Vui lòng thử lại.");
+                req.setAttribute("errorMessage", MessageUtil.getError("error.verification.code.wrong"));
             }
         } else {
-            req.setAttribute("errorMessage", "Thông tin xác minh không hợp lệ. Vui lòng đăng ký trước.");
+            req.setAttribute("errorMessage", MessageUtil.getError("error.verification.invalid.info"));
         }
         
         req.getRequestDispatcher("/auth/verify.jsp").forward(req, resp);
