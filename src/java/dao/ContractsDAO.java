@@ -4,6 +4,7 @@
  */
 package dao;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -25,4 +26,5 @@ public interface ContractsDAO {
     List<Contracts> getContractByDateRange(LocalDateTime startDate, LocalDateTime endDate);
     List<Contracts> getContractByStatus(String status);
     boolean calculateTotalAmout(Integer contractId);
+    public boolean updateContractTotalAmount(Integer contractId, BigDecimal totalAmount);
 }

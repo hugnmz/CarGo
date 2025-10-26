@@ -11,15 +11,19 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import model.RequestReturnCar;
 import service.ContractService;
+import service.ReturnCarService;
 import util.di.DIContainer;
 
 /**
@@ -29,9 +33,7 @@ import util.di.DIContainer;
 @WebServlet(name = "ReturnCar", urlPatterns = {"/returncar"})
 public class ReturnCar extends HttpServlet {
 
-    // Hàng đợi yêu cầu theo contractId để chống trùng lặp
-    private final ConcurrentMap<Integer, RequestReturnCar> queue = new ConcurrentHashMap<>();
-
+    private ReturnCarService returnCarService;
     private ContractService contractService;
 
     @Override
@@ -40,6 +42,7 @@ public class ReturnCar extends HttpServlet {
 
         try {
             contractService = DIContainer.get(ContractService.class);
+            returnCarService = DIContainer.get(ReturnCarService.class);
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize ContractService", e);
         }
@@ -48,14 +51,27 @@ public class ReturnCar extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // Render danh sách cho staff
-        req.setAttribute("requests", new ArrayList<>(queue.values()));
+        // Lấy danh sách tạm thời từ queue (state toàn ứng dụng)
+        List<RequestReturnCar> requests = new ArrayList<>(returnCarService.all());
+        req.setAttribute("requests", requests);
+        //tạo mã csrf để bảo mật
+        String csrf = java.util.UUID.randomUUID().toString();
+        req.getSession().setAttribute("csrf", csrf);
+        // Tạo session whitelist: chỉ những contractId này mới được phép xử lý
+        Map<Integer, RequestReturnCar> pendingMap = new LinkedHashMap<>();
+        for (RequestReturnCar r : requests) {
+            pendingMap.put(r.getContract().getContractId(), r);
+        }
+        req.getSession().setAttribute("pendingReturnMap", pendingMap);
+
+        // Forward tới trang danh sách
         req.getRequestDispatcher("staff/returncar.jsp").forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         List<String> errors = new ArrayList<>();
+        HttpSession session = req.getSession();
         String contractIdParam = req.getParameter("contractId");
 
         // 1) Validate input
@@ -90,7 +106,7 @@ public class ReturnCar extends HttpServlet {
             }
         }
 
-        // Nếu có lỗi: trả lại cho KH (customer.jsp), không đẩy sang trang staff
+        // Nếu có lỗi: trả lại cho KH 
         if (!errors.isEmpty()) {
             req.setAttribute("errors", errors);
             // Ở đây forward để KH thấy lỗi ngay trên trang của họ
@@ -102,15 +118,17 @@ public class ReturnCar extends HttpServlet {
         ContractDTO dto = dtoOpt.get();
         int cid = dto.getContractId();
 
-        queue.compute(cid, (k, existing) -> {
-            if (existing == null) {
-                return new RequestReturnCar(dto, LocalDateTime.now());
-            }
-            return existing;
-        });
+        RequestReturnCar existing = returnCarService.get(cid);
+        if (existing == null) {
+            // Chưa có → thêm mới
+            RequestReturnCar newReq = new RequestReturnCar(dto, LocalDateTime.now());
+            returnCarService.putIfAbsentOrKeep(cid, newReq);
+            req.getSession().setAttribute("flash", "Gửi yêu cầu trả xe thành công");
+        } else {
+            // Đã có trong hàng chờ
+            req.getSession().setAttribute("flash", "Hợp đồng đang chờ xử lí");
+        }
 
-        // Flash message & PRG
-        req.getSession().setAttribute("message", "Gửi yêu cầu trả xe thành công");
         // Redirect về trang khách để tránh submit lại khi F5
         resp.sendRedirect(req.getContextPath() + "/staff/staff.jsp");
     }

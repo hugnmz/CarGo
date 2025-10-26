@@ -65,12 +65,12 @@
     </head>
 
     <%
-    
-    List<RequestReturnCar> requests = (List<RequestReturnCar>) request.getAttribute("requests");
-    if (requests == null) {
-        response.sendRedirect(request.getContextPath() + "/returncar");
-        return;
-    }
+
+        List<RequestReturnCar> requests = (List<RequestReturnCar>) request.getAttribute("requests");
+        if (requests == null) {
+            response.sendRedirect(request.getContextPath() + "/returncar");
+            return;
+        }
     %>
 
 
@@ -96,7 +96,7 @@
                 <h1><i class="fas fa-tachometer-alt"></i> Staff Dashboard</h1>
                 <p class="mb-0">Xem và xử lý hợp đồng từ khách hàng</p>
             </div>
-            
+
 
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h1 class="mb-4">Danh sách yêu cầu trả xe</h1>
@@ -152,10 +152,14 @@
                                             </c:choose>
                                         </td>
                                         <td class="text-end">
-                                            <a href="${pageContext.request.contextPath}/returns/process?contractId=${r.contract.contractId}"
-                                               class="btn btn-outline-primary btn-sm d-inline-flex align-items-center justify-content-center px-3 py-1">
-                                                <i class="bi bi-gear me-1"></i> Xử lý
-                                            </a>
+                                            <form method="post" action="${pageContext.request.contextPath}/processreturncar"
+                                                  class="d-inline">
+                                                <input type="hidden" name="contractId" value="${r.contract.contractId}"/>
+                                                <input type="hidden" name="csrf" value="${sessionScope.csrf}">
+                                                <button class="btn btn-outline-primary btn-sm d-inline-flex align-items-center justify-content-center px-3 py-1">
+                                                    <i class="bi bi-gear me-1"></i> Xử lý
+                                                </button>
+                                            </form>
 
                                         </td>
                                     </tr>
@@ -171,7 +175,12 @@
                     </div>
                 </div>
             </div>
+            <div class="pt-2">
+                <h4>Tổng số hợp đồng: ${requests.size()}</h4>
+            </div>
         </div>
+
+
 
 
 

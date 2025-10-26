@@ -2,6 +2,7 @@ package service;
 
 import dto.ContractDTO;
 import dto.ContractDetailDTO;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,7 +10,7 @@ import java.util.Optional;
  * ContractService - Service layer cho Contract business logic
  */
 public interface ContractService {
-    
+
     List<ContractDTO> getContractsByCustomer(Integer customerId);
 
     Optional<ContractDTO> getContractById(Integer contractId);
@@ -18,8 +19,9 @@ public interface ContractService {
 
     boolean updateContractStatus(Integer contractId, String status);
 
-    // Tính tổng tiền hợp đồng
+    void updateContractTotalAmount(Integer contractId, BigDecimal totalAmount);
 
+    // Tính tổng tiền hợp đồng
     boolean calculateTotalAmount(Integer contractId);
 
     // Xóa hợp đồng
@@ -32,6 +34,5 @@ public interface ContractService {
     boolean createContract(ContractDTO contractDTO);
 
     List<ContractDTO> createContractsFromCart(Integer customerId, Integer[] selectedOrderIds);
-
 
 }

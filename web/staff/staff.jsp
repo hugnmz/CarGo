@@ -183,9 +183,10 @@
         <c:forEach var="e" items="${errors}">
             <p>${e}</p>
         </c:forEach>
-        <c:if test="${not empty message}">
-            <p>${message}</p>
-        </c:if>
+     <c:if test="${not empty sessionScope.flash}">
+                <div class="alert alert-success">${sessionScope.flash}</div>
+                <c:remove var="flash" scope="session"/>
+            </c:if>
         <form action="${pageContext.request.contextPath}/returncar" method="post">
             <label>Mã HĐ:</label>
             <input type="text" name="contractId" placeholder="VD: 297" required>

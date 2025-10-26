@@ -330,4 +330,13 @@ public class ContractServiceImpl implements ContractService {
         return contractDTOs;
 
     }
+
+    @Override
+    public void updateContractTotalAmount(Integer contractId, BigDecimal totalAmount) {
+       boolean result = contractsDAO.updateContractTotalAmount(contractId, totalAmount);
+       if(!result){
+           throw new RuntimeException("Không thể cập nhật tổng tiền hợp đồng mã "+contractId);
+       }
+    }
+
 }
