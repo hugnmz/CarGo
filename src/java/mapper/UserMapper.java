@@ -6,9 +6,6 @@ import model.Locations;
 import model.Roles;
 import util.di.annotation.Component;
 
-/**
- * UserMapper - Chuyển đổi giữa UserDTO và Users Model
- */
 @Component
 public class UserMapper {
 

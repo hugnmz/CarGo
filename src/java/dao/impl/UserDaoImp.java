@@ -65,9 +65,8 @@ public class UserDaoImp implements UsersDAO {
                 user.getFullName(),
                 user.getPhone(),
                 user.getEmail(),
-                user.getDateOfBirth() != null ? java.sql.Date.valueOf(user.getDateOfBirth()) : null,
                 user.getLocationId(),
-                user.getRoleId(), // ✅ thêm dòng này
+                user.getRoleId(),
                 user.getCreateAt() != null ? Timestamp.valueOf(user.getCreateAt()) : new Timestamp(System.currentTimeMillis())
         );
 
