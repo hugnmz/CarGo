@@ -12,10 +12,10 @@
         <input type="hidden" name="action" value="update">
         <input type="hidden" name="userId" value="${editUser.userId}">
 
-        <div class="col-md-6">
+<!--        <div class="col-md-6">
             <label class="form-label">Tên đăng nhập:</label>
             <input type="text" name="username" class="form-control" value="${editUser.username}" required>
-        </div>
+        </div>-->
 
         <div class="col-md-6">
             <label class="form-label">Họ tên:</label>
@@ -56,7 +56,9 @@
         </div>
 
         <div class="col-12 d-flex justify-content-end mt-3">
-            <button type="submit" class="btn btn-primary px-5">Cập nhật</button>
+            <button type="submit" class="btn btn-primary px-5"
+                    onclick="return confirm('Bạn có chắc chắn muốn sửa các thông tin không?')">
+                Cập nhật</button>
             <a href="HomeAdmin" class="btn btn-secondary ml-2">Hủy</a>
         </div>
     </form>

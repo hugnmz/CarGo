@@ -16,56 +16,56 @@ import java.util.Optional;
 public class AdminTest {
 
     public static void main(String[] args) {
-//        try {
-//            // Khởi tạo DAO
-//            UserDaoImp userDao = new UserDaoImp();
-//
-//            // Tạo đối tượng admin
-//            Users admin = new Users();
-//            admin.setUsername("admin4");
-//            admin.setFullName("System Administrator");
-//            admin.setPhone("0111111114");
-//            admin.setEmail("admin2@system.com");
-//
-//            // Mã hóa mật khẩu
-//            String password = "222";
-//            byte[] salt = PasswordUtil.generateSalt();
-//            byte[][] result = PasswordUtil.hashPassword(password, salt);
-//
-//            admin.setPasswordHash(result[0]);
-//            admin.setPasswordSalt(result[1]);
-//
-//            // Gán roleId cho admin (giả sử roleId = 1 là ADMIN)
-//            admin.setRoleId(3);
-//
-//            // Nếu có locationId (hoặc để null)
-//            admin.setLocationId(null);
-//
-//            // Tạo user
-//            boolean created = userDao.createUser(admin);
-//            if (created) {
-//                System.out.println("✅ Admin created successfully with ID: " + admin.getUserId());
-//                System.out.println("✅ Role ADMIN assigned (roleId = " + admin.getRoleId() + ")");
-//            } else {
-//                System.out.println("❌ Failed to create admin.");
-//            }
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        try {
+            // Khởi tạo DAO
+            UserDaoImp userDao = new UserDaoImp();
 
-        UserDaoImp userDao = new UserDaoImp();
-        Optional<Users> adminOpt = userDao.getUserByUsername("admin");
+            // Tạo đối tượng admin
+            Users admin = new Users();
+            admin.setUsername("admin");
+            admin.setFullName("System Administrator");
+            admin.setPhone("0111111114");
+            admin.setEmail("admin2@system.com");
 
-        if (adminOpt.isPresent()) {
-            Users admin = adminOpt.get();
-            System.out.println("✅ Found user:");
-            System.out.println("ID: " + admin.getUserId());
-            System.out.println("Username: " + admin.getUsername());
-            System.out.println("Hash (length): " + admin.getPasswordHash().length);
-            System.out.println("Salt (length): " + admin.getPasswordSalt().length);
-        } else {
-            System.out.println("❌ User 'admin' not found");
+            // Mã hóa mật khẩu
+            String password = "111";
+            byte[] salt = PasswordUtil.generateSalt();
+            byte[][] result = PasswordUtil.hashPassword(password, salt);
+
+            admin.setPasswordHash(result[0]);
+            admin.setPasswordSalt(result[1]);
+
+            // Gán roleId cho admin (giả sử roleId = 1 là ADMIN)
+            admin.setRoleId(3);
+
+            // Nếu có locationId (hoặc để null)
+            admin.setLocationId(null);
+
+            // Tạo user
+            boolean created = userDao.createUser(admin);
+            if (created) {
+                System.out.println("✅ Admin created successfully with ID: " + admin.getUserId());
+                System.out.println("✅ Role ADMIN assigned (roleId = " + admin.getRoleId() + ")");
+            } else {
+                System.out.println("❌ Failed to create admin.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
+//        UserDaoImp userDao = new UserDaoImp();
+//        Optional<Users> adminOpt = userDao.getUserByUsername("admin");
+//
+//        if (adminOpt.isPresent()) {
+//            Users admin = adminOpt.get();
+//            System.out.println("✅ Found user:");
+//            System.out.println("ID: " + admin.getUserId());
+//            System.out.println("Username: " + admin.getUsername());
+//            System.out.println("Hash (length): " + admin.getPasswordHash().length);
+//            System.out.println("Salt (length): " + admin.getPasswordSalt().length);
+//        } else {
+//            System.out.println("❌ User 'admin' not found");
+//        }
     }
 }

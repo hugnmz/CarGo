@@ -1,97 +1,121 @@
 package mapper;
 
 import dto.CarDTO;
+import java.math.BigDecimal;
+import model.CarPrices;
 import model.Cars;
 import model.Categories;
 import model.Fuels;
 import model.Seatings;
 import util.di.annotation.Component;
 
-/**
- * CarMapper - Chuyển đổi giữa CarDTO và Cars Model
- */
 @Component
 public class CarMapper {
 
-    // Chuyen tu Model sang DTO
+    // Model -> DTO
     public CarDTO toDTO(Cars car) {
-        // Kiem tra null
         if (car == null) {
             return null;
         }
 
         CarDTO dto = new CarDTO();
-        
-        // Gan cac truong co ban cua xe
         dto.setCarId(car.getCarId());
         dto.setName(car.getName());
         dto.setYear(car.getYear());
         dto.setDescription(car.getDescription());
         dto.setImage(car.getImage());
 
-        // Map nested objects nếu có
         if (car.getCategory() != null) {
+            dto.setCategoryId(car.getCategory().getCategoryId());
             dto.setCategoryName(car.getCategory().getCategoryName());
         }
-        
         if (car.getFuel() != null) {
+            dto.setFuelId(car.getFuel().getFuelId());
             dto.setFuelType(car.getFuel().getFuelType());
         }
-        
         if (car.getSeating() != null) {
+            dto.setSeatingId(car.getSeating().getSeatingId());
             dto.setSeatingType(car.getSeating().getSeatingType());
         }
-        
-        // Location - tạm thời set N/A
+
         dto.setLocationCity("N/A");
-        
-        if (car.getCarPrices() != null && car.getCarPrices().getDailyPrice() != null) {
-            dto.setDailyPrice(car.getCarPrices().getDailyPrice().doubleValue());
+        if (car.getCarPrices() != null) {
+            if (car.getCarPrices().getDailyPrice() != null) {
+                dto.setDailyPrice(car.getCarPrices().getDailyPrice().doubleValue());
+            }
+            if (car.getCarPrices().getDepositAmount() != null) {
+                dto.setDepositAmount(car.getCarPrices().getDepositAmount().doubleValue());
+            }
         }
 
         return dto;
     }
 
-    // Chuyen tu DTO sang Model
+    // DTO -> Model
     public Cars toModel(CarDTO dto) {
-        // Kiem tra null
         if (dto == null) {
             return null;
         }
 
         Cars car = new Cars();
-        
-        // Gan cac truong co ban cua xe
         car.setCarId(dto.getCarId());
         car.setName(dto.getName());
         car.setYear(dto.getYear());
         car.setDescription(dto.getDescription());
         car.setImage(dto.getImage());
 
-        // Tao doi tuong Category neu co thong tin danh muc
-        if (dto.getCategoryName() != null) {
+        // Category
+        if (dto.getCategoryId() != null || dto.getCategoryName() != null) {
             Categories category = new Categories();
-            category.setCategoryName(dto.getCategoryName());
+            if (dto.getCategoryId() != null) {
+                category.setCategoryId(dto.getCategoryId());
+            }
+            if (dto.getCategoryName() != null) {
+                category.setCategoryName(dto.getCategoryName());
+            }
             car.setCategory(category);
+            car.setCategoryId(dto.getCategoryId());
         }
 
-        // Tao doi tuong Fuel neu co thong tin nhien lieu
-        if (dto.getFuelType() != null) {
+        // Fuel
+        if (dto.getFuelId() != null || dto.getFuelType() != null) {
             Fuels fuel = new Fuels();
-            fuel.setFuelType(dto.getFuelType());
+            if (dto.getFuelId() != null) {
+                fuel.setFuelId(dto.getFuelId());
+            }
+            if (dto.getFuelType() != null) {
+                fuel.setFuelType(dto.getFuelType());
+            }
             car.setFuel(fuel);
+            car.setFuelId(dto.getFuelId());
         }
 
-        // Tao doi tuong Seating neu co thong tin so cho
-        if (dto.getSeatingType() != null) {
+        // Seating
+        if (dto.getSeatingId() != null || dto.getSeatingType() != null) {
             Seatings seating = new Seatings();
-            seating.setSeatingType(dto.getSeatingType());
+            if (dto.getSeatingId() != null) {
+                seating.setSeatingId(dto.getSeatingId());
+            }
+            if (dto.getSeatingType() != null) {
+                seating.setSeatingType(dto.getSeatingType());
+            }
             car.setSeating(seating);
+            car.setSeatingId(dto.getSeatingId());
         }
 
-        // Location - tạm thời bỏ vì LocationsDAO thiếu method
-        // TODO: Implement location mapping khi có getLocationById
+        // Price & Deposit
+        if (dto.getDailyPrice() != null || dto.getDepositAmount() != null) {
+            CarPrices price = new CarPrices();
+            if (dto.getDailyPrice() != null) {
+                price.setDailyPrice(BigDecimal.valueOf(dto.getDailyPrice()));
+            }
+            if (dto.getDepositAmount() != null) {
+                price.setDepositAmount(BigDecimal.valueOf(dto.getDepositAmount()));
+            }
+            car.setCarPrices(price);
+        }
 
         return car;
     }
+
 }

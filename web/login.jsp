@@ -15,7 +15,7 @@
       rel="stylesheet"
     />
     <link
-      href="${pageContext.request.contextPath}/css/login.css"
+      href="${pageContext.request.contextPath}/CSS/login.css"
       rel="stylesheet"
     />
   </head>

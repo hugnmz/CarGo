@@ -13,10 +13,10 @@ public class UserDaoImp implements UsersDAO {
 
     @Override
     public List<Users> getAllUsers() {
-        String sql = "SELECT u.*, l.city, r.roleName\n" +
-"        FROM Users u\n" +
-"        LEFT JOIN Locations l ON u.locationId = l.locationId\n" +
-"        LEFT JOIN Roles r ON u.roleId = r.roleId";
+        String sql = "SELECT u.*, l.city, r.roleName\n"
+                + "        FROM Users u\n"
+                + "        LEFT JOIN Locations l ON u.locationId = l.locationId\n"
+                + "        LEFT JOIN Roles r ON u.roleId = r.roleId";
         return JdbcTemplateUtil.query(sql, Users.class);
     }
 
@@ -128,7 +128,28 @@ public class UserDaoImp implements UsersDAO {
         int affected = JdbcTemplateUtil.update(sql, userId, roleId);
         return affected > 0;
     }
-    
+
+    @Override
+    public boolean existsUsername(String username) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE username = ?";
+        int count = JdbcTemplateUtil.count(sql, username);
+        return count > 0;
+    }
+
+    @Override
+    public boolean existsEmail(String email) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE email = ?";
+        int count = JdbcTemplateUtil.count(sql, email);
+        return count > 0;
+    }
+
+    @Override
+    public boolean existsPhone(String phone) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE phone = ?";
+        int count = JdbcTemplateUtil.count(sql, phone);
+        return count > 0;
+    }
+
     public static void main(String[] args) {
         UserDaoImp user = new UserDaoImp();
         Optional<Users> list = user.getUserByUsername("admin");

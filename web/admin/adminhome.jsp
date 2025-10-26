@@ -1,6 +1,11 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
+    
+    response.setHeader("Cache-Control","no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma","no-cache");
+    response.setDateHeader("Expires", 0);
+    
     String role = (String) session.getAttribute("roleName");
     if (role == null) {
         response.sendRedirect("LoginAdmin");
@@ -26,12 +31,7 @@
             <div class="container-fluid d-flex justify-content-between align-items-center">
                 <!-- Left: Logo -->
                 <a class="navbar-brand" href="HomeAdmin">🚗 Admin</a>
-
-                <!-- Center: Xin chào -->
-                <!--                <span class="navbar-text text-white text-center" style="flex:1;">
-                                    Xin chào <b>${username}</b>
-                                </span>-->
-
+                
                 <!-- Right: Nút thêm và logout -->
                 <div>
                     <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#addUserForm">
@@ -114,7 +114,9 @@
                             </div>
 
                             <div class="col-12 d-flex justify-content-end mt-3">
-                                <button type="submit" class="btn btn-primary px-5">Lưu</button>
+                                <button type="submit" class="btn btn-primary px-5"
+                                        onclick="return confirm('Bạn có chắc chắn muốn tạo tài khoản này?')"
+                                        >Lưu</button>
                             </div>
                         </form>
                     </div>
@@ -132,6 +134,7 @@
                                 <th>Tên đăng nhập</th>
                                 <th>Họ tên</th>
                                 <th>Email</th>
+                                <th>Phone</th>
                                 <th>Thành phố</th>
                                 <th>Vai trò</th>
                                 <th>Hành động</th>
@@ -144,21 +147,27 @@
                                     <td>${user.username}</td>
                                     <td>${user.fullName}</td>
                                     <td>${user.email}</td>
+                                    <td>${user.phone}</td>
                                     <td>${user.city}</td>
                                     <td>
                                         <span class="badge bg-info">${user.roleName}</span>
                                     </td>
                                     <td>
-                                        <form action="ControllerAdmin" method="post" style="display:inline;">
-                                            <input type="hidden" name="action" value="delete">
-                                            <input type="hidden" name="userId" value="${user.userId}">
-                                            <button type="submit" class="btn btn-danger btn-sm"
-                                                    onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này')">
-                                                Xóa
-                                            </button>
-                                        </form>
-                                        <a href="ControllerAdmin?action=edit&userId=${user.userId}" 
-                                           class="btn btn-warning btn-sm">Sửa</a>
+                                        <!-- Ẩn nút Xóa/Sửa nếu người dùng là ADMIN -->
+                                        <c:if test="${user.roleName ne 'ADMIN'}">
+                                            <form action="ControllerAdmin" method="post" style="display:inline;">
+                                                <input type="hidden" name="action" value="delete">
+                                                <input type="hidden" name="userId" value="${user.userId}">
+                                                <button type="submit" class="btn btn-danger btn-sm"
+                                                        onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">
+                                                    Xóa
+                                                </button>
+                                            </form>
+                                            <a href="ControllerAdmin?action=edit&userId=${user.userId}" 
+                                               class="btn btn-warning btn-sm"
+                                               
+                                               >Sửa</a>
+                                        </c:if>
                                     </td>
                                 </tr>
                             </c:forEach>

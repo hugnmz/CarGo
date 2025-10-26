@@ -1,25 +1,25 @@
-package model;
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package dto;
 
 import java.util.List;
+import model.Cars;
 import util.di.annotation.Column;
 
-public class Fuels {
-
-    @Column()
+/**
+ *
+ * @author DELL
+ */
+public class FuelDTO {
     private Integer fuelId;          // ID loại nhiên liệu
-    @Column()
     private String fuelType;         // Loại nhiên liệu
-    private List<Cars> cars;         // Danh sách xe sử dụng loại nhiên liệu này
+    private List<Cars> cars;
 
-    // Constructors
-    public Fuels() {
+    public FuelDTO() {
     }
 
-    public Fuels(String fuelType) {
-        this.fuelType = fuelType;
-    }
-
-    // Getters and Setters
     public Integer getFuelId() {
         return fuelId;
     }
@@ -42,11 +42,6 @@ public class Fuels {
 
     public void setCars(List<Cars> cars) {
         this.cars = cars;
-    }
-
-    @Override
-    public String toString() {
-        return "Fuels{" + "fuelId=" + fuelId + ", fuelType=" + fuelType + ", cars=" + cars + '}';
     }
     
     

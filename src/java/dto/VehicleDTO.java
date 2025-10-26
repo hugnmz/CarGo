@@ -34,23 +34,6 @@ public class VehicleDTO {
     // Constructors
     public VehicleDTO() {}
 
-    public VehicleDTO(Integer vehicleId, Integer carId, String plateNumber, Boolean isActive, Integer locationId, String carName, Integer year, String description, String image, String categoryName, String fuelType, Integer seatingType, String city, BigDecimal currentPrice, BigDecimal depositAmount) {
-        this.vehicleId = vehicleId;
-        this.carId = carId;
-        this.plateNumber = plateNumber;
-        this.isActive = isActive;
-        this.locationId = locationId;
-        this.carName = carName;
-        this.year = year;
-        this.description = description;
-        this.image = image;
-        this.categoryName = categoryName;
-        this.fuelType = fuelType;
-        this.seatingType = seatingType;
-        this.city = city;
-        this.currentPrice = currentPrice;
-        this.depositAmount = depositAmount;
-    }
     
     
     

@@ -36,7 +36,7 @@ public class LoginAdmin extends HttpServlet {
         }
 
         // Nếu chưa đăng nhập → ở lại trang đăng nhập
-        req.getRequestDispatcher("admin_login.jsp").forward(req, resp);
+        req.getRequestDispatcher("admin/admin_login.jsp").forward(req, resp);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class LoginAdmin extends HttpServlet {
 
         if (username == null || username.isBlank() || password == null || password.isBlank()) {
             request.setAttribute("error", "Vui lòng nhập đầy đủ thông tin");
-            request.getRequestDispatcher("admin_login.jsp").forward(request, response);
+            request.getRequestDispatcher("admin/admin_login.jsp").forward(request, response);
             return;
         }
 
@@ -60,7 +60,7 @@ public class LoginAdmin extends HttpServlet {
                 // Kiểm tra quyền ADMIN
                 if (!"ADMIN".equalsIgnoreCase(admin.getRoleName())) {
                     request.setAttribute("error", "Tài khoản này không có quyền truy cập trang quản trị");
-                    request.getRequestDispatcher("admin_login.jsp").forward(request, response);
+                    request.getRequestDispatcher("admin/admin_login.jsp").forward(request, response);
                     return;
                 }
 
@@ -71,13 +71,13 @@ public class LoginAdmin extends HttpServlet {
                 response.sendRedirect("HomeAdmin");
             } else {
                 request.setAttribute("error", "Sai tên đăng nhập hoặc mật khẩu");
-                request.getRequestDispatcher("admin_login.jsp").forward(request, response);
+                request.getRequestDispatcher("admin/admin_login.jsp").forward(request, response);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Đã xảy ra lỗi khi đăng nhập");
-            request.getRequestDispatcher("admin_login.jsp").forward(request, response);
+            request.getRequestDispatcher("admin/admin_login.jsp").forward(request, response);
         }
     }
 

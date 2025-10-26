@@ -15,6 +15,14 @@ public class FuelsDAOImpl implements FuelsDAO {
         String sql = "SELECT * FROM dbo.Fuels";
         return JdbcTemplateUtil.query(sql, Fuels.class);
     }
+    
+    public static void main(String[] args) {
+        FuelsDAOImpl d = new FuelsDAOImpl();
+        List<Fuels> list = d.getAllFuels();
+        for (Fuels fuels : list) {
+            System.out.println(fuels.toString());
+        }
+    }
 
     @Override
     public Optional<Fuels> getFuelsById(Integer fuelId) {

@@ -4,7 +4,9 @@
  */
 package service.impl;
 
+import dao.LocationsDAO;
 import dao.VehiclesDAO;
+import dto.LocationDTO;
 import dto.VehicleDTO;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,9 @@ public class VehicleServiceImpl implements VehicleService {
     @Autowired
     private VehicleMapper vehicleMapper;
 
+    @Autowired
+    private LocationsDAO locationsDAO;
+
     @Override
     public List<VehicleDTO> getVehicleByCarId(Integer carId) {
         List<Vehicles> vehicles = vehiclesDAO.getVehiclesByCar(carId);
@@ -48,6 +53,78 @@ public class VehicleServiceImpl implements VehicleService {
             return Optional.of(dto);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public List<LocationDTO> getAllLocation() {
+        try {
+
+            var locations = locationsDAO.getAllLocations();
+
+            return locations.stream()
+                    .map(loc -> {
+                        LocationDTO dto = new LocationDTO();
+                        dto.setLocationId(loc.getLocationId());
+                        dto.setCity(loc.getCity());
+                        dto.setAddress(loc.getAddress());
+                        return dto;
+                    })
+                    .toList();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of(); // Trả về danh sách rỗng nếu lỗi
+        }
+
+    }
+
+    @Override
+    public boolean addVehicle(VehicleDTO vehicleDTO) throws Exception {
+        if (vehicleDTO == null) {
+            throw new IllegalArgumentException("Vehicle không được null");
+        }
+
+        // Chuyển DTO sang Model
+        Vehicles vehicle = vehicleMapper.toModel(vehicleDTO);
+
+        // Kiểm tra biển số trùng
+        if (vehiclesDAO.getVehicleyPlateNumber(vehicle.getPlateNumber()).isPresent()) {
+            throw new Exception("Biển số " + vehicle.getPlateNumber() + " đã tồn tại.");
+        }
+
+        // Thêm vehicle
+        boolean added = vehiclesDAO.addVehicle(vehicle);
+        if (!added) {
+            throw new Exception("Không thể thêm vehicle. Lỗi cơ sở dữ liệu.");
+        }
+        
+        return true;
+    }
+
+    @Override
+    public boolean updateVehicle(VehicleDTO vehicleDTO) throws Exception {
+        if (vehicleDTO == null) {
+            throw new Exception("Vehicle không tồn tại!");
+        }
+
+        // Kiểm tra biển số trùng (ví dụ method riêng trong DAO/Service)
+        if (vehiclesDAO.isPlateNumberExist(vehicleDTO.getPlateNumber(), vehicleDTO.getVehicleId())) {
+            throw new Exception("Biển số '" + vehicleDTO.getPlateNumber() + "' đã tồn tại!");
+        }
+
+        Vehicles vehicle = vehicleMapper.toModel(vehicleDTO);
+        boolean updated = vehiclesDAO.updateVehicle(vehicle);
+
+        if (!updated) {
+            throw new Exception("Cập nhật thất bại do dữ liệu không hợp lệ hoặc lỗi hệ thống!");
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean deleteVehicle(Integer vehicleId) {
+        return vehiclesDAO.deleteVehicle(vehicleId);
     }
 
 }

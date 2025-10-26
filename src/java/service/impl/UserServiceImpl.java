@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<UserDTO> loginUser(String username, String password) {
         try {
-            // 1️⃣ Tìm user theo username
+            // Tìm user theo username
             Optional<Users> userOpt = usersDAO.getUserByUsername(username);
             if (userOpt.isEmpty()) {
                 return Optional.empty();
@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
 
             Users user = userOpt.get();
 
-            // 2️⃣ Kiểm tra mật khẩu
+            // Kiểm tra mật khẩu
             boolean valid = PasswordUtil.verifyPassword(
                     password,
                     user.getPasswordHash(),
@@ -47,10 +47,9 @@ public class UserServiceImpl implements UserService {
                 return Optional.empty();
             }
 
-            // 3️⃣ Chuyển sang DTO
+            // Chuyển sang DTO
             UserDTO dto = userMapper.toDTO(user);
 
-            // 4️⃣ (Tùy chọn) Kiểm tra nếu là admin
             // Nếu bạn chỉ muốn đăng nhập admin:
             // if (!hasAdminRole(user.getUserId())) return Optional.empty();
             return Optional.of(dto);
@@ -81,52 +80,102 @@ public class UserServiceImpl implements UserService {
     @Override
     public void addUser(UserDTO userDTO, String password) {
         try {
-            // resolve locationId
+            // 
+            if (usersDAO.getUserByUsername(userDTO.getUsername()).isPresent()) {
+                throw new IllegalArgumentException("Tên đăng nhập '" + userDTO.getUsername() + "' đã tồn tại!");
+            }
+            if (usersDAO.existsEmail(userDTO.getEmail())) {
+                throw new IllegalArgumentException("Email '" + userDTO.getEmail() + "' đã tồn tại!");
+            }
+
+            if (usersDAO.existsPhone(userDTO.getPhone())) {
+                throw new IllegalArgumentException("Phone '" + userDTO.getPhone() + "' đã tồn tại!");
+            }
+
+            // 2️⃣ Xử lý locationId
             Integer locationId = userDTO.getLocationId();
             if (locationId == null && userDTO.getCity() != null) {
                 locationId = locationsDAO.getOrCreateIdByCity(userDTO.getCity());
             }
-            //Mã hóa mật khẩu với salt ngẫu nhiên
-            byte[] hashSalt = PasswordUtil.generateSalt(); // Tạo salt ngẫu nhiên
-            byte[][] hashPassword = PasswordUtil.hashPassword(password, hashSalt); // Hash password
-            byte[] passwordHash = hashPassword[0]; // Lấy hash
-            byte[] passwordSalt = hashPassword[1]; // Lấy salt
 
-            //Chuyển đổi từ DTO sang Model
+            // 3️⃣ Hash mật khẩu với salt ngẫu nhiên
+            byte[] salt = PasswordUtil.generateSalt();
+            byte[][] hashResult = PasswordUtil.hashPassword(password, salt);
+            byte[] passwordHash = hashResult[0];
+            byte[] passwordSalt = hashResult[1];
+
+            // 4️⃣ Chuyển DTO → Model
             Users user = userMapper.toModel(userDTO);
-            user.setPasswordHash(passwordHash); // Lưu hash password (byte[])
-            user.setPasswordSalt(passwordSalt); // Lưu salt (byte[])
+            user.setPasswordHash(passwordHash);
+            user.setPasswordSalt(passwordSalt);
             user.setLocationId(locationId);
 
-            usersDAO.createUser(user);
+            boolean created = usersDAO.createUser(user);
+            if (!created) {
+                throw new RuntimeException("Không thể thêm người dùng vào cơ sở dữ liệu.");
+            }
 
+            System.out.println("Thêm user thành công: " + user.getUsername());
+
+        } catch (IllegalArgumentException e) {
+            System.err.println("Lỗi dữ liệu đầu vào: " + e.getMessage());
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            System.err.println("❌ Lỗi không xác định: " + e.getMessage());
+            throw new RuntimeException("Đã xảy ra lỗi khi thêm người dùng.", e);
         }
     }
 
     @Override
     public void updateUser(UserDTO userDTO) {
         try {
-            // 1️⃣ Tìm locationId nếu chỉ nhập city
+            // Kiểm tra người dùng có tồn tại chưa
+            Optional<Users> existingUser = usersDAO.getUserById(userDTO.getUserId());
+            if (existingUser.isEmpty()) {
+                throw new IllegalArgumentException("Không tìm thấy người dùng ID = " + userDTO.getUserId());
+            }
+
+            // Kiểm tra trùng username, email, phone (nếu có thay đổi)
+            Users oldUser = existingUser.get();
+
+//            if (!oldUser.getUsername().equals(userDTO.getUsername())
+//                    && usersDAO.existsUsername(userDTO.getUsername())) {
+//                throw new IllegalArgumentException("Tên đăng nhập '" + userDTO.getUsername() + "' đã tồn tại!");
+//            }
+
+            if (!oldUser.getEmail().equals(userDTO.getEmail())
+                    && usersDAO.existsEmail(userDTO.getEmail())) {
+                throw new IllegalArgumentException("Email '" + userDTO.getEmail() + "' đã được sử dụng!");
+            }
+
+            if (!oldUser.getPhone().equals(userDTO.getPhone())
+                    && usersDAO.existsPhone(userDTO.getPhone())) {
+                throw new IllegalArgumentException("Số điện thoại '" + userDTO.getPhone() + "' đã tồn tại!");
+            }
+
+            // Resolve locationId
             Integer locationId = userDTO.getLocationId();
             if (locationId == null && userDTO.getCity() != null) {
                 locationId = locationsDAO.getOrCreateIdByCity(userDTO.getCity());
             }
 
-            // 2️⃣ Chuyển DTO sang Model
+            // Chuyển đổi sang model
             Users user = userMapper.toModel(userDTO);
             user.setLocationId(locationId);
 
-            // 3️⃣ Gọi DAO để update
             boolean success = usersDAO.updateUser(user);
             if (!success) {
-                throw new RuntimeException("Không thể cập nhật user ID = " + userDTO.getUserId());
+                throw new RuntimeException("Không thể cập nhật thông tin người dùng (ID = " + userDTO.getUserId() + ")");
             }
 
+            System.out.println("Cập nhật user thành công: " + user.getUsername());
+
+        } catch (IllegalArgumentException e) {
+            System.err.println("Lỗi dữ liệu: " + e.getMessage());
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Lỗi khi cập nhật user: " + e.getMessage());
+            System.err.println("Lỗi không xác định: " + e.getMessage());
+            throw new RuntimeException("Đã xảy ra lỗi khi cập nhật người dùng.", e);
         }
     }
 
@@ -146,10 +195,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<LocationDTO> getAllLocation() {
         try {
-            // 1️⃣ Lấy toàn bộ danh sách location từ DAO
+            // Lấy toàn bộ danh sách Location từ Database
             var locations = locationsDAO.getAllLocations();
 
-            // 2️⃣ Chuyển sang DTO (nếu bạn chưa có LocationMapper)
+            // Chuyển sang DTO
             return locations.stream()
                     .map(loc -> {
                         LocationDTO dto = new LocationDTO();
@@ -162,7 +211,8 @@ public class UserServiceImpl implements UserService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return List.of(); // Trả về danh sách rỗng nếu lỗi
+            // Trả về danh sách rỗng nếu lỗi
+            return List.of(); 
         }
 
     }

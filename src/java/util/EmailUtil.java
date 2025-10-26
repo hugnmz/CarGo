@@ -19,9 +19,12 @@ public class EmailUtil {
 
     static {
         try (InputStream in = EmailUtil.class.getClassLoader()
-                .getResourceAsStream("mail.properties")) { 
-            if (in != null) props.load(in);
-            else System.err.println("[EmailUtil] mail.properties not found!");
+                .getResourceAsStream("mail.properties")) {
+            if (in != null) {
+                props.load(in);
+            } else {
+                System.err.println("[EmailUtil] mail.properties not found!");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -62,5 +65,55 @@ public class EmailUtil {
 
         Transport.send(message);
         System.out.println("[EmailUtil] Mail sent to " + to);
+    }
+
+    
+    //Admin gửi thông tin tài khoản cho nhân viên
+    public static void sendCredentials(String toEmail, String username, String password, String role) {
+        // Load cấu hình từ mail.properties
+        final String fromEmail = props.getProperty("mail.from", props.getProperty("mail.username"));
+        final String appPassword = props.getProperty("mail.password");
+
+        Properties mailProps = new Properties();
+        mailProps.put("mail.smtp.auth", props.getProperty("mail.smtp.auth", "true"));
+        mailProps.put("mail.smtp.starttls.enable", props.getProperty("mail.smtp.starttls.enable", "true"));
+        mailProps.put("mail.smtp.ssl.protocols", props.getProperty("mail.smtp.ssl.protocols", "TLSv1.2"));
+        mailProps.put("mail.smtp.host", props.getProperty("mail.smtp.host", "smtp.gmail.com"));
+        mailProps.put("mail.smtp.port", props.getProperty("mail.smtp.port", "587"));
+
+        // Nếu có bật debug mode
+        if ("true".equalsIgnoreCase(props.getProperty("mail.debug"))) {
+            mailProps.put("mail.debug", "true");
+        }
+
+        Session session = Session.getInstance(mailProps, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(fromEmail, appPassword);
+            }
+        });
+
+        try {
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(fromEmail, "CarGo Admin"));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
+            message.setSubject("CarGo account your information");
+
+            String content = "<h3>Xin chào " + username + ",</h3>"
+                    + "<p>Tài khoản của bạn đã được tạo trong hệ thống CarGo.</p>"
+                    + "<p><b>Tên đăng nhập:</b> " + username + "<br>"
+                    + "<b>Mật khẩu:</b> " + password + "<br>"
+                    + "<b>Vai trò:</b> " + role + "</p>"
+                    + "<p>Vui lòng đăng nhập tại: <a href='http://localhost:8080/RentalCar/Login'>CarGo</a></p>"
+                    + "<p>Trân trọng,<br>CarGo Team</p>";
+
+            message.setContent(content, "text/html; charset=UTF-8");
+
+            Transport.send(message);
+            System.out.println("[EmailUtil] Mail sent to " + toEmail);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("[EmailUtil] Lỗi gửi email: " + e.getMessage());
+        }
     }
 }

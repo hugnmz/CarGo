@@ -179,10 +179,10 @@ public class LoginServlet extends HttpServlet {
 
         switch (role.toUpperCase()) {
             case "MANAGER":
-                response.sendRedirect(path + "/home");
+                response.sendRedirect(path + "/manager_home.jsp");
                 break;
             case "STAFF":
-                response.sendRedirect(path + "/staff/home");
+                response.sendRedirect(path + "/home");
                 break;
             case "CUSTOMER":
                 response.sendRedirect(path + "/home");

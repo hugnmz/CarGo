@@ -1,5 +1,25 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+
+<%
+    response.setHeader("Cache-Control","no-cache, no-store, must-revalidate"); // HTTP 1.1
+    response.setHeader("Pragma","no-cache"); // HTTP 1.0
+    response.setDateHeader("Expires", 0); // Proxies
+%>
+
+<%
+    String role = (String) session.getAttribute("roleName");
+    if (role == null) {
+        response.sendRedirect("manager_home.jsp");
+        return;
+    }
+    if (!"MANAGER".equalsIgnoreCase(role)) {
+        request.setAttribute("error", "Bạn không có quyền truy cập trang này!");
+        request.getRequestDispatcher("error.jsp").forward(request, response);
+        return;
+    }
+%>
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -50,7 +70,7 @@
         <h4 class="text-center text-white mb-4"><i class="fa-solid fa-car"></i> Car Rental</h4>
         <a href="manager_home.jsp"><i class="fa-solid fa-house"></i> Trang chủ</a>
         <a href="manage_customers.jsp"><i class="fa-solid fa-users"></i> Quản lý khách hàng</a>
-        <a href="manage_cars.jsp"><i class="fa-solid fa-car-side"></i> Quản lý xe</a>
+        <a href="managecar"><i class="fa-solid fa-car-side"></i> Quản lý xe</a>
         <a href="#"><i class="fa-solid fa-file-contract"></i> Hợp đồng</a>
         <a href="${pageContext.request.contextPath}/LogoutServlet"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
     </div>
@@ -85,7 +105,7 @@
                             <h5>Quản lý xe</h5>
                             <p class="text-muted">Thêm xe mới, chỉnh sửa thông tin hoặc xóa xe</p>
                         </div>
-                        <a href="manage_cars.jsp" class="btn btn-outline-success">
+                        <a href="managecar" class="btn btn-outline-success">
                             <i class="fa-solid fa-car"></i> Truy cập
                         </a>
                     </div>

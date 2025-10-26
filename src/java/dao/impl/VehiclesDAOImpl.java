@@ -13,8 +13,18 @@ public class VehiclesDAOImpl implements VehiclesDAO {
 
     @Override
     public List<Vehicles> getAllVehicles() {
-        String sql = "SELECT v.*, l.city, c.name, c.year FROM dbo.Vehicles v LEFT JOIN dbo.Locations l ON l.locationId = v.locationId LEFT JOIN dbo.Cars c ON c.carId = v.carId";
+        String sql = "SELECT v.*, l.city, c.name, c.year FROM dbo.Vehicles v "
+                + "LEFT JOIN dbo.Locations l ON l.locationId = v.locationId "
+                + "LEFT JOIN dbo.Cars c ON c.carId = v.carId";
         return JdbcTemplateUtil.query(sql, Vehicles.class);
+    }
+
+    public static void main(String[] args) {
+        VehiclesDAOImpl v = new VehiclesDAOImpl();
+        List<Vehicles> list = v.getAllVehicles();
+        for (Vehicles vehicles : list) {
+            System.out.println(vehicles.toString());
+        }
     }
 
     @Override
@@ -69,6 +79,18 @@ public class VehiclesDAOImpl implements VehiclesDAO {
         String sql = " DELETE FROM dbo.Vehicles WHERE vehicleId = ?";
 
         int result = JdbcTemplateUtil.update(sql, vehicleId);
+        return result >= 0;
+    }
+
+    @Override
+    public boolean deleteVehicleByCarId(Integer carId) {
+        return false;
+    }
+
+    @Override
+    public boolean deleteVehiclesByCarId(Integer carId) {
+        String sql = "DELETE FROM dbo.Vehicles WHERE carId = ?";
+        int result = JdbcTemplateUtil.update(sql, carId);
         return result >= 0;
     }
 
@@ -132,6 +154,20 @@ public class VehiclesDAOImpl implements VehiclesDAO {
                 + ")";
 
         int count = JdbcTemplateUtil.count(sql, vehicleId, startDate, startDate, endDate, endDate, startDate, endDate);
+        return count > 0;
+    }
+
+    @Override
+    public boolean isPlateNumberExist(String plateNumber, Integer excludeVehicleId) {
+        String sql = "SELECT COUNT(*) FROM dbo.Vehicles WHERE plateNumber = ?";
+        Object[] params;
+        if (excludeVehicleId != null) {
+            sql += " AND vehicleId != ?";
+            params = new Object[]{plateNumber, excludeVehicleId};
+        } else {
+            params = new Object[]{plateNumber};
+        }
+        int count = JdbcTemplateUtil.count(sql, params);
         return count > 0;
     }
 }
