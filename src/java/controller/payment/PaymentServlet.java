@@ -110,7 +110,7 @@ public class PaymentServlet extends HttpServlet {
             URL url = new URL("https://api.stripe.com/v1/tokens");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
-            conn.setRequestProperty("Authorization", "Bearer sk_test_51SMVYYBhARJUIMkucl0NfyRrDbYWoZ2tneVLIZWYAqgMwsgHJdN9YHZVKDslzm4PzGUz8tG29LeFA1yJvqS4T7ES00Y8P1Doh7"); // Thay bằng secret key test của bạn
+            conn.setRequestProperty("Authorization", "Bearer .."); // Thay bằng secret key test của bạn
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             conn.setDoOutput(true);
 
