@@ -170,4 +170,11 @@ public class VehiclesDAOImpl implements VehiclesDAO {
         int count = JdbcTemplateUtil.count(sql, params);
         return count > 0;
     }
+
+    @Override
+    public int countVehicles() {
+        String sql = "SELECT COUNT(*) FROM dbo.Vehicles";
+        return JdbcTemplateUtil.count(sql);
+    }
+
 }

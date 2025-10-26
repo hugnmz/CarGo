@@ -39,4 +39,6 @@ public interface VehiclesDAO {
     public boolean deleteVehicleByCarId(Integer carId);
 
     boolean isPlateNumberExist(String plateNumber, Integer excludeVehicleId);
+    
+    public int countVehicles();
 }

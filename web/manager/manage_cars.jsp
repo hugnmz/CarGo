@@ -60,15 +60,22 @@
                 border-radius: 6px;
                 border: 1px solid #ddd;
             }
+
+            .sidebar a.active {
+                background-color: #0d6efd;
+                color: #fff !important;
+            }
         </style>
     </head>
     <body>
         <!-- Sidebar -->
         <div class="sidebar">
             <h4 class="text-center text-white mb-4"><i class="fa-solid fa-car"></i> Car Rental</h4>
-            <a href="manager_home.jsp"><i class="fa-solid fa-house"></i> Trang chủ</a>
+            <a href="homemange"><i class="fa-solid fa-house"></i> Trang chủ</a>
+            <a href="profile"><i class="fa-solid fa-user-gear"></i> Thông tin cá nhân</a>
             <a href="manage_customers.jsp"><i class="fa-solid fa-users"></i> Quản lý khách hàng</a>
-            <a href="manage_cars.jsp" style="background-color:#343a40; color:white;">
+            <a href="manage_cars.jsp"
+               class="<%= request.getRequestURI().contains("manage_cars.jsp") ? "active" : "" %>">
                 <i class="fa-solid fa-car-side"></i> Quản lý xe
             </a>
             <a href="#"><i class="fa-solid fa-file-contract"></i> Hợp đồng</a>

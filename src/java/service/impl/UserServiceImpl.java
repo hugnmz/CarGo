@@ -121,7 +121,7 @@ public class UserServiceImpl implements UserService {
             System.err.println("Lỗi dữ liệu đầu vào: " + e.getMessage());
             throw e;
         } catch (Exception e) {
-            System.err.println("❌ Lỗi không xác định: " + e.getMessage());
+            System.err.println("Lỗi không xác định: " + e.getMessage());
             throw new RuntimeException("Đã xảy ra lỗi khi thêm người dùng.", e);
         }
     }
@@ -135,13 +135,8 @@ public class UserServiceImpl implements UserService {
                 throw new IllegalArgumentException("Không tìm thấy người dùng ID = " + userDTO.getUserId());
             }
 
-            // Kiểm tra trùng username, email, phone (nếu có thay đổi)
+            // Kiểm tra email, phone (nếu có thay đổi)
             Users oldUser = existingUser.get();
-
-//            if (!oldUser.getUsername().equals(userDTO.getUsername())
-//                    && usersDAO.existsUsername(userDTO.getUsername())) {
-//                throw new IllegalArgumentException("Tên đăng nhập '" + userDTO.getUsername() + "' đã tồn tại!");
-//            }
 
             if (!oldUser.getEmail().equals(userDTO.getEmail())
                     && usersDAO.existsEmail(userDTO.getEmail())) {
@@ -212,7 +207,7 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             e.printStackTrace();
             // Trả về danh sách rỗng nếu lỗi
-            return List.of(); 
+            return List.of();
         }
 
     }
@@ -238,6 +233,46 @@ public class UserServiceImpl implements UserService {
         dto.setLocationId(user.getLocationId());
 
         return dto;
+    }
+
+    @Override
+    public boolean changeUserPassword(Integer userId, String oldPassword, String newPassword) {
+        try {
+            // Không cho phép đặt mật khẩu mới giống mật khẩu cũ
+            if (oldPassword.equals(newPassword)) {
+                return false;
+            }
+
+            // Lấy thông tin user từ database
+            Optional<Users> ou = usersDAO.getUserById(userId);
+            if (!ou.isPresent()) {
+                // Không tìm thấy user
+                return false;
+            }
+
+            Users user = ou.get();
+
+            // Xác thực mật khẩu cũ
+            if (!PasswordUtil.verifyPassword(oldPassword,
+                    user.getPasswordHash(), user.getPasswordSalt())) {
+                // Mật khẩu cũ không đúng
+                return false; 
+            }
+
+            // Tạo salt mới và hash mật khẩu mới
+            byte[] newSalt = PasswordUtil.generateSalt(); // Tạo salt mới
+            byte[][] newHash = PasswordUtil.hashPassword(newPassword, newSalt); // Hash mật khẩu mới
+            byte[] newPasswordHash = newHash[0]; // Lấy hash
+            byte[] newPasswordSalt = newHash[1]; // Lấy salt
+
+            // Cập nhật mật khẩu mới trong database
+            return usersDAO.changePassword(user.getUserId(), newPasswordHash, newPasswordSalt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Có lỗi xảy ra
+            return false; 
+        }
     }
 
 }

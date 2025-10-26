@@ -68,7 +68,7 @@ public class VehicleController extends HttpServlet {
             // Đẩy lỗi chi tiết ra JSP
             request.setAttribute("error", "Thêm thất bại: " + e.getMessage());
         }
-        request.getRequestDispatcher("cardetail?action=detail&carId="
+        request.getRequestDispatcher("controllerinformationcar?action=detail&carId="
                 + Integer.parseInt(request.getParameter("carId")))
                 .forward(request, response);
     }
@@ -118,7 +118,7 @@ public class VehicleController extends HttpServlet {
             request.setAttribute("error", "Cập nhật thất bại: " + e.getMessage());
         }
 
-        request.getRequestDispatcher("cardetail?action=detail&carId="
+        request.getRequestDispatcher("controllerinformationcar?action=detail&carId="
                 + Integer.parseInt(request.getParameter("carId")))
                 .forward(request, response);
     }
@@ -137,13 +137,13 @@ public class VehicleController extends HttpServlet {
                 request.setAttribute("error", "Xóa vehicle thất bại!");
             }
 
-            request.getRequestDispatcher("cardetail?action=detail&carId=" + carId)
+            request.getRequestDispatcher("controllerinformationcar?action=detail&carId=" + carId)
                     .forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Lỗi khi xóa vehicle: " + e.getMessage());
-            request.getRequestDispatcher("cardetail?action=detail&carId="
+            request.getRequestDispatcher("controllerinformationcar?action=detail&carId="
                     + Integer.parseInt(request.getParameter("carId")))
                     .forward(request, response);
         }

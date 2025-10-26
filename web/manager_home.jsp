@@ -68,11 +68,13 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <h4 class="text-center text-white mb-4"><i class="fa-solid fa-car"></i> Car Rental</h4>
-        <a href="manager_home.jsp"><i class="fa-solid fa-house"></i> Trang chủ</a>
+        <a href="homemange"><i class="fa-solid fa-house"></i> Trang chủ</a>
+        <a href="profile"><i class="fa-solid fa-user-gear"></i> Thông tin cá nhân</a>
         <a href="manage_customers.jsp"><i class="fa-solid fa-users"></i> Quản lý khách hàng</a>
         <a href="managecar"><i class="fa-solid fa-car-side"></i> Quản lý xe</a>
         <a href="#"><i class="fa-solid fa-file-contract"></i> Hợp đồng</a>
-        <a href="${pageContext.request.contextPath}/LogoutServlet"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
+        <a href="${pageContext.request.contextPath}/LogoutServlet">
+            <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
     </div>
 
     <!-- Main Content -->

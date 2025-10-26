@@ -26,4 +26,6 @@ public interface VehicleService {
     boolean updateVehicle(VehicleDTO vehicleDTO) throws Exception;
     
     boolean deleteVehicle(Integer vehicleId);
+    
+    int countVehical();
 }

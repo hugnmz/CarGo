@@ -127,4 +127,9 @@ public class VehicleServiceImpl implements VehicleService {
         return vehiclesDAO.deleteVehicle(vehicleId);
     }
 
+    @Override
+    public int countVehical() {
+        return vehiclesDAO.countVehicles();
+    }
+
 }
