@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface PaymentsDAO {
-    
+  
     // Lấy tất cả thanh toán
     List<Payments> getAllPayments();
     
