@@ -93,10 +93,15 @@ public class ContractServiceImpl implements ContractService {
         return detailDTOs;
     }
 
-    @Override
-    public boolean updateContractStatus(Integer contractId, String status) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+@Override
+public boolean updateContractStatus(Integer contractId, String status) {
+    try {
+        return contractsDAO.updateContractStatus(contractId, status);
+    } catch (Exception e) {
+        e.printStackTrace();
+        return false;
     }
+}
 
     @Override
     public boolean calculateTotalAmount(Integer contractId) {
@@ -113,10 +118,30 @@ public class ContractServiceImpl implements ContractService {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
-    @Override
-    public List<ContractDTO> getAllContracts() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+@Override
+public List<ContractDTO> getAllContracts() {
+    List<ContractDTO> contractDTOs = new ArrayList<>();
+    
+    try {
+        List<model.Contracts> contracts = contractsDAO.getAllContracts();
+        
+        for (Contracts contract : contracts) {
+            ContractDTO dto = contractMapper.toDTO(contract);
+            
+            // Lấy tên khách hàng
+            Optional<model.Customers> customer = customersDAO.getCustomerById(dto.getCustomerId());
+            if (customer.isPresent() && customer.get().getFullName() != null) {
+                dto.setCustomerName(customer.get().getFullName());
+            }
+            
+            contractDTOs.add(dto);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+    
+    return contractDTOs;
+}
 
     @Override
     public boolean createContract(ContractDTO contractDTO) {
