@@ -1,3 +1,4 @@
+
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
@@ -11,7 +12,7 @@
             body {
                 background: #f7f7f9;
             }
-            .a{
+            a{
                 text-decoration: none;
                 color: white;
             }
@@ -66,7 +67,7 @@
 
 
             <div class="container py-4">
-                <h2 class="mb-4">Xử lý trả xe - Chi tiết hợp đồng mã: ${currentRequest.getContract().getContractId()}</h2>
+                <h2 class="mb-4">Xử lý trả xe - Chi tiết hợp đồng mã: #${currentRequest.getContract().getContractId()}</h2>
 
                 <div class="card mb-4">
                     <div class="card-body">
@@ -83,6 +84,14 @@
                             </c:choose>
                         </p>
                     </div>
+                        <c:forEach var="v" items="${currentRequest.getContract().getContractDetails()}">
+                        <div>
+                            <p><strong>Tên xe:</strong> ${v.getCarName()}</p>
+                        <p><strong>Giá:</strong> ${v.getPrice()}</p>
+                        <p><strong>Biển số:</strong> ${v.getPlateNumber()}</p>
+                       
+                        </div>
+                        </c:forEach>
                 </div>
 
                 <form method="post" action="${pageContext.request.contextPath}/processreturncar">
@@ -90,14 +99,20 @@
                     <input type="hidden" name="staffId" value="001">
                     <div class="mb-3">
                         <label class="form-label">Tiền phạt trả xe muộn</label>
-                        <select name="lateFee" class="form-select">
+                        <select name="lateFee" id="lateFee" class="form-select">
                             <option value="0">Không trễ / Miễn phí</option>
                             <option value="300000">Dưới 1 ngày: 300.000đ</option>
                             <option value="800000">1–3 ngày: 800.000đ</option>
                             <option value="1500000">3–5 ngày: 1.500.000đ</option>
                             <option value="3000000">5–7 ngày: 3.000.000đ</option>
                             <option value="5000000">Trên 7 ngày: 5.000.000đ</option>
+                            <option value="custom_lateFee">Khác </option>
                         </select>
+                    </div>
+                    <div class="mb-3" id="customAmountWrapper1" style="display: none;">
+                        <label class="form-label">Số tiền phạt muộn khác </label>
+                        <input type="number" name="customAmountLateFee" class="form-control" min="0" step="10000" placeholder="Nhập số tiền (đ)">
+                        <div class="form-text text-muted">Nhập khi tiền phạt không nằm trong danh sách trên.</div>
                     </div>
 
 
@@ -110,13 +125,13 @@
                             <option value="2000000">Nứt đèn / Hư cảm biến / Vỡ gương (2.000.000đ)</option>
                             <option value="5000000">Biến dạng thân xe / Hư điện / Máy (5.000.000đ)</option>
                             <option value="10000000">Tai nạn nghiêm trọng (≥10.000.000đ)</option>
-                            <option value="custom">Khác (tùy chỉnh)</option>
+                            <option value="custom_damageFee">Khác </option>
                         </select>
                     </div>
 
-                    <div class="mb-3" id="customAmountWrapper" style="display: none;">
-                        <label class="form-label">Số tiền khác (tùy chỉnh)</label>
-                        <input type="number" name="customAmount" class="form-control" min="0" step="10000" placeholder="Nhập số tiền (đ)">
+                    <div class="mb-3" id="customAmountWrapper2" style="display: none;">
+                        <label class="form-label">Số tiền hư hại khác </label>
+                        <input type="number" name="customAmountDamageFee" class="form-control" min="0" step="10000" placeholder="Nhập số tiền (đ)">
                         <div class="form-text text-muted">Nhập khi thiệt hại không nằm trong danh sách trên.</div>
                     </div>
 
@@ -137,12 +152,28 @@
                 </form>
             </div>
             <script>
-                const damageFeeSelect = document.getElementById('damageFee');
-                const customWrapper = document.getElementById('customAmountWrapper');
-
-                damageFeeSelect.addEventListener('change', () => {
-                    customWrapper.style.display = (damageFeeSelect.value === 'custom') ? 'block' : 'none';
+                //nhập số tiền phạt muộn khác
+                document.getElementById("lateFee").addEventListener("change", function () {
+                    const wrapper = document.getElementById("customAmountWrapper1");
+                    if (this.value === "custom_lateFee") {
+                        wrapper.style.display = "block";
+                    } else {
+                        wrapper.style.display = "none";
+                    }
                 });
+                //nhập số tiền phạt hư hỏng khác
+                document.getElementById("damageFee").addEventListener("change", function () {
+                    const wrapper = document.getElementById("customAmountWrapper2");
+                    if (this.value === "custom_damageFee") {
+                        wrapper.style.display = "block";
+                    } else {
+                        wrapper.style.display = "none";
+                    }
+                });
+
+
+
+
             </script>
     </body>
 </html>

@@ -112,16 +112,19 @@ public class ProcessReturnCar extends HttpServlet {
         // ========== POST #2: XÁC NHẬN & CẬP NHẬT ==========
         try {
             // Lấy dữ liệu form xác nhận (phí muộn + hư hại)
-            BigDecimal lateFee = parseMoney(req.getParameter("lateFee"), "0");
+            //tiền phạt trả muộn
+            String lateFeeParam = req.getParameter("lateFee");
+            BigDecimal lateFee = "custom_damageFee".equalsIgnoreCase(lateFeeParam)
+                    ? parseMoney(req.getParameter("customAmountLateFee"), "0")
+                    : parseMoney(lateFeeParam, "0");
+            //tiền phạt hư hại
             String damageFeeParam = req.getParameter("damageFee");
-            BigDecimal damageFee = "custom".equalsIgnoreCase(damageFeeParam)
-                    ? parseMoney(req.getParameter("customAmount"), "0")
+            BigDecimal damageFee = "custom_damageFee".equalsIgnoreCase(damageFeeParam)
+                    ? parseMoney(req.getParameter("customAmountDamageFee"), "0")
                     : parseMoney(damageFeeParam, "0");
-            
 
             String note = req.getParameter("note");
-            
-            
+
             // Lấy hợp đồng từ DB
             Optional<ContractDTO> contractOpt = contractService.getContractById(contractId);
             if (contractOpt.isEmpty()) {
@@ -130,19 +133,18 @@ public class ProcessReturnCar extends HttpServlet {
                 return;
             }
             ContractDTO contract = contractOpt.get();
-            BigDecimal totalAmount= safe(lateFee).add(safe(damageFee)).add(contract.getTotalAmount());
-            
+            BigDecimal totalAmount = safe(lateFee).add(safe(damageFee)).add(contract.getTotalAmount());
+
             //update tổng tiền sau khi trả xe
             contractService.updateContractTotalAmount(contractId, totalAmount);
-            
-            
+
             // Dọn dẹp: bỏ khỏi whitelist theo phiên + hàng chờ service
             pendingMap.remove(contractId);
             session.setAttribute("pendingReturnMap", pendingMap);
             returnCarService.remove(contractId);
 
             session.setAttribute("flash",
-                    "Đã hoàn tất trả xe #" + contractId );
+                    "Đã hoàn tất trả xe #" + contractId);
             resp.sendRedirect(req.getContextPath() + "/returncar");
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -150,7 +152,6 @@ public class ProcessReturnCar extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/returncar");
         }
     }
-
 
     private BigDecimal parseMoney(String raw, String defaultVal) {
         try {

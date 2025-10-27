@@ -76,7 +76,13 @@ public class ContractServiceImpl implements ContractService {
             //lấy số điện thoại
             if (customer.isPresent() && customer.get().getPhone() != null) {
                 dto.setCustomerPhone(customer.get().getPhone());
-            }
+            }  
+            //lấy contract details
+            List<ContractDetailDTO> cdDTO = this.getContractDetails(contractId);
+            if (cdDTO !=null) {
+                dto.setContractDetails(cdDTO);
+            } 
+            
             return Optional.of(dto);
         }
         return Optional.empty();
