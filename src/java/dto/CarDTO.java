@@ -138,6 +138,6 @@ public class CarDTO {
         this.depositAmount = depositAmount;
     }
 
-    
 
 }
+

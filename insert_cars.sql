@@ -95,3 +95,5 @@ WHERE c.name IN ('Toyota Camry 2023', 'Honda CR-V 2023', 'Mazda CX-5 2023', 'Hyu
 -- Kiểm tra kết quả
 SELECT 'Cars inserted:' as Status, COUNT(*) as Count FROM dbo.Cars;
 SELECT 'CarPrices inserted:' as Status, COUNT(*) as Count FROM dbo.CarPrices;
+
+SELECT * FROM Cars

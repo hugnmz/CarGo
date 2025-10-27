@@ -1,3 +1,4 @@
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -5,6 +6,9 @@
 package dao.impl;
 
 import dao.LocationsDAO;
+import java.util.List;
+import model.Locations;
+import model.Users;
 import util.JdbcTemplateUtil;
 import util.di.annotation.Repository;
 
@@ -42,6 +46,20 @@ public class LocationsDAOImpl implements LocationsDAO {
         // Nếu chưa có, insert mới
         return insertCity(city);
 
+    }
+
+    @Override
+    public List<Locations> getAllLocations() {
+        String sql = "SELECT * FROM Locations";
+        return JdbcTemplateUtil.query(sql, Locations.class);
+    }
+
+    public static void main(String[] args) {
+        LocationsDAOImpl l = new LocationsDAOImpl();
+        List<Locations> list = l.getAllLocations();
+        for (Locations locations : list) {
+            System.out.println(locations.toString());
+        }
     }
 
 }

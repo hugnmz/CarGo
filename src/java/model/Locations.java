@@ -46,4 +46,11 @@ public class Locations {
     
     public List<Cars> getCars() { return cars; }
     public void setCars(List<Cars> cars) { this.cars = cars; }
+
+    @Override
+    public String toString() {
+        return "Locations{" + "locationId=" + locationId + ", city=" + city + ", address=" + address + ", users=" + users + ", customers=" + customers + ", cars=" + cars + '}';
+    }
+    
+    
 }

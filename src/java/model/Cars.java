@@ -95,4 +95,11 @@ public class Cars {
     
     public CarPrices getCarPrices() { return carPrices; }
     public void setCarPrices(CarPrices carPrices) { this.carPrices = carPrices; }
+
+    @Override
+    public String toString() {
+        return "Cars{" + "carId=" + carId + ", name=" + name + ", year=" + year + ", description=" + description + ", image=" + image + ", categoryId=" + categoryId + ", fuelId=" + fuelId + ", seatingId=" + seatingId + ", category=" + category + ", fuel=" + fuel + ", seating=" + seating + ", vehicles=" + vehicles + ", carPrices=" + carPrices + '}';
+    }
+    
+    
 }

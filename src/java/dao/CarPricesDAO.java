@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import model.CarPrices;
+import model.Cars;
 
 /**
  *
@@ -27,10 +28,14 @@ public interface CarPricesDAO {
     boolean updateCarPrice(CarPrices carPrice);
 
     boolean deleteCarPrice(Integer priceId);
+    
+    boolean deleteCarPricesByCarId(Integer carId);
 
     boolean endCurrentPrice(Integer carId, LocalDate endDate);
     
     Optional<BigDecimal> getCurrentDailyPrice(Integer carId);
     
     Optional<BigDecimal> getCurrentDepositAmount(Integer carId);
+    
+    
 }
