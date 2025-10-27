@@ -25,4 +25,5 @@ public interface CarsDAO {
     List<Cars> getCarByLocation(Integer locationId);
     List<Cars> searchCars(String keyword);
     List<Cars> getCarWithCurrentPrice(BigDecimal minPrice, BigDecimal maxPrice);
+    public int addCarAndReturnId(Cars car);
 }

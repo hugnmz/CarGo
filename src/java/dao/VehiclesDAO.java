@@ -27,10 +27,18 @@ public interface VehiclesDAO {
 
     boolean deleteVehicle(Integer vehicleId);
 
+    public boolean deleteVehiclesByCarId(Integer carId);
+
     List<Vehicles> getVehiclesByCar(Integer CarId);
 
     List<Vehicles> getAvailableVehiclesByCar(Integer carId, LocalDateTime startDate,
-             LocalDateTime endDate);
+            LocalDateTime endDate);
 
     boolean isVehicleAvailable(Integer vehicleId, LocalDateTime startDate, LocalDateTime endDate);
+
+    public boolean deleteVehicleByCarId(Integer carId);
+
+    boolean isPlateNumberExist(String plateNumber, Integer excludeVehicleId);
+    
+    public int countVehicles();
 }

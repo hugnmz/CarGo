@@ -12,6 +12,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import service.CustomerService;
+import service.UserService;
+import service.VehicleService;
+import util.di.DIContainer;
 
 /**
  *
@@ -20,28 +24,31 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet(name="HomeManage", urlPatterns={"/homemange"})
 public class HomeManage extends HttpServlet {
    
-    /** 
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    
+    private VehicleService vehiclesService;
+    private CustomerService customerService;
+    
+    @Override
+    public void init() throws ServletException {
+        try {
+            vehiclesService = DIContainer.get(VehicleService.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet HomeManage</title>");  
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet HomeManage at " + request.getContextPath () + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
+        int totalVehicles = vehiclesService.countVehical();
+//        int totalCustomers = customerService.getTotalCustomers();
+//        int totalContracts = contractService.getTotalActiveContracts();
+
+        request.setAttribute("totalCars", totalVehicles);
+//        request.setAttribute("totalCustomers", totalCustomers);
+//        request.setAttribute("totalContracts", totalContracts);
+
+        request.getRequestDispatcher("/manager/manager_home.jsp").forward(request, response);
+        
     } 
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

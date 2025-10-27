@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ page import="jakarta.servlet.http.*, jakarta.servlet.*" %>
 <%
@@ -47,7 +48,7 @@
                                 <%= username %>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="${pageContext.request.contextPath}/customer/profile.jsp"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a></li>
+                                <li><a class="dropdown-item" href="${pageContext.request.contextPath}/CustomerServlet"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="${pageContext.request.contextPath}/LogoutServlet"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
                             </ul>
@@ -232,7 +233,7 @@
                     <c:when test="${not empty allCars}">
                         <c:forEach var="car" items="${allCars}" varStatus="status" end="5">
                             <div class="col-md-6 col-lg-4">
-                                 <div class="card car-card-modern" onclick="window.location.href = '${pageContext.request.contextPath}/car-detail?carId=${car.carId}'" style="cursor: pointer;">
+                                 <div class="card car-card-modern car-card-clickable" onclick="window.location.href = '${pageContext.request.contextPath}/car-detail?carId=${car.carId}'">
                                     <div class="position-relative overflow-hidden">
                                         <c:choose>
                                             <c:when test="${not empty car.image}">
@@ -281,8 +282,8 @@
                                                     <div>
                                                         <c:set var="currentPrice" value="${car.dailyPrice}" />
                                                         <c:set var="originalPrice" value="${currentPrice * 1.18}" />
-                                                        <small class="price-old d-block">${originalPrice}K</small>
-                                                        <span class="price-modern">${currentPrice}K<small class="text-muted fw-normal">/ngày</small></span>
+                                                        <small class="price-old d-block"><fmt:formatNumber value="${originalPrice}" pattern="#,###" /> VNĐ</small>
+                                                        <span class="price-modern"><fmt:formatNumber value="${currentPrice}" pattern="#,###" /> VNĐ<small class="text-muted fw-normal">/ngày</small></span>
                                                     </div>
                                                 </c:when>
                                                 <c:otherwise>

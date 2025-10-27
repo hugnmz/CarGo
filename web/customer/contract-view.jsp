@@ -1,4 +1,5 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> <%@ page
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib
+prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %> <%@ page
 contentType="text/html; charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -90,25 +91,38 @@ contentType="text/html; charset=UTF-8" language="java" %>
               <span class="info-label"
                 ><i class="far fa-calendar-check"></i>Ngày bắt đầu</span
               >
-              <span class="info-value">${contract.startDate}</span>
+              <span class="info-value"
+                >${contract.startDate.toLocalDate()}</span
+              >
             </div>
             <div class="info-row">
               <span class="info-label"
                 ><i class="far fa-calendar-times"></i>Ngày kết thúc</span
               >
-              <span class="info-value">${contract.endDate}</span>
+              <span class="info-value">${contract.endDate.toLocalDate()}</span>
             </div>
             <div class="info-row">
               <span class="info-label"
                 ><i class="fas fa-piggy-bank"></i>Tiền đặt cọc</span
               >
-              <span class="info-value">${contract.depositAmount} VNĐ</span>
+              <span class="info-value"
+                ><fmt:formatNumber
+                  value="${contract.depositAmount}"
+                  pattern="#,###"
+                />
+                VNĐ</span
+              >
             </div>
           </div>
 
           <div class="total-amount">
             <small class="d-block opacity-75">Tổng giá trị hợp đồng</small>
-            <h2>${contract.totalAmount}</h2>
+            <h2>
+              <fmt:formatNumber
+                value="${contract.totalAmount}"
+                pattern="#,###"
+              />
+            </h2>
             <small class="opacity-75">VNĐ</small>
           </div>
         </div>
@@ -132,7 +146,9 @@ contentType="text/html; charset=UTF-8" language="java" %>
                       class="d-flex justify-content-between align-items-start mb-2"
                     >
                       <div>
-                        <h6 class="fw-bold mb-1">Xe #${d.vehicleId}</h6>
+                        <h6 class="fw-bold mb-1">
+                          ${d.plateNumber != null ? d.plateNumber : 'N/A'}
+                        </h6>
                         <small class="text-muted"
                           >Chi tiết #${d.contractDetailId}</small
                         >
@@ -142,18 +158,22 @@ contentType="text/html; charset=UTF-8" language="java" %>
                           class="fw-bold text-success"
                           style="font-size: 1.25rem"
                         >
-                          ${d.price} VNĐ
+                          <fmt:formatNumber
+                            value="${d.price}"
+                            pattern="#,###"
+                          />
+                          VNĐ
                         </div>
                       </div>
                     </div>
                     <div class="row g-2 text-muted small">
                       <div class="col-sm-6">
                         <i class="far fa-calendar-check text-success me-1"></i>
-                        Nhận: ${d.rentStartDate}
+                        Nhận: ${d.rentStartDate.toLocalDate()}
                       </div>
                       <div class="col-sm-6">
                         <i class="far fa-calendar-times text-danger me-1"></i>
-                        Trả: ${d.rentEndDate}
+                        Trả: ${d.rentEndDate.toLocalDate()}
                       </div>
                     </div>
                     <c:if test="${not empty d.note}">

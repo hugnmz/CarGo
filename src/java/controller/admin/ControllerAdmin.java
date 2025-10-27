@@ -18,7 +18,9 @@ import java.util.List;
 import model.Users;
 import service.RoleService;
 import service.UserService;
+import util.MessageUtil;
 import util.di.DIContainer;
+import util.EmailUtil;
 
 /**
  *
@@ -28,13 +30,13 @@ import util.di.DIContainer;
 public class ControllerAdmin extends HttpServlet {
 
     private UserService userService;
-    private RoleService RoleService;
+    private RoleService roleService;
 
     @Override
     public void init() throws ServletException {
         try {
             userService = DIContainer.get(UserService.class);
-            RoleService = DIContainer.get(RoleService.class);
+            roleService = DIContainer.get(RoleService.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -49,7 +51,6 @@ public class ControllerAdmin extends HttpServlet {
         //Lấy action từ server
         String action = request.getParameter("action");
 
-        
         if ("create".equalsIgnoreCase(action)) {
             //Nếu action là create thì thêm user mới
             addUser(request, response);
@@ -68,34 +69,121 @@ public class ControllerAdmin extends HttpServlet {
     // Thêm user
     private void addUser(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //Lấy parameter từ server 
-        String username = request.getParameter("username");
-        String fullname = request.getParameter("fullname");
-        String email = request.getParameter("email");
-        String phone = request.getParameter("phone");
-        String password = request.getParameter("password");
-        String roleIdStr = request.getParameter("roleid");
-        String locationIdStr = request.getParameter("locationid");
+        try {
+            // Lấy parameter
+            String username = request.getParameter("username");
+            String fullname = request.getParameter("fullname");
+            String email = request.getParameter("email");
+            String phone = request.getParameter("phone");
+            String password = request.getParameter("password");
+            String roleIdStr = request.getParameter("roleid");
+            String locationIdStr = request.getParameter("locationid");
 
-        // Khởi tạo Dto để truyền dữ liệu
-        UserDTO user = new UserDTO();
-        user.setUsername(username);
-        user.setFullName(fullname);
-        user.setEmail(email);
-        user.setPhone(phone);
-        if (roleIdStr != null && !roleIdStr.isEmpty()) {
-            user.setRoleId(Integer.parseInt(roleIdStr));
+            // Tạo DTO
+            UserDTO user = new UserDTO();
+            user.setUsername(username);
+            user.setFullName(fullname);
+            user.setEmail(email);
+            user.setPhone(phone);
+
+            if (roleIdStr != null && !roleIdStr.isEmpty()) {
+                user.setRoleId(Integer.parseInt(roleIdStr));
+            }
+            if (locationIdStr != null && !locationIdStr.isEmpty()) {
+                user.setLocationId(Integer.parseInt(locationIdStr));
+            }
+
+            // Gọi service
+            userService.addUser(user, password);
+
+            // Gửi mail
+            try {
+                String roleName = user.getFullName();
+                if (user.getRoleId() == 3) {
+                    roleName = "Admin";
+                } else if (user.getRoleId() == 1) {
+                    roleName = "Staff";
+                } else if (user.getRoleId() == 2) {
+                    roleName = "Manager";
+                }
+
+                if (email != null && !email.isEmpty()) {
+                    util.EmailUtil.sendCredentials(email, username, password, roleName);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                request.setAttribute("error", MessageUtil.getError("error.user.add.email.error"));
+            }
+//            try {
+//                String roleName = switch (user.getRoleId()) {
+//                    case 1 ->
+//                        "Admin";
+//                    case 2 ->
+//                        "Staff";
+//                    case 3 ->
+//                        "Customer";
+//                    default ->
+//                        "Người dùng";
+//                };
+//
+//                if (email != null && !email.isEmpty()) {
+//                    util.EmailUtil.sendCredentials(email, username, password, roleName);
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                request.setAttribute("error", "User thêm thành công nhưng lỗi gửi email: " + e.getMessage());
+//            }
+
+            request.setAttribute("message", MessageUtil.getError("error.user.add.success"));
+            request.getRequestDispatcher("HomeAdmin").forward(request, response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", MessageUtil.getError("error.user.add.error"));
+            request.getRequestDispatcher("HomeAdmin").forward(request, response);
         }
-        if (locationIdStr != null && !locationIdStr.isEmpty()) {
-            user.setLocationId(Integer.parseInt(locationIdStr));
+    }
+
+    // Cập nhật user
+    private void updateUser(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+
+            //Lấy parameter từ server
+            String userIdStr = request.getParameter("userId");
+            //Kiểm tra id của user null hay không
+            if (userIdStr == null || userIdStr.isEmpty()) {
+                response.sendRedirect("HomeAdmin");
+                return;
+            }
+
+            //Khởi tạo dto để truyền tham số
+            UserDTO user = new UserDTO();
+            user.setUserId(Integer.parseInt(userIdStr));
+            user.setUsername(request.getParameter("username"));
+            user.setFullName(request.getParameter("fullname"));
+            user.setEmail(request.getParameter("email"));
+            user.setPhone(request.getParameter("phone"));
+            String roleIdStr = request.getParameter("roleid");
+            if (roleIdStr != null && !roleIdStr.isEmpty()) {
+                user.setRoleId(Integer.parseInt(roleIdStr));
+            }
+            String locationIdStr = request.getParameter("locationid");
+            if (locationIdStr != null && !locationIdStr.isEmpty()) {
+                user.setLocationId(Integer.parseInt(locationIdStr));
+            }
+
+            //Cập nhật thông tin user
+            userService.updateUser(user);
+
+            //Truyền dữ liệu về server
+            request.setAttribute("message", MessageUtil.getError("error.user.update.success"));
+            request.getRequestDispatcher("HomeAdmin").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", MessageUtil.getError("error.user.update.error"));
+            request.getRequestDispatcher("HomeAdmin").forward(request, response);
         }
-
-        // Thêm 1 user mới
-        userService.addUser(user, password);
-
-        //Gửi attribute lên server
-        request.setAttribute("message", "Thêm user thành công!");
-        request.getRequestDispatcher("HomeAdmin").forward(request, response);
     }
 
     // Xóa user
@@ -103,11 +191,11 @@ public class ControllerAdmin extends HttpServlet {
             throws ServletException, IOException {
         //Lấy parameter từ server
         String userIdStr = request.getParameter("userId");
-        //Cập nhật thông tin user
+        //Xóa thông tin user
         if (userIdStr != null && !userIdStr.isEmpty()) {
             Integer userId = Integer.parseInt(userIdStr);
             userService.deleteUser(userId);
-            request.setAttribute("message", "Xóa user thành công!");
+            request.setAttribute("message", MessageUtil.getError("error.user.delete.success"));
         }
         //Gửi dữ liệu về home admin
         request.getRequestDispatcher("HomeAdmin").forward(request, response);
@@ -122,9 +210,9 @@ public class ControllerAdmin extends HttpServlet {
         if (userIdStr != null && !userIdStr.isEmpty()) {
             Integer userId = Integer.parseInt(userIdStr);
             // Tạo phương thức getUserById ở Service
-            UserDTO user = userService.getUserById(userId); 
+            UserDTO user = userService.getUserById(userId);
             // Lấy danh sách vai trò
-            List<RoleDTO> roleList = RoleService.getAllRole();
+            List<RoleDTO> roleList = roleService.getAllRole();
             // Lấy danh sách địa điểm (thành phố)
             List<LocationDTO> locationList = userService.getAllLocation();
 
@@ -132,46 +220,10 @@ public class ControllerAdmin extends HttpServlet {
             request.setAttribute("roles", roleList);
             request.setAttribute("locations", locationList);
             request.setAttribute("editUser", user);
-            request.getRequestDispatcher("edituser.jsp").forward(request, response);
+            request.getRequestDispatcher("admin/edituser.jsp").forward(request, response);
         } else {
             response.sendRedirect("HomeAdmin");
         }
-    }
-
-    // Cập nhật user
-    private void updateUser(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        //Lấy parameter từ server
-        String userIdStr = request.getParameter("userId");
-        //Kiểm tra id của user null hay không
-        if (userIdStr == null || userIdStr.isEmpty()) {
-            response.sendRedirect("HomeAdmin");
-            return;
-        }
-
-        //Khởi tạo dto để truyền tham số
-        UserDTO user = new UserDTO();
-        user.setUserId(Integer.parseInt(userIdStr));
-        user.setUsername(request.getParameter("username"));
-        user.setFullName(request.getParameter("fullname"));
-        user.setEmail(request.getParameter("email"));
-        user.setPhone(request.getParameter("phone"));
-        String roleIdStr = request.getParameter("roleid");
-        if (roleIdStr != null && !roleIdStr.isEmpty()) {
-            user.setRoleId(Integer.parseInt(roleIdStr));
-        }
-        String locationIdStr = request.getParameter("locationid");
-        if (locationIdStr != null && !locationIdStr.isEmpty()) {
-            user.setLocationId(Integer.parseInt(locationIdStr));
-        }
-
-        //Cập nhật thông tin user
-        userService.updateUser(user);
-
-        //Truyền dữ liệu về server
-        request.setAttribute("message", "Cập nhật user thành công!");
-        request.getRequestDispatcher("HomeAdmin").forward(request, response);
     }
 
     @Override

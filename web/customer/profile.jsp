@@ -1,18 +1,24 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 
-<!-- Set default values for session attributes -->
-<c:set var="username" value="${sessionScope.username}" />
+<!-- Set default values - ưu tiên từ customer object, fallback từ session -->
+<c:set var="username" value="${not empty customer.username ? customer.username : sessionScope.username}" />
 <c:set var="avatar" value="${not empty sessionScope.avatar ? sessionScope.avatar : 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'}" />
-<c:set var="email" value="${sessionScope.email}" />
-<c:set var="phone" value="${sessionScope.phone}" />
-<c:set var="fullName" value="${not empty sessionScope.fullName ? sessionScope.fullName : sessionScope.username}" />
-<c:set var="city" value="${not empty sessionScope.city ? sessionScope.city : ''}"/>
-<c:set var="dateOfBirth" value="${not empty sessionScope.dateOfBirth ? sessionScope.dateOfBirth : ''}"/>
-
-<!-- Check if user is logged in -->
+<c:set var="email" value="${not empty customer.email ? customer.email : sessionScope.email}" />
+<c:set var="phone" value="${not empty customer.phone ? customer.phone : sessionScope.phone}" />
+<c:set var="fullName" value="${not empty customer.fullName ? customer.fullName : (not empty sessionScope.fullName ? sessionScope.fullName : sessionScope.username)}" />
+<c:set var="city" value="${not empty customer.city ? customer.city : (not empty sessionScope.city ? sessionScope.city : '')}"/>
+<c:set var="dateOfBirth" value="${not empty customer.dateOfBirth ? customer.dateOfBirth : (not empty sessionScope.dateOfBirth ? sessionScope.dateOfBirth : '')}"/>
+<c:set var="createAt" value="${not empty customer.createAt ? customer.createAt : (not empty sessionScope.createAt ? sessionScope.createAt : '')}"/>
 <c:set var="isLoggedIn" value="${not empty username}" />
+<c:set var="listContract" value="${requestScope.listContract}" />
+
+<!-- Check userType for authorization -->
+<c:set var="userType" value="${sessionScope.userType}" />
+<c:set var="isCustomer" value="${userType == 'CUSTOMER'}" />
+
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -25,6 +31,51 @@
         <link href="${pageContext.request.contextPath}/css/customer/profile.css" rel="stylesheet">
     </head>
     <body>
+        <!-- Check authorization -->
+        <c:if test="${!isCustomer}">
+            <div class="container mt-5 pt-5">
+                <div class="alert alert-warning text-center">
+                    <h4><i class="fa fa-exclamation-triangle"></i> Trang không phù hợp!</h4>
+                    <p>Trang này chỉ dành cho khách hàng.</p>
+                    <c:choose>
+                        <c:when test="${userType == 'MANAGER'}">
+                            <a href="${pageContext.request.contextPath}/manager/manager_home.jsp" class="btn btn-primary">Về trang quản lý</a>
+                        </c:when>
+                        <c:when test="${userType == 'STAFF'}">
+                            <a href="${pageContext.request.contextPath}/staff/staff.jsp" class="btn btn-primary">Về trang nhân viên</a>
+                        </c:when>
+                        <c:when test="${userType == 'ADMIN'}">
+                            <a href="${pageContext.request.contextPath}/admin/adminhome.jsp" class="btn btn-primary">Về trang admin</a>
+                        </c:when>
+                        <c:otherwise>
+                            <a href="${pageContext.request.contextPath}/home" class="btn btn-primary">Về trang chủ</a>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+            </div>
+        </c:if>
+        
+        <c:if test="${isCustomer}">
+        <!-- Error Messages -->
+        <c:if test="${not empty error}">
+            <div class="container mt-5 pt-5">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fa fa-exclamation-triangle"></i> ${error}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        </c:if>
+        
+        <!-- Success Messages -->
+        <c:if test="${not empty success}">
+            <div class="container mt-5 pt-5">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fa fa-check-circle"></i> ${success}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        </c:if>
+        
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg fixed-top">
             <div class="container">
@@ -193,9 +244,8 @@
                                             <div class="col-md-6">
                                                 <div class="info-item">
                                                     <label for="joinDate"><i class="fa fa-calendar text-muted"></i> Ngày tham gia</label>
-                                                    <input type="text" class="form-control" id="joinDate" name="joinDate" 
-                                                           value="${not empty customer.createAt ? customer.createAt : ''}" 
-                                                           readonly>
+                                                    <input type="date" class="form-control" id="joinDate" name="joinDate" 
+                                                           value="${not empty customer.createAt ? customer.createAt.toLocalDate() : (not empty createAt ? createAt.toLocalDate() : '')}"                                                           readonly>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -274,42 +324,45 @@
                                 </div>
 
                                 <div class="booking-list">
-                                   
-                                    <c:choose>
-                                        <c:when test="${not empty listContract}">
-                                            <c:forEach var="contract" items="${listContract}">
-                                                <div class="booking-item">
-                                                    <div class="booking-image">
-                                                        <img src="https://via.placeholder.com/100x80?text=Car" alt="Car">
+                                    <form>
+                                        <c:choose>
+                                            <c:when test="${not empty listContract}">
+                                                <c:forEach var="contract" items="${listContract}">
+                                                    <div class="booking-item">
+                                                        <div class="booking-image">
+                                                            <img src="https://via.placeholder.com/100x80?text=Car" alt="Car">
+                                                        </div>
+                                                        <div class="booking-details">
+                                                            <h6>Hợp đồng #${contract.contractId}</h6>
+                                                            <p class="text-muted mb-1">Từ ${contract.startDate} đến ${contract.endDate}</p>
+                                                            <p class="text-muted mb-1">Tạo lúc: ${contract.createAt}</p>
+                                                            <span class="badge ${contract.status == 'ACCEPTED' ? 'bg-success' : contract.status == 'PENDING' ? 'bg-warning' : 'bg-danger'}">
+                                                                ${contract.status == 'ACCEPTED' ? 'ACCEPTED' : contract.status == 'PENDING' ? 'PENDING' : 'REJECTED'}
+                                                            </span>
+                                                        </div>
+                                                        <div class="booking-price">
+                                                            <h6 class="text-success"><fmt:formatNumber value="${contract.totalAmount}" pattern="#,###" /> VNĐ</h6>
+                                                            <p class="text-muted small">Cọc: <fmt:formatNumber value="${contract.depositAmount}" pattern="#,###" /> VNĐ</p>
+                                                            <a href="${pageContext.request.contextPath}/view-contract?contractId=${contract.contractId}" 
+                                                               class="btn btn-sm btn-outline-primary">Chi tiết</a>
+                                                        </div>
                                                     </div>
-                                                    <div class="booking-details">
-                                                        <h6>Hợp đồng #${contract.contractId}</h6>
-                                                        <p class="text-muted mb-1">Từ ${contract.startDate} đến ${contract.endDate}</p>
-                                                        <p class="text-muted mb-1">Tạo lúc: ${contract.createAt}</p>
-                                                        <span class="badge ${contract.status == 'ACCEPTED' ? 'bg-success' : contract.status == 'PENDING' ? 'bg-warning' : 'bg-danger'}">
-                                                            ${contract.status == 'ACCEPTED' ? 'ACCEPTED' : contract.status == 'PENDING' ? 'PENDING' : 'Từ chối'}
-                                                        </span>
-                                                    </div>
-                                                    <div class="booking-price">
-                                                        <h6 class="text-success">${contract.totalAmount} VNĐ</h6>
-                                                        <p class="text-muted small">Cọc: ${contract.depositAmount} VNĐ</p>
-                                                        <button class="btn btn-sm btn-outline-primary">Chi tiết</button>
-                                                    </div>
+                                                </c:forEach>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <!-- No contracts found -->
+                                                <div class="text-center py-4">
+                                                    <i class="fa fa-car fa-3x text-muted mb-3"></i>
+                                                    <h5 class="text-muted">Chưa có lịch sử đặt xe</h5>
+                                                    <p class="text-muted">Bạn chưa có hợp đồng thuê xe nào</p>
+                                                    <a href="${pageContext.request.contextPath}/" class="btn btn-primary">
+                                                        <i class="fa fa-search"></i> Tìm xe ngay
+                                                    </a>
                                                 </div>
-                                            </c:forEach>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <!-- No contracts found -->
-                                            <div class="text-center py-4">
-                                                <i class="fa fa-car fa-3x text-muted mb-3"></i>
-                                                <h5 class="text-muted">Chưa có lịch sử đặt xe</h5>
-                                                <p class="text-muted">Bạn chưa có hợp đồng thuê xe nào</p>
-                                                <a href="${pageContext.request.contextPath}/" class="btn btn-primary">
-                                                    <i class="fa fa-search"></i> Tìm xe ngay
-                                                </a>
-                                            </div>
-                                        </c:otherwise>
-                                    </c:choose>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </form>
+
                                 </div>
                             </div>
                         </div>
@@ -329,7 +382,7 @@
                                                 <h6>BMW X5 2024</h6>
                                                 <p class="text-muted">SUV - 7 chỗ</p>
                                                 <div class="d-flex justify-content-between align-items-center">
-                                                    <span class="text-success fw-bold">2,500,000 VNĐ/ngày</span>
+                                                    <span class="text-success fw-bold">2.500.000 VNĐ/ngày</span>
                                                     <button class="btn btn-sm btn-outline-danger">
                                                         <i class="fa fa-heart"></i>
                                                     </button>
@@ -344,7 +397,7 @@
                                                 <h6>Mercedes C-Class 2024</h6>
                                                 <p class="text-muted">Sedan - 5 chỗ</p>
                                                 <div class="d-flex justify-content-between align-items-center">
-                                                    <span class="text-success fw-bold">1,800,000 VNĐ/ngày</span>
+                                                    <span class="text-success fw-bold">1.800.000 VNĐ/ngày</span>
                                                     <button class="btn btn-sm btn-outline-danger">
                                                         <i class="fa fa-heart"></i>
                                                     </button>
@@ -383,29 +436,36 @@
                                     <form method="POST" action="${pageContext.request.contextPath}/ChangePasswordServlet">
                                         <div class="setting-item">
                                             <div class="row">
-                                                <div class="col-md-6">
+                                                <div class="col-md-4">
                                                     <div class="mb-3">
                                                         <label for="oldPassword" class="form-label">Mật khẩu cũ</label>
                                                         <input type="password" class="form-control" id="oldPassword" name="old" 
                                                                placeholder="Nhập mật khẩu cũ" required>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6">
+                                                <div class="col-md-4">
                                                     <div class="mb-3">
                                                         <label for="newPassword" class="form-label">Mật khẩu mới</label>
                                                         <input type="password" class="form-control" id="newPassword" name="new" 
                                                                placeholder="Nhập mật khẩu mới" required>
                                                     </div>
                                                 </div>
+                                                <div class="col-md-4">
+                                                    <div class="mb-3">
+                                                        <label for="confirmPassword" class="form-label">Xác nhận mật khẩu</label>
+                                                        <input type="password" class="form-control" id="confirmPassword" name="confirm" 
+                                                               placeholder="Nhập lại mật khẩu mới" required>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            
+
                                             <!-- Thêm hidden field cho customerId -->
                                             <input type="hidden" name="customerId" value="${not empty customer.customerId ? customer.customerId : sessionScope.customerId}">
-                                            
+
                                             <div class="mb-3">
                                                 <p class="text-muted">Cập nhật mật khẩu để bảo vệ tài khoản</p>
                                             </div>
-                                            
+
                                             <button type="submit" class="btn btn-outline-primary">
                                                 <i class="fa fa-key"></i> Đổi mật khẩu
                                             </button>
@@ -525,5 +585,6 @@
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        </c:if> <!-- End customer check -->
     </body>
 </html>

@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import service.CustomerService;
 import util.EmailUtil;
 import util.di.DIContainer;
+import util.MessageUtil;
 
 @WebServlet("/resend-code")
 public class ResendCodeServlet extends HttpServlet {
@@ -68,12 +69,12 @@ public class ResendCodeServlet extends HttpServlet {
                     Logger.getLogger(ResendCodeServlet.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
-                req.setAttribute("infoMessage", "Đã gửi lại mã, vui lòng kiểm tra email.");
+                req.setAttribute("infoMessage", MessageUtil.getMessage("resend.code.success"));
             } else {
-                req.setAttribute("errorMessage", "Không thể gửi lại mã.");
+                req.setAttribute("errorMessage", MessageUtil.getError("error.resend.code.failed"));
             }
         } else {
-            req.setAttribute("errorMessage", "Phiên làm việc đã hết hạn. Vui lòng đăng ký lại.");
+            req.setAttribute("errorMessage", MessageUtil.getError("error.session.expired.verify"));
         }
         
         req.getRequestDispatcher("/auth/verify.jsp").forward(req, resp);

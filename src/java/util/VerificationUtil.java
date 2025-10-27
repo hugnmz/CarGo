@@ -1,19 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package util;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 
-/**
- *
- * @author admin
- */
-
-// xác minh email
+// class xu ly xac minh email
 public class VerificationUtil {
+    // securerandom de tao so ngau nhien
     private static final SecureRandom random = new SecureRandom();
     
     // sinh ma 6 chu so ngau nhien
@@ -22,7 +14,7 @@ public class VerificationUtil {
         return String.format("%06d", number);
     }
     
-    // tinh time het han
+    // tinh thoi gian het han
     public static LocalDateTime expiryAfterMinutes(int minutes){
         return LocalDateTime.now().plusMinutes(minutes);
     }

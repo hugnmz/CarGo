@@ -1,4 +1,5 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> <%@ page
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib
+prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %> <%@ page
 contentType="text/html; charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -79,18 +80,29 @@ contentType="text/html; charset=UTF-8" language="java" %>
                       </div>
                       <div class="contract-date">
                         <i class="far fa-calendar-check"></i>
-                        <span>${c.startDate}</span>
+                        <span>${c.startDate.toLocalDate()}</span>
                       </div>
                       <div class="contract-date">
                         <i class="far fa-calendar-times"></i>
-                        <span>${c.endDate}</span>
+                        <span>${c.endDate.toLocalDate()}</span>
                       </div>
                     </div>
                     <div class="col-lg-3 mb-3 mb-lg-0">
                       <small class="text-muted d-block">Tổng tiền</small>
-                      <div class="contract-amount">${c.totalAmount} VNĐ</div>
+                      <div class="contract-amount">
+                        <fmt:formatNumber
+                          value="${c.totalAmount}"
+                          pattern="#,###"
+                        />
+                        VNĐ
+                      </div>
                       <small class="text-muted"
-                        >Đặt cọc: ${c.depositAmount} VNĐ</small
+                        >Đặt cọc:
+                        <fmt:formatNumber
+                          value="${c.depositAmount}"
+                          pattern="#,###"
+                        />
+                        VNĐ</small
                       >
                     </div>
                     <div class="col-lg-3 text-lg-end">

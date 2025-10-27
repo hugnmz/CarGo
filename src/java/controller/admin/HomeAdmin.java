@@ -48,7 +48,7 @@ public class HomeAdmin extends HttpServlet {
         request.setAttribute("users", list);
         request.setAttribute("roles", roleList);
         request.setAttribute("locations", locationList);
-        request.getRequestDispatcher("adminhome.jsp").forward(request, response);
+        request.getRequestDispatcher("/admin/adminhome.jsp").forward(request, response);
         
     }
 

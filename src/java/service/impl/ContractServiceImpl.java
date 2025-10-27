@@ -8,7 +8,6 @@ import dto.ContractDTO;
 import dto.ContractDetailDTO;
 import dto.OrderDTO;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +17,9 @@ import java.util.Optional;
 import mapper.ContractMapper;
 import mapper.ContractDetailMapper;
 import mapper.OrderMapper;
+import model.ContractDetails;
 import model.Contracts;
+import model.Customers;
 import service.ContractService;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
@@ -64,7 +65,7 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     public Optional<ContractDTO> getContractById(Integer contractId) {
-        Optional<model.Contracts> contract = contractsDAO.getContractById(contractId);
+        Optional<Contracts> contract = contractsDAO.getContractById(contractId);
         if (contract.isPresent()) {
             ContractDTO dto = contractMapper.toDTO(contract.get());
 

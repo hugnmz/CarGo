@@ -14,65 +14,70 @@ import service.CarService;
 import service.VehicleService;
 import util.di.DIContainer;
 
-// Servlet hien thi chi tiet xe
+
 @WebServlet(name = "CarDetailServlet", urlPatterns = {"/car-detail"})
 public class CarDetailServlet extends HttpServlet {
 
-    // Khoi tao cac service can thiet
+    // service xu ly thong tin xe
     private CarService carService;
+    // service xu ly thong tin phuong tien
     private VehicleService vehicleService;
 
     @Override
     public void init() throws ServletException {
         super.init();
-        // Khoi tao CarService va VehicleService tu DI Container
         try {
+            // khoi tao car service tu di container
             carService = DIContainer.get(CarService.class);
+            // khoi tao vehicle service tu di container
             vehicleService = DIContainer.get(VehicleService.class);
         } catch (Exception e) {
+            // log loi ra console
             e.printStackTrace();
         }
     }
 
-    // GET: hien thi trang chi tiet xe
-    // Lay carId tu parameter, lay thong tin car tu service, lay danh sach vehicle tu service de hien thi
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         try {
-            // Lay carId tu parameter
+            // lay car id tu tham so request
             String carIdStr = request.getParameter("carId");
 
-            // Kiem tra carId co hop le khong
+            // kiem tra car id co hop le khong
             if (carIdStr == null || carIdStr.trim().isEmpty()) {               
                 response.sendRedirect(request.getContextPath() + "/home");
                 return;
             }
 
-            // Chuyen doi carId sang Integer
+            // chuyen doi car id tu string sang integer
             Integer carId = Integer.valueOf(carIdStr);
 
-            // Lay thong tin xe tu service
+            // lay thong tin xe tu database bang car id
             Optional<CarDTO> carDTO = carService.getCarById(carId);
             if (!carDTO.isPresent()) {
+                // neu khong tim thay xe thi dat thong bao loi
                 request.setAttribute("error", "Khong tim thay xe nao");
                 request.getRequestDispatcher("/customer/car-detail.jsp").forward(request, response);
                 return;
             }
 
-            // Lay danh sach vehicle cua xe
+            // lay danh sach phuong tien cua xe tu database
             List<VehicleDTO> vehicles = vehicleService.getVehicleByCarId(carId);
 
-            // Truyen du lieu xuong JSP
+            // dat thong tin xe vao request de truyen sang jsp
             request.setAttribute("car", carDTO.get());
+            // dat danh sach phuong tien vao request de truyen sang jsp
             request.setAttribute("vehicles", vehicles);
 
-            // Forward den trang car-detail.jsp
+            // chuyen huong den trang chi tiet xe
             request.getRequestDispatcher("/customer/car-detail.jsp").forward(request, response);
         } catch (Exception e) {
-            // Xu ly loi he thong
+            // log loi ra console
             e.printStackTrace();
+            // dat thong bao loi vao request
             request.setAttribute("error", "Khong the tai thong tin xe: " + e.getMessage());
             request.getRequestDispatcher("/customer/car-detail.jsp").forward(request, response);
         }
@@ -81,7 +86,7 @@ public class CarDetailServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // POST cung xu ly nhu GET
+        // method post cung xu ly nhu get
         doGet(request, response);
     }
 

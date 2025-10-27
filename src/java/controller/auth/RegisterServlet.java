@@ -7,33 +7,38 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.List;
+import java.util.ArrayList;
+import util.MessageUtil;
 import service.CustomerService;
 import util.EmailUtil;
 import util.di.DIContainer;
 
-// servlet xu ly dang ky tai khoan
+
 @WebServlet("/RegisterServlet")
 public class RegisterServlet extends HttpServlet {
 
+    // service xu ly thong tin khach hang
     private CustomerService customerService;
 
     @Override
     public void init() throws ServletException {
         super.init();
-        // khoi tao customerservice tu di container
         try {
+            // khoi tao customer service tu di container
             customerService = DIContainer.get(CustomerService.class);
         } catch (Exception e) {
+            // nem loi neu khoi tao service that bai
             throw new RuntimeException(e);
         }
-
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // redirect get requests to register page
+        // chuyen huong cac request get den trang dang ky
         response.sendRedirect(request.getContextPath() + "/auth/register.jsp");
     }
 
@@ -41,7 +46,7 @@ public class RegisterServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // doc du lieu tu form 
+        // lay du lieu tu form dang ky
         String fullname = request.getParameter("fullname");
         String phone = request.getParameter("phone");
         String email = request.getParameter("email");
@@ -50,54 +55,99 @@ public class RegisterServlet extends HttpServlet {
         String password = request.getParameter("password");
         String confirmPassword = request.getParameter("confirmPassword");
         
-        // xac thuc du lieu
+        // tao danh sach de luu cac loi validation
+        List<String> errors = new ArrayList<>();
+        
         try {
-
-            // kiem tra trung lap
-            if (customerService.isEmailExists(email)) {
-                request.setAttribute("errorMessage", "Email đã tồn tại.");
-                setFormData(request, fullname, phone, email, city, username);
-                request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
-                return;
-            }
-
-            if (customerService.isPhoneExists(phone)) {
-                request.setAttribute("errorMessage", "số này đã tồn tại");
-                setFormData(request, fullname, phone, email, city, username);
-                request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
-                return;
-            }
-
-            if (customerService.isUsernameExists(username)) {
-                request.setAttribute("errorMessage", "tên đăng nhập này đã tồn tại");
-                setFormData(request, fullname, phone, email, city, username);
-                request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
-                return;
+            // kiem tra cac truong bat buoc
+            if (fullname == null || fullname.trim().isEmpty()) {
+                errors.add(MessageUtil.getError("error.fullname.required"));
             }
             
-            if(!confirmPassword.equals(password)){
-                request.setAttribute("errorMessage", "nhập lại mk");
+            if (phone == null || phone.trim().isEmpty()) {
+                errors.add(MessageUtil.getError("error.phone.required"));
+            }
+            
+            if (email == null || email.trim().isEmpty()) {
+                errors.add(MessageUtil.getError("error.email.required"));
+            }
+            
+            if (username == null || username.trim().isEmpty()) {
+                errors.add(MessageUtil.getError("error.username.required"));
+            }
+            
+            if (password == null || password.trim().isEmpty()) {
+                errors.add(MessageUtil.getError("error.password.required"));
+            }
+            
+            if (confirmPassword == null || confirmPassword.trim().isEmpty()) {
+                errors.add(MessageUtil.getError("error.confirm.password.required"));
+            }
+
+            // kiem tra mat khau khop
+            if (password != null && confirmPassword != null && !confirmPassword.equals(password)) {
+                errors.add(MessageUtil.getError("error.password.mismatch"));
+            }
+            
+            // kiem tra dinh dang email
+            if (email != null && !email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+                errors.add(MessageUtil.getError("error.email.invalid"));
+            }
+            
+            // kiem tra dinh dang so dien thoai
+            if (phone != null && !phone.matches("^[0-9]{10,11}$")) {
+                errors.add(MessageUtil.getError("error.phone.invalid"));
+            }
+
+            // neu co loi validation thi hien thi tat ca loi
+            if (!errors.isEmpty()) {
+                request.setAttribute("errors", errors);
                 setFormData(request, fullname, phone, email, city, username);
                 request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
                 return;
             }
 
-            // tao dto
+            // kiem tra trung lap email
+            if (customerService.isEmailExists(email)) {
+                errors.add(MessageUtil.getError("error.email.exists"));
+            }
+
+            // kiem tra trung lap so dien thoai
+            if (customerService.isPhoneExists(phone)) {
+                errors.add(MessageUtil.getError("error.phone.exists"));
+            }
+
+            // kiem tra trung lap username
+            if (customerService.isUsernameExists(username)) {
+                errors.add(MessageUtil.getError("error.username.exists"));
+            }
+
+            // neu co loi trung lap thi hien thi tat ca loi
+            if (!errors.isEmpty()) {
+                request.setAttribute("errors", errors);
+                setFormData(request, fullname, phone, email, city, username);
+                request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
+                return;
+            }
+
+            // tao doi tuong customer dto de luu thong tin dang ky
             CustomerDTO customerDTO = new CustomerDTO();
             customerDTO.setUsername(username.trim());
             customerDTO.setFullName(fullname.trim());
             customerDTO.setPhone(phone.trim());
             customerDTO.setEmail(email.trim());
             customerDTO.setCity(city);
-
-            // thuc hien dang ki
+            customerDTO.setCreateAt(LocalDateTime.now());
+            // thuc hien dang ky tai khoan customer
             boolean success = customerService.registerCustomer(customerDTO, password);
 
             if (success) {
+                // tao va luu ma xac thuc
                 Optional<String> otpCode = customerService.generateAndStoreVerificationCode(customerDTO.getUsername());
                 if (otpCode.isPresent()) {
                     String code = otpCode.get();
 
+                    // tao url xac thuc
                     String baseUrl = request.getScheme() + "://" + request.getServerName()
                             + (request.getServerPort() == 80 ? "" : ":" + request.getServerPort())
                             + request.getContextPath();
@@ -105,27 +155,34 @@ public class RegisterServlet extends HttpServlet {
                     String link = baseUrl + "/VerifyServlet?u=" + URLEncoder.encode(username, StandardCharsets.UTF_8)
                             + "&code=" + code;
 
+                    // gui email xac thuc
                     EmailUtil.send(email,
-                            "[CarGo] Mã xác minh tài khoản",
+                            "[CarGo] Ma xac minh tai khoan",
                             "<p>Mã xác minh: <b>" + code + "</b> (hết hạn 10 phút).</p>"
                             + "<p><a href='" + link + "'>Xác minh ngay</a></p>");
 
-                    // Lưu session để VerifyServlet biết user nào đang chờ xác minh
+                    // luu session de verify servlet biet user nao dang cho xac minh
                     HttpSession session = request.getSession(true);
                     session.setAttribute("pendingUser", username);
                     session.setAttribute("pendingEmail", email);
 
+                    // chuyen huong den trang xac thuc
                     request.getRequestDispatcher("/auth/verify.jsp").forward(request, response);
                     return;
                 }
             } else {
-                request.setAttribute("errorMessage", "dki that bai");
+                // neu dang ky that bai thi them loi vao danh sach
+                errors.add(MessageUtil.getError("error.register.failed"));
+                request.setAttribute("errors", errors);
                 setFormData(request, fullname, phone, email, city, username);
                 request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
             }
         } catch (Exception e) {
+            // log loi ra console
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Có lỗi xảy ra trong quá trình đăng ký. Vui lòng thử lại!");
+            // them loi he thong vao danh sach
+            errors.add(MessageUtil.getError("error.system.register"));
+            request.setAttribute("errors", errors);
             setFormData(request, fullname, phone, email, city, username);
             request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
         }

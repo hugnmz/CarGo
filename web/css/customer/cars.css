@@ -14,6 +14,10 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
+.car-card-clickable {
+  cursor: pointer;
+}
+
 .car-image-container {
   position: relative;
   overflow: hidden;

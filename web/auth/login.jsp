@@ -21,16 +21,12 @@
   </head>
   <body class="d-flex justify-content-center align-items-center">
     <!-- Card login -->
-    <div
-      class="card shadow-lg p-4 text-center fade-in"
-      style="max-width: 400px; width: 100%; border-radius: 12px"
-    >
+    <div class="card shadow-lg p-4 text-center fade-in login-card">
       <!-- Logo -->
       <img
         src="https://img.freepik.com/vector-cao-cap/hinh-minh-hoa-vector-logo-xe-hoi-nen-trang_917213-258381.jpg"
         alt="Car Logo"
-        class="mx-auto d-block rounded-circle mb-3"
-        style="width: 150px; height: 150px; object-fit: cover"
+        class="mx-auto d-block rounded-circle mb-3 login-logo"
       />
 
       <!-- Tiêu đề -->
@@ -39,8 +35,16 @@
       <%@ taglib prefix="c" uri="jakarta.tags.core" %> <%@ taglib prefix="fmt"
       uri="jakarta.tags.fmt" %>
 
-      <c:if test="${not empty errorMessage}">
-        <div class="alert alert-danger">${errorMessage}</div>
+      <c:if test="${not empty errors}">
+        <div class="alert alert-danger">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          <strong>Có lỗi xảy ra:</strong>
+          <ul class="mb-0 mt-2">
+            <c:forEach var="error" items="${errors}">
+              <li>${error}</li>
+            </c:forEach>
+          </ul>
+        </div>
       </c:if>
       <c:if test="${not empty successMessage}">
         <div class="alert alert-success">${successMessage}</div>
@@ -58,6 +62,7 @@
             name="username"
             class="form-control"
             placeholder="Tên đăng nhập"
+            value="${username != null ? username : ''}"
             required
           />
         </div>
@@ -104,7 +109,9 @@
       <!-- Liên kết -->
       <div class="d-flex justify-content-between mt-3">
         <a href="#">Quên mật khẩu?</a>
-        <a href="${pageContext.request.contextPath}/auth/register.jsp">Đăng ký tài khoản</a>
+        <a href="${pageContext.request.contextPath}/auth/register.jsp"
+          >Đăng ký tài khoản</a
+        >
       </div>
     </div>
 

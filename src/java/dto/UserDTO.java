@@ -2,6 +2,7 @@ package dto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * UserDTO - Dùng để trao đổi dữ liệu người dùng giữa tầng Controller / View.
@@ -22,12 +23,14 @@ public class UserDTO {
     private Integer roleId;          // ID vai trò (FK)
     private Integer locationId;      // ID địa điểm (FK)
 
-    public UserDTO() {}
+    public UserDTO() {
+    }
 
     // ===== GETTERS & SETTERS =====
     public Integer getUserId() {
         return userId;
     }
+
     public void setUserId(Integer userId) {
         this.userId = userId;
     }
@@ -35,6 +38,7 @@ public class UserDTO {
     public String getUsername() {
         return username;
     }
+
     public void setUsername(String username) {
         this.username = username;
     }
@@ -42,6 +46,7 @@ public class UserDTO {
     public String getFullName() {
         return fullName;
     }
+
     public void setFullName(String fullName) {
         this.fullName = fullName;
     }
@@ -49,6 +54,7 @@ public class UserDTO {
     public String getPhone() {
         return phone;
     }
+
     public void setPhone(String phone) {
         this.phone = phone;
     }
@@ -56,6 +62,7 @@ public class UserDTO {
     public String getEmail() {
         return email;
     }
+
     public void setEmail(String email) {
         this.email = email;
     }
@@ -63,6 +70,7 @@ public class UserDTO {
     public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
+
     public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
@@ -70,6 +78,7 @@ public class UserDTO {
     public LocalDateTime getCreateAt() {
         return createAt;
     }
+
     public void setCreateAt(LocalDateTime createAt) {
         this.createAt = createAt;
     }
@@ -77,6 +86,7 @@ public class UserDTO {
     public String getCity() {
         return city;
     }
+
     public void setCity(String city) {
         this.city = city;
     }
@@ -84,6 +94,7 @@ public class UserDTO {
     public String getAddress() {
         return address;
     }
+
     public void setAddress(String address) {
         this.address = address;
     }
@@ -91,6 +102,7 @@ public class UserDTO {
     public String getRoleName() {
         return roleName;
     }
+
     public void setRoleName(String roleName) {
         this.roleName = roleName;
     }
@@ -98,6 +110,7 @@ public class UserDTO {
     public Integer getRoleId() {
         return roleId;
     }
+
     public void setRoleId(Integer roleId) {
         this.roleId = roleId;
     }
@@ -105,25 +118,16 @@ public class UserDTO {
     public Integer getLocationId() {
         return locationId;
     }
+
     public void setLocationId(Integer locationId) {
         this.locationId = locationId;
     }
 
-    @Override
-    public String toString() {
-        return "UserDTO{" +
-                "userId=" + userId +
-                ", username='" + username + '\'' +
-                ", fullName='" + fullName + '\'' +
-                ", phone='" + phone + '\'' +
-                ", email='" + email + '\'' +
-                ", dateOfBirth=" + dateOfBirth +
-                ", createAt=" + createAt +
-                ", city='" + city + '\'' +
-                ", address='" + address + '\'' +
-                ", roleName='" + roleName + '\'' +
-                ", roleId=" + roleId +
-                ", locationId=" + locationId +
-                '}';
+    public String getCreatedAtFormatted() {
+        if (createAt == null) {
+            return "";
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return createAt.format(formatter);
     }
 }

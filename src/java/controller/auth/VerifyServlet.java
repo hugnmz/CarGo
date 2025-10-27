@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller.auth;
 
 import java.io.IOException;
@@ -14,23 +10,23 @@ import jakarta.servlet.http.HttpSession;
 
 import service.CustomerService;
 import util.di.DIContainer;
+import util.MessageUtil;
 
-/**
- *
- * @author admin
- */
+
 @WebServlet("/VerifyServlet")
 public class VerifyServlet extends HttpServlet {
     
+    // service xu ly thong tin khach hang
     private CustomerService customerService;
     
     @Override
     public void init() throws ServletException {
-        super.init(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
-
+        super.init();
         try {
+            // khoi tao customer service tu di container
             customerService = DIContainer.get(CustomerService.class);
         } catch (Exception e) {
+            // log loi ra console
             e.printStackTrace();
         }
     }
@@ -38,7 +34,7 @@ public class VerifyServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        // Redirect GET requests to verify page
+        // chuyen huong cac request get den trang xac thuc
         req.getRequestDispatcher("/auth/verify.jsp").forward(req, resp);
     }
     
@@ -46,35 +42,44 @@ public class VerifyServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         
+        // lay session hien tai, neu khong co thi null
         HttpSession session = req.getSession(false);
+        // lay username dang cho xac thuc tu session
         String username = (session != null) ? (String) session.getAttribute("pendingUser") : null;
+        // lay ma xac thuc tu form
         String inputCode = req.getParameter("code");
         if (inputCode != null) {
             inputCode = inputCode.trim();
         }
+        // lay email dang cho xac thuc tu session
         String email = (session != null) ? (String) session.getAttribute("pendingEmail") : null;
         
-        
+        // kiem tra username va ma xac thuc co hop le khong
         if (username != null && inputCode != null) {
             
+            // goi service de kiem tra ma xac thuc
             boolean isValid = customerService.verifyAccount(username, inputCode);            
             if (isValid) {
-                // Xóa session sau khi xác minh thành công
+                // neu xac thuc thanh cong thi xoa session pending
                 if (session != null) {
                     session.removeAttribute("pendingUser");
                     session.removeAttribute("pendingEmail");
                 }
                 
-                req.setAttribute("successMessage", "Xác minh thành công! Bạn có thể đăng nhập ngay bây giờ.");
+                // dat thong bao thanh cong va chuyen den trang dang nhap
+                req.setAttribute("successMessage", MessageUtil.getMessage("verification.success.login"));
                 req.getRequestDispatcher("/auth/login.jsp").forward(req, resp);
                 return;
             } else {
-                req.setAttribute("errorMessage", "Mã xác minh không đúng hoặc đã hết hạn. Vui lòng thử lại.");
+                // neu ma xac thuc sai thi dat thong bao loi
+                req.setAttribute("errorMessage", MessageUtil.getError("error.verification.code.wrong"));
             }
         } else {
-            req.setAttribute("errorMessage", "Thông tin xác minh không hợp lệ. Vui lòng đăng ký trước.");
+            // neu thieu thong tin thi dat thong bao loi
+            req.setAttribute("errorMessage", MessageUtil.getError("error.verification.invalid.info"));
         }
         
+        // hien thi lai trang xac thuc voi thong bao loi
         req.getRequestDispatcher("/auth/verify.jsp").forward(req, resp);
     }
     

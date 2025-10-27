@@ -13,10 +13,10 @@ public class UserDaoImp implements UsersDAO {
 
     @Override
     public List<Users> getAllUsers() {
-        String sql = "SELECT u.*, l.city, r.roleName\n" +
-"        FROM Users u\n" +
-"        LEFT JOIN Locations l ON u.locationId = l.locationId\n" +
-"        LEFT JOIN Roles r ON u.roleId = r.roleId";
+        String sql = "SELECT u.*, l.city, r.roleName\n"
+                + "        FROM Users u\n"
+                + "        LEFT JOIN Locations l ON u.locationId = l.locationId\n"
+                + "        LEFT JOIN Roles r ON u.roleId = r.roleId";
         return JdbcTemplateUtil.query(sql, Users.class);
     }
 
@@ -50,10 +50,10 @@ public class UserDaoImp implements UsersDAO {
         String sql = """
         INSERT INTO Users (
             username, password_hash, password_salt,
-            fullName, phone, email, dateOfBirth,
+            fullName, phone, email,
             locationId, roleId, createAt
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """;
 
         int id = JdbcTemplateUtil.insertAndReturnKey(
@@ -64,9 +64,8 @@ public class UserDaoImp implements UsersDAO {
                 user.getFullName(),
                 user.getPhone(),
                 user.getEmail(),
-                user.getDateOfBirth() != null ? java.sql.Date.valueOf(user.getDateOfBirth()) : null,
                 user.getLocationId(),
-                user.getRoleId(), // ✅ thêm dòng này
+                user.getRoleId(),
                 user.getCreateAt() != null ? Timestamp.valueOf(user.getCreateAt()) : new Timestamp(System.currentTimeMillis())
         );
 
@@ -81,7 +80,7 @@ public class UserDaoImp implements UsersDAO {
     public boolean updateUser(Users user) {
         String sql = """
             UPDATE Users SET
-                fullName = ?, phone = ?, email = ?, dateOfBirth = ?, locationId = ?
+                fullName = ?, phone = ?, email = ?, locationId = ?
             WHERE userId = ?
         """;
 
@@ -90,7 +89,6 @@ public class UserDaoImp implements UsersDAO {
                 user.getFullName(),
                 user.getPhone(),
                 user.getEmail(),
-                user.getDateOfBirth() != null ? java.sql.Date.valueOf(user.getDateOfBirth()) : null,
                 user.getLocationId(),
                 user.getUserId()
         );
@@ -128,23 +126,25 @@ public class UserDaoImp implements UsersDAO {
         int affected = JdbcTemplateUtil.update(sql, userId, roleId);
         return affected > 0;
     }
-    
-    public static void main(String[] args) {
-        UserDaoImp user = new UserDaoImp();
-        Optional<Users> list = user.getUserByUsername("admin");
 
-        if (list.isPresent()) {
-            System.out.println("Tìm thấy user:");
-            System.out.println("ID: " + list.get().getUserId());
-            System.out.println("Username: " + list.get().getUsername());
-            System.out.println("RoleName: " + list.get().getRole());
-        } else {
-            System.out.println("Không tìm thấy user 'admin'");
-        }
+    @Override
+    public boolean existsUsername(String username) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE username = ?";
+        int count = JdbcTemplateUtil.count(sql, username);
+        return count > 0;
+    }
 
-//        List<Users> list = user.getAllUsers();
-//        for (Users users : list) {
-//            System.out.println(users.toString());
-//        }
+    @Override
+    public boolean existsEmail(String email) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE email = ?";
+        int count = JdbcTemplateUtil.count(sql, email);
+        return count > 0;
+    }
+
+    @Override
+    public boolean existsPhone(String phone) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE phone = ?";
+        int count = JdbcTemplateUtil.count(sql, phone);
+        return count > 0;
     }
 }

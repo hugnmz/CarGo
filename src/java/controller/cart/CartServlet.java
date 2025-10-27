@@ -8,24 +8,29 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.ArrayList;
+import util.MessageUtil;
 import service.CartService;
 import util.di.DIContainer;
 import util.AuthUtil;
 
-// Servlet xu ly them san pham vao gio hang
+
 @WebServlet(name = "CartServlet", urlPatterns = {"/Cart"})
 public class CartServlet extends HttpServlet {
 
+    // service xu ly gio hang
     private CartService cartService;
 
     @Override
     public void init() throws ServletException {
         super.init();
-        // Khoi tao CartService tu DI Container
         try {
+            // khoi tao cart service tu di container
             cartService = DIContainer.get(CartService.class);
         } catch (Exception e) {
+            // nem loi neu khoi tao service that bai
             throw new RuntimeException("Failed to initialize CartService", e);
         }
     }
@@ -33,109 +38,128 @@ public class CartServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // method doGet khong su dung trong servlet nay
     }
 
-    // Xu ly them san pham vao gio hang
-    // Kiem tra dang nhap, lay va validate tham so, them san pham vao gio hang, redirect voi thong bao ket qua
+    /**
+     * method xu ly them san pham vao gio hang
+     * - kiem tra dang nhap
+     * - lay va validate tham so tu form
+     * - them san pham vao gio hang
+     * - chuyen huong voi thong bao ket qua
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         try {
-            // Kiem tra trang thai dang nhap
+            // kiem tra trang thai dang nhap, neu chua dang nhap thi chuyen den trang dang nhap
             if (!AuthUtil.requireLogin(request, response)) {
                 return;
             }
 
-            // Lay thong tin customer tu session
+            // lay thong tin customer tu session
             Integer customerId = AuthUtil.getCustomerId(request);
 
-            // Lay cac tham so tu request
+            // lay cac tham so tu request
             String vehicleIdStr = request.getParameter("vehicleId");
             String carIdStr = request.getParameter("carId");
             String startDateStr = request.getParameter("startDate");
             String endDateStr = request.getParameter("endDate");
-            String startTimeStr = request.getParameter("startTime");
-            String endTimeStr = request.getParameter("endTime");
 
-            // Kiem tra tham so bat buoc
+            // kiem tra tham so bat buoc, neu thieu thi chuyen ve trang chi tiet xe voi thong bao loi
             if (vehicleIdStr == null || carIdStr == null) {
                 response.sendRedirect(request.getContextPath() + "/car-detail?carId=" + (carIdStr != null ? carIdStr : "")
                         + "&error=missing_params");
                 return;
             }
 
-            // Chuyen doi tham so sang Integer
+            // chuyen doi tham so tu string sang integer
             Integer carId;
             Integer vehicleId;
             try {
                 carId = Integer.valueOf(carIdStr);
                 vehicleId = Integer.valueOf(vehicleIdStr);
             } catch (NumberFormatException nfe) {
+                // neu chuyen doi that bai thi chuyen ve trang chi tiet xe voi thong bao loi
                 response.sendRedirect(request.getContextPath() + "/car-detail?carId=" + carIdStr + "&error=invalid_params");
                 return;
             }
 
-            // Xu ly thoi gian thue xe
-            LocalDateTime startDate, endDate;
-            if (startDateStr != null && endDateStr != null
-                    && !startDateStr.trim().isEmpty() && !endDateStr.trim().isEmpty()) {
-                // Neu co gio:phut thi dung, nguoc lai mac dinh 09:00 - 17:00
-                String startTime = (startTimeStr != null && !startTimeStr.trim().isEmpty()) ? startTimeStr : "09:00";
-                String endTime = (endTimeStr != null && !endTimeStr.trim().isEmpty()) ? endTimeStr : "17:00";
-                startDate = LocalDateTime.parse(startDateStr + "T" + startTime + ":00");
-                endDate = LocalDateTime.parse(endDateStr + "T" + endTime + ":00");
-            } else {
-                // Khong co date: dung thoi gian mac dinh
-                startDate = LocalDateTime.now().plusDays(1).withHour(9).withMinute(0).withSecond(0);
-                endDate = startDate.plusDays(1).withHour(17).withMinute(0).withSecond(0);
+            // tao danh sach de luu cac loi validation
+            List<String> errors = new ArrayList<>();
+
+            // kiem tra ngay bat dau, neu thieu thi them loi vao danh sach
+            if (startDateStr == null || startDateStr.trim().isEmpty()) {
+                errors.add(MessageUtil.getError("error.start.date.required"));
+            }
+            
+            // kiem tra ngay ket thuc, neu thieu thi them loi vao danh sach
+            if (endDateStr == null || endDateStr.trim().isEmpty()) {
+                errors.add(MessageUtil.getError("error.end.date.required"));
             }
 
-            // Kiem tra thoi gian thue toi thieu 1 gio
-            if (java.time.Duration.between(startDate, endDate).toMinutes() < 60) {
-                String back = request.getContextPath() + "/customer/booking-form.jsp?carId=" + carId
-                        + "&vehicleId=" + vehicleId + "&error=min_1h"
-                        + "&startDate=" + startDateStr + "&endDate=" + endDateStr
-                        + "&startTime=" + startTimeStr + "&endTime=" + endTimeStr
-                        + "&pickupLocation=" + request.getParameter("pickupLocation")
-                        + "&returnLocation=" + request.getParameter("returnLocation");
-                response.sendRedirect(back);
+            // chuyen doi ngay tu string sang localdate
+            LocalDate startDate = null, endDate = null;
+            if (startDateStr != null && endDateStr != null) {
+                try {
+                    startDate = LocalDate.parse(startDateStr);
+                    endDate = LocalDate.parse(endDateStr);
+                } catch (Exception e) {
+                    // neu chuyen doi that bai thi them loi vao danh sach
+                    errors.add(MessageUtil.getError("error.date.format.invalid"));
+                }
+            }
+
+            // kiem tra ngay bat dau phai trong tuong lai
+            if (startDate != null && startDate.isBefore(LocalDate.now())) {
+                errors.add(MessageUtil.getError("error.date.past"));
+            }
+
+            // kiem tra thoi gian thue toi thieu 1 ngay
+            if (startDate != null && endDate != null && (startDate.isAfter(endDate) || startDate.isEqual(endDate))) {
+                errors.add(MessageUtil.getError("error.rental.minimum"));
+            }
+
+            // neu co loi thi hien thi tat ca loi va chuyen ve trang booking form
+            if (!errors.isEmpty()) {
+                request.setAttribute("errors", errors);
+                request.setAttribute("startDate", startDateStr);
+                request.setAttribute("endDate", endDateStr);
+                request.setAttribute("pickupLocation", request.getParameter("pickupLocation"));
+                request.setAttribute("returnLocation", request.getParameter("returnLocation"));
+                request.getRequestDispatcher("/customer/booking-form.jsp").forward(request, response);
                 return;
             }
 
-            // Kiem tra thoi gian dat phai trong tuong lai
-            LocalDateTime now = LocalDateTime.now();
-            if (startDate.isBefore(now)) {
-                String back = request.getContextPath() + "/customer/booking-form.jsp?carId=" + carId
-                        + "&vehicleId=" + vehicleId + "&error=past_time"
-                        + "&startDate=" + startDateStr + "&endDate=" + endDateStr
-                        + "&startTime=" + startTimeStr + "&endTime=" + endTimeStr
-                        + "&pickupLocation=" + request.getParameter("pickupLocation")
-                        + "&returnLocation=" + request.getParameter("returnLocation");
-                response.sendRedirect(back);
-                return;
-            }
-            // Them san pham vao gio hang
-            boolean ok = cartService.addToCart(customerId, vehicleId, startDate, endDate);
+            // chuyen doi sang localdatetime voi gio mac dinh (6h-22h)
+            LocalDateTime startDateTime = startDate.atTime(6, 0);   // 6:00 sang
+            LocalDateTime endDateTime = endDate.atTime(22, 0);      // 22:00 dem
+            // them vao gio hang bang service
+            boolean success = cartService.addToCart(customerId, vehicleId, startDateTime, endDateTime);
 
-            if (ok) {
-                // Thanh cong: quay lai car-detail voi thong bao success
+            if (success) {
+                // neu them thanh cong thi chuyen ve trang chi tiet xe voi thong bao thanh cong
                 response.sendRedirect(request.getContextPath() + "/car-detail?carId=" + carId + "&vehicleId=" + vehicleId + "&add=true");
             } else {
-                // That bai chung (khong khang dinh overlap)
-                String back = request.getContextPath() + "/customer/booking-form.jsp?carId=" + carId
-                        + "&vehicleId=" + vehicleId + "&error=add_failed"
-                        + "&startDate=" + startDateStr + "&endDate=" + endDateStr
-                        + "&startTime=" + startTimeStr + "&endTime=" + endTimeStr
-                        + "&pickupLocation=" + request.getParameter("pickupLocation")
-                        + "&returnLocation=" + request.getParameter("returnLocation");
-                response.sendRedirect(back);
+                // neu them that bai thi them loi vao danh sach va hien thi lai form
+                errors.add(MessageUtil.getError("error.vehicle.unavailable"));
+                request.setAttribute("errors", errors);
+                request.setAttribute("startDate", startDateStr);
+                request.setAttribute("endDate", endDateStr);
+                request.setAttribute("pickupLocation", request.getParameter("pickupLocation"));
+                request.setAttribute("returnLocation", request.getParameter("returnLocation"));
+                request.getRequestDispatcher("/customer/booking-form.jsp").forward(request, response);
             }
 
         } catch (Exception e) {
-            // Xu ly loi he thong
+            // xu ly loi he thong
             e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/car-detail?carId=" + request.getParameter("carId") + "&error=system_error");
+            // tao danh sach loi va hien thi trang booking form
+            List<String> errors = new ArrayList<>();
+            errors.add(MessageUtil.getError("error.system.cart"));
+            request.setAttribute("errors", errors);
+            request.getRequestDispatcher("/customer/booking-form.jsp").forward(request, response);
         }
     }
 

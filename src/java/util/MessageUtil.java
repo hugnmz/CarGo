@@ -1,0 +1,52 @@
+package util;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+// class xu ly thong bao va loi tu file properties
+public class MessageUtil {
+    // properties chua thong bao
+    private static Properties messages;
+    // properties chua loi
+    private static Properties errors;
+    
+    // khoi tao properties khi class duoc load
+    static {
+        loadProperties();
+    }
+    
+    // method tai properties tu file
+    private static void loadProperties() {
+        try {
+            // tai file messages.properties
+            messages = new Properties();
+            InputStream messagesStream = MessageUtil.class.getClassLoader().getResourceAsStream("messages.properties");
+            if (messagesStream != null) {
+                messages.load(new java.io.InputStreamReader(messagesStream, "UTF-8"));
+                messagesStream.close();
+            }
+            
+            // tai file errors.properties
+            errors = new Properties();
+            InputStream errorsStream = MessageUtil.class.getClassLoader().getResourceAsStream("errors.properties");
+            if (errorsStream != null) {
+                errors.load(new java.io.InputStreamReader(errorsStream, "UTF-8"));
+                errorsStream.close();
+            }
+        } catch (IOException e) {
+            // log loi neu co
+            e.printStackTrace();
+        }
+    }
+    
+    // method lay thong bao theo key
+    public static String getMessage(String key) {
+        return messages.getProperty(key, "Message not found: " + key);
+    }
+    
+    // method lay loi theo key
+    public static String getError(String key) {
+        return errors.getProperty(key, "Error not found: " + key);
+    }
+}

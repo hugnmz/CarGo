@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package util;
 
 import java.lang.reflect.Field;
@@ -12,34 +8,32 @@ import java.time.LocalTime;
 import util.di.annotation.Column;
 import util.di.annotation.Nested;
 
-/**
- *
- * @author admin
- */
+// class map result set thanh object
 public class MapResultSet {
 
+    // map result set thanh object theo class
     public static <T> T mapResultSet(ResultSet rs, Class<T> clazz) throws SQLException {
         try {
 
             // tao instance tu clazz
             T instance = clazz.getDeclaredConstructor().newInstance();
 
-            //duyet qua cac field cua class do
+            // duyet qua cac field cua class do
             for (Field f : clazz.getDeclaredFields()) {
                 f.setAccessible(true);
 
-                // lay column dc gan annotation
+                // lay column duoc gan annotation
                 Column column = f.getAnnotation(Column.class);
-                // neu ko dc gan bo qua
+                // neu khong duoc gan thi bo qua
                 if (column == null) {
                     continue;
                 }
 
                 // lay ten tu column
-                // ko co thi lay ten cua field
+                // khong co thi lay ten cua field
                 String columnName = column.name().isEmpty() ? f.getName() : column.name();
 
-                // chi set neu ResultSet thuc su co cot nay
+                // chi set neu resultset thuc su co cot nay
                 if (!columnExists(rs, columnName)) {
                     continue;
                 }
@@ -48,12 +42,12 @@ public class MapResultSet {
                     Object obj = readValue(rs, columnName, f.getType());
                     f.set(instance, obj);
                 } catch (Exception ignore) {
-                    // bo qua cot ko dc set
+                    // bo qua cot khong duoc set
                 }
 
             }
 
-            // cac field co @Nested( 1- 1) list thi chiu nhé ae
+            // cac field co @nested (1-1) list thi chiu nhe ae
             for (Field f : clazz.getDeclaredFields()) {
                 f.setAccessible(true);
                 if (f.getAnnotation(Column.class) != null) {
@@ -65,7 +59,7 @@ public class MapResultSet {
                     continue;
                 }
 
-                //Bỏ qua nếu là Collection hoặc Map
+                // bo qua neu la collection hoac map
                 if (java.util.Collection.class.isAssignableFrom(f.getType())
                         || java.util.Map.class.isAssignableFrom(f.getType())) {
                     continue;
@@ -81,7 +75,7 @@ public class MapResultSet {
 
                     Column c = cf.getAnnotation(Column.class);
                     if (c == null) {
-                        continue; // chi nap nhung field dc gan annotation
+                        continue; // chi nap nhung field duoc gan annotation
                     }
 
                     String base = c.name().isEmpty() ? cf.getName() : c.name();
@@ -90,7 +84,7 @@ public class MapResultSet {
                     try {
                         Object val = readValue(rs, label, cf.getType());
                         cf.set(child, val);
-                        check = true;  //da dc set it nhat 1 field
+                        check = true;  // da duoc set it nhat 1 field
                     } catch (Exception ignore) {
                     }
 
@@ -105,16 +99,17 @@ public class MapResultSet {
 
             return instance;
         } catch (Exception e) {
+            // log loi neu co
             e.printStackTrace();
             throw new RuntimeException("Mapping error: " + e.getMessage(), e);
         }
 
     }
 
-    // ktra xem ResultSet có cột này ko 
+    // kiem tra xem resultset co cot nay khong
     private static boolean columnExists(ResultSet rs, String label) {
         try {
-            // Thử lấy giá trị từ column để kiểm tra xem có tồn tại không
+            // thu lay gia tri tu column de kiem tra xem co ton tai khong
             rs.getObject(label);
             return true;
         } catch (SQLException ignore) {
@@ -122,6 +117,7 @@ public class MapResultSet {
         }
     }
 
+    // doc gia tri tu resultset theo kieu du lieu
     private static Object readValue(ResultSet rs, String label, Class<?> type) throws SQLException {
         if (type.isEnum()) {
             String s = rs.getString(label);

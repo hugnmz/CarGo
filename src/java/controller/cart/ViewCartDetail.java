@@ -14,18 +14,19 @@ import service.CartService;
 import util.di.DIContainer;
 import util.AuthUtil;
 
-// Servlet hien thi chi tiet gio hang
 @WebServlet(name = "ViewCartDetail", urlPatterns = {"/ViewCartDetail"})
 public class ViewCartDetail extends HttpServlet {
 
+    // service xu ly gio hang
     private CartService cartService;
 
     @Override
     public void init() throws ServletException {
-        // Khoi tao CartService tu DI Container
         try {
+            // khoi tao cart service tu di container
             cartService = DIContainer.get(CartService.class);
         } catch (Exception e) {
+            // nem loi neu khoi tao service that bai
             throw new RuntimeException(e);
         }
     }
@@ -33,19 +34,20 @@ public class ViewCartDetail extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Kiem tra trang thai dang nhap
+        // kiem tra trang thai dang nhap, neu chua dang nhap thi chuyen den trang dang nhap
         if (!AuthUtil.requireLogin(request, response)) {
             return;
         }
         
-        // Lay thong tin customer va danh sach san pham trong gio hang
+        // lay thong tin customer tu session
         Integer customerId = AuthUtil.getCustomerId(request);
+        // lay danh sach san pham trong gio hang tu database
         List<OrderDTO> items = cartService.getCartItems(customerId);
         
-        // Truyen danh sach san pham xuong JSP
+        // dat danh sach san pham vao request de truyen sang jsp
         request.setAttribute("cartItems", items);
         
-        // Truyen carId va vehicleId xuong JSP de hien thi link "Quay lai xem xe"
+        // lay car id va vehicle id tu tham so de hien thi link "quay lai xem xe"
         String carId = request.getParameter("carId");
         String vehicleId = request.getParameter("vehicleId");
         if (carId != null && !carId.trim().isEmpty()) {
@@ -55,48 +57,51 @@ public class ViewCartDetail extends HttpServlet {
             request.setAttribute("vehicleId", vehicleId);
         }
         
-        // Forward den trang cart.jsp
+        // chuyen huong den trang cart.jsp
         request.getRequestDispatcher("/customer/cart.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Kiem tra trang thai dang nhap
+        // kiem tra session va customer id, neu khong co thi chuyen den trang dang nhap
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("customerId") == null) {
             response.sendRedirect(request.getContextPath() + "/auth/login.jsp");
             return;
         }
         
-        // Lay thong tin customer va cac tham so
+        // lay thong tin customer tu session
         Integer customerId = (Integer) session.getAttribute("customerId");
+        // lay tham so action de xac dinh hanh dong can thuc hien
         String action = request.getParameter("action");
+        // lay danh sach id cac san pham duoc chon de xoa
         String[] selected = request.getParameterValues("selectedIds");
 
         boolean success = false;
         
-        // Xu ly cac hanh dong xoa san pham
+        // xu ly cac hanh dong xoa san pham
         if ("clear".equals(action)) {
-            // Xoa tat ca san pham trong gio hang
+            // xoa tat ca san pham trong gio hang
             success = cartService.clearCart(customerId);
         } else if ("remove".equals(action) && selected != null && selected.length > 0) {
-            // Xoa cac san pham da chon
+            // xoa cac san pham da chon
             for (String id : selected) {
                 try {
+                    // chuyen doi id tu string sang integer va xoa san pham
                     boolean result = cartService.removeFromCart(customerId, Integer.valueOf(id));
                     if (result) success = true;
                 } catch (NumberFormatException e) {
-                    // Bo qua cac ID khong hop le
+                    // bo qua cac id khong hop le
                 }
             }
         }
 
-        // Sau khi xoa: lay lai danh sach gio hang moi
+        // sau khi xoa: lay lai danh sach gio hang moi tu database
         List<OrderDTO> items = cartService.getCartItems(customerId);
         request.setAttribute("cartItems", items);
         
-        // Truyen carId va vehicleId xuong JSP
+        // lay car id va vehicle id tu tham so de hien thi link "quay lai xem xe"
         String carId = request.getParameter("carId");
         String vehicleId = request.getParameter("vehicleId");
         if (carId != null && !carId.trim().isEmpty()) {
@@ -106,8 +111,7 @@ public class ViewCartDetail extends HttpServlet {
             request.setAttribute("vehicleId", vehicleId);
         }
         
-        
-        // Forward lai trang cart
+        // chuyen huong lai trang cart.jsp
         request.getRequestDispatcher("/customer/cart.jsp").forward(request, response);
     }
 }
