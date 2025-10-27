@@ -3,7 +3,6 @@
     Created on : 23 thg 10, 2025, 11:31:55
     Author     : HOANGNAM
 --%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
