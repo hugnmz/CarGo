@@ -117,7 +117,7 @@ public class PaymentServlet extends HttpServlet {
             paymentDTO.setContractId(contractId);
             paymentDTO.setAmount(amount);
             paymentDTO.setMethodName(paymentMethod.getMethodName());
-            paymentDTO.setStatus("pending");
+            paymentDTO.setStatus("PENDING");
 
             // Tạo thanh toán
             boolean success = paymentService.createPayment(paymentDTO);

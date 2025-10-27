@@ -251,6 +251,7 @@
                 </div>
             </div>
 
+
             <c:choose>
                 <c:when test="${empty contracts}">
                     <div class="alert alert-info">
@@ -341,9 +342,11 @@
                                     <!-- Action buttons -->
                                     <div class="col-md-1">
                                         <div class="btn-group-vertical w-100" role="group">
-                                            <button type="button" class="btn btn-view btn-action btn-sm mb-1">
+                                            <button type="button" class="btn btn-view btn-action btn-sm mb-1"
+                                                    onclick="window.location.href = '${pageContext.request.contextPath}/ContractServlet?action=view&contractId=${contract.contractId}'">
                                                 <i class="fas fa-eye"></i> Xem chi tiết
                                             </button>
+
                                             <button type="button" class="btn btn-info btn-action btn-sm mb-1"
                                                     onclick="window.location.href = '${pageContext.request.contextPath}/PaymentServlet?action=by_contract&contractId=${contract.contractId}'">
                                                 <i class="fas fa-money-check"></i> Thanh toán
@@ -369,40 +372,47 @@
                     </c:forEach>
                 </c:otherwise>
             </c:choose>
+            <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
+            <!-- Debug: kiểm tra số hợp đồng nhận được -->
+            <div class="alert alert-info">
+                Contracts received: ${fn:length(contracts)}
+            </div>
 
         </div>
 
         <!-- Scripts -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-                                        function updateStatus(contractId, status) {
-                                            if (confirm('Bạn có chắc muốn cập nhật trạng thái hợp đồng?')) {
-                                                var form = document.createElement('form');
-                                                form.method = 'POST';
-                                                form.action = '${pageContext.request.contextPath}/ContractServlet';
+                                                                function updateStatus(contractId, status) {
+                                                                    if (confirm('Bạn có chắc muốn cập nhật trạng thái hợp đồng?')) {
+                                                                        var form = document.createElement('form');
+                                                                        form.method = 'POST';
+                                                                        form.action = '${pageContext.request.contextPath}/ContractServlet';
 
-                                                var actionInput = document.createElement('input');
-                                                actionInput.type = 'hidden';
-                                                actionInput.name = 'action';
-                                                actionInput.value = 'update_status';
-                                                form.appendChild(actionInput);
+                                                                        var actionInput = document.createElement('input');
+                                                                        actionInput.type = 'hidden';
+                                                                        actionInput.name = 'action';
+                                                                        actionInput.value = 'update_status';
+                                                                        form.appendChild(actionInput);
 
-                                                var contractIdInput = document.createElement('input');
-                                                contractIdInput.type = 'hidden';
-                                                contractIdInput.name = 'contractId';
-                                                contractIdInput.value = contractId;
-                                                form.appendChild(contractIdInput);
+                                                                        var contractIdInput = document.createElement('input');
+                                                                        contractIdInput.type = 'hidden';
+                                                                        contractIdInput.name = 'contractId';
+                                                                        contractIdInput.value = contractId;
+                                                                        form.appendChild(contractIdInput);
 
-                                                var statusInput = document.createElement('input');
-                                                statusInput.type = 'hidden';
-                                                statusInput.name = 'status';
-                                                statusInput.value = status;
-                                                form.appendChild(statusInput);
+                                                                        var statusInput = document.createElement('input');
+                                                                        statusInput.type = 'hidden';
+                                                                        statusInput.name = 'status';
+                                                                        statusInput.value = status;
+                                                                        form.appendChild(statusInput);
 
-                                                document.body.appendChild(form);
-                                                form.submit();
-                                            }
-                                        }
+                                                                        document.body.appendChild(form);
+                                                                        form.submit();
+                                                                    }
+                                                                }
+
         </script>
     </body>
 </html>

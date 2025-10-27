@@ -19,6 +19,7 @@ import mapper.ContractMapper;
 import mapper.ContractDetailMapper;
 import mapper.OrderMapper;
 import model.Contracts;
+import model.Customers;
 import service.ContractService;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
@@ -28,37 +29,37 @@ public class ContractServiceImpl implements ContractService {
 
     @Autowired
     private ContractsDAO contractsDAO;
-    
+
     @Autowired
     private ContractDetailsDAO contractDetailsDAO;
-    
+
     @Autowired
     private CustomersDAO customersDAO;
-    
+
     @Autowired
     private OrdersDAO ordersDAO;
-    
+
     @Autowired
     private ContractMapper contractMapper;
-    
+
     @Autowired
     private ContractDetailMapper contractDetailMapper;
-    
+
     @Autowired
     private OrderMapper orderMapper;
 
     @Override
     public List<ContractDTO> getContractsByCustomer(Integer customerId) {
         List<ContractDTO> contractDTOs = new ArrayList<>();
-        
+
         // Lấy danh sách contracts từ DAO
         List<model.Contracts> contracts = contractsDAO.getContractByCustomer(customerId);
-        
+
         for (Contracts contract : contracts) {
             ContractDTO dto = contractMapper.toDTO(contract);
             contractDTOs.add(dto);
         }
-        
+
         return contractDTOs;
     }
 
@@ -67,13 +68,13 @@ public class ContractServiceImpl implements ContractService {
         Optional<model.Contracts> contract = contractsDAO.getContractById(contractId);
         if (contract.isPresent()) {
             ContractDTO dto = contractMapper.toDTO(contract.get());
-            
+
             // Lấy tên khách hàng
             Optional<model.Customers> customer = customersDAO.getCustomerById(dto.getCustomerId());
             if (customer.isPresent() && customer.get().getFullName() != null) {
                 dto.setCustomerName(customer.get().getFullName());
             }
-            
+
             return Optional.of(dto);
         }
         return Optional.empty();
@@ -82,26 +83,26 @@ public class ContractServiceImpl implements ContractService {
     @Override
     public List<ContractDetailDTO> getContractDetails(Integer contractId) {
         List<ContractDetailDTO> detailDTOs = new ArrayList<>();
-        
+
         List<model.ContractDetails> details = contractDetailsDAO.getContractDetailsByContractId(contractId);
-        
+
         for (model.ContractDetails detail : details) {
             ContractDetailDTO dto = contractDetailMapper.toDTO(detail);
             detailDTOs.add(dto);
         }
-        
+
         return detailDTOs;
     }
 
-@Override
-public boolean updateContractStatus(Integer contractId, String status) {
-    try {
-        return contractsDAO.updateContractStatus(contractId, status);
-    } catch (Exception e) {
-        e.printStackTrace();
-        return false;
+    @Override
+    public boolean updateContractStatus(Integer contractId, String status) {
+        try {
+            return contractsDAO.updateContractStatus(contractId, status);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-}
 
     @Override
     public boolean calculateTotalAmount(Integer contractId) {
@@ -115,75 +116,94 @@ public boolean updateContractStatus(Integer contractId, String status) {
 
     @Override
     public List<ContractDTO> getContractsByStaff(Integer staffId) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        List<ContractDTO> contractDTOs = new ArrayList<>();
+        try {
+            List<Contracts> contracts = contractsDAO.getContractByStaff(staffId);
+            for (Contracts contract : contracts) {
+                ContractDTO dto = contractMapper.toDTO(contract);
+                Optional<Customers> customer = customersDAO.getCustomerById(dto.getCustomerId());
+                customer.ifPresent(c -> dto.setCustomerName(c.getFullName()));
+                contractDTOs.add(dto);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return contractDTOs;
     }
 
-@Override
-public List<ContractDTO> getAllContracts() {
-    List<ContractDTO> contractDTOs = new ArrayList<>();
-    
-    try {
-        List<model.Contracts> contracts = contractsDAO.getAllContracts();
-        
-        for (Contracts contract : contracts) {
-            ContractDTO dto = contractMapper.toDTO(contract);
-            
-            // Lấy tên khách hàng
-            Optional<model.Customers> customer = customersDAO.getCustomerById(dto.getCustomerId());
-            if (customer.isPresent() && customer.get().getFullName() != null) {
-                dto.setCustomerName(customer.get().getFullName());
+    @Override
+    public List<ContractDTO> getAllContracts() {
+        List<ContractDTO> contractDTOs = new ArrayList<>();
+
+        try {
+            List<model.Contracts> contracts = contractsDAO.getAllContracts(); // ✅ lấy tất cả
+            for (Contracts contract : contracts) {
+                ContractDTO dto = contractMapper.toDTO(contract);
+                Optional<model.Customers> customer = customersDAO.getCustomerById(dto.getCustomerId());
+                customer.ifPresent(c -> dto.setCustomerName(c.getFullName()));
+                contractDTOs.add(dto);
             }
-            
-            contractDTOs.add(dto);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return contractDTOs;
     }
-    
-    return contractDTOs;
-}
 
     @Override
     public boolean createContract(ContractDTO contractDTO) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        try {
+            model.Contracts contract = contractMapper.toModel(contractDTO);
+            if (contract.getCreateAt() == null) {
+                contract.setCreateAt(LocalDateTime.now());
+            }
+            if (contract.getStatus() != null) {
+                contract.setStatus(contract.getStatus().toUpperCase());
+            }
+            return contractsDAO.addContract(contract);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-    
+
     @Override
     public List<ContractDTO> createContractsFromCart(Integer customerId, Integer[] selectedOrderIds) {
         List<ContractDTO> createdContracts = new ArrayList<>();
-        
+
         try {
             // 1. Lấy tên khách hàng
             String customerName = getCustomerName(customerId);
-            
+
             // 2. Lấy danh sách orders
             List<OrderDTO> selectedOrders = getSelectedOrders(customerId, selectedOrderIds);
-            
+
             if (selectedOrders.isEmpty()) {
                 return createdContracts;
             }
-            
+
             // 3. Nhóm orders theo (startDate, endDate)
             Map<String, List<OrderDTO>> groups = groupOrdersByDateRange(selectedOrders);
-            
+
             // 4. Tạo hợp đồng cho từng nhóm
             for (Map.Entry<String, List<OrderDTO>> entry : groups.entrySet()) {
                 List<OrderDTO> orders = entry.getValue();
-                if (orders.isEmpty()) continue;
-                
+                if (orders.isEmpty()) {
+                    continue;
+                }
+
                 ContractDTO contractDTO = createContractFromOrders(customerId, customerName, orders);
                 if (contractDTO != null) {
                     createdContracts.add(contractDTO);
                 }
             }
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         return createdContracts;
     }
-    
+
     private String getCustomerName(Integer customerId) {
         try {
             Optional<model.Customers> customer = customersDAO.getCustomerById(customerId);
@@ -195,10 +215,10 @@ public List<ContractDTO> getAllContracts() {
         }
         return "Khách hàng";
     }
-    
+
     private List<OrderDTO> getSelectedOrders(Integer customerId, Integer[] selectedOrderIds) {
         List<OrderDTO> selectedOrders = new ArrayList<>();
-        
+
         try {
             if (selectedOrderIds != null && selectedOrderIds.length > 0) {
                 // Lấy orders được chọn
@@ -220,10 +240,10 @@ public List<ContractDTO> getAllContracts() {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         return selectedOrders;
     }
-    
+
     private Map<String, List<OrderDTO>> groupOrdersByDateRange(List<OrderDTO> orders) {
         Map<String, List<OrderDTO>> groups = new HashMap<>();
         for (OrderDTO order : orders) {
@@ -232,20 +252,22 @@ public List<ContractDTO> getAllContracts() {
         }
         return groups;
     }
-    
+
     private ContractDTO createContractFromOrders(Integer customerId, String customerName, List<OrderDTO> orders) {
         try {
-            if (orders.isEmpty()) return null;
-            
+            if (orders.isEmpty()) {
+                return null;
+            }
+
             LocalDateTime start = orders.get(0).getRentStartDate();
             LocalDateTime end = orders.get(0).getRentEndDate();
-            
+
             // Tính tổng tiền thuê
             BigDecimal total = calculateTotalAmount(orders);
-            
+
             // Tính tiền đặt cọc
             BigDecimal deposit = calculateDepositAmount(total);
-            
+
             // Tạo Contract entity
             model.Contracts contract = new model.Contracts();
             contract.setCustomerId(customerId);
@@ -255,13 +277,13 @@ public List<ContractDTO> getAllContracts() {
             contract.setTotalAmount(total);
             contract.setDepositAmount(deposit);
             contract.setCreateAt(LocalDateTime.now());
-            
+
             // Lưu contract
             boolean contractSaved = contractsDAO.addContract(contract);
             if (!contractSaved) {
                 return null;
             }
-            
+
             // Lấy contract ID vừa tạo - KHÔNG DÙNG STREAM
             List<model.Contracts> customerContracts = contractsDAO.getContractByCustomer(customerId);
             model.Contracts savedContract = null;
@@ -271,13 +293,13 @@ public List<ContractDTO> getAllContracts() {
                     break;
                 }
             }
-            
+
             if (savedContract == null) {
                 return null;
             }
-            
+
             Integer contractId = savedContract.getContractId();
-            
+
             // Tạo contract details và xóa orders khỏi giỏ
             List<ContractDetailDTO> contractDetails = new ArrayList<>();
             for (OrderDTO order : orders) {
@@ -289,31 +311,31 @@ public List<ContractDTO> getAllContracts() {
                 detail.setRentStartDate(order.getRentStartDate());
                 detail.setRentEndDate(order.getRentEndDate());
                 detail.setNote(null);
-                
+
                 // Lưu contract detail (cần implement method này trong DAO)
-                boolean ok =  contractDetailsDAO.addContractDetail(detail);
-                
+                boolean ok = contractDetailsDAO.addContractDetail(detail);
+
                 // Xóa order khỏi giỏ
                 ordersDAO.deleteOrder(order.getCartDetailId());
-                
+
                 // Convert to DTO
                 ContractDetailDTO detailDTO = contractDetailMapper.toDTO(detail);
                 contractDetails.add(detailDTO);
             }
-            
+
             // Tạo ContractDTO
             ContractDTO contractDTO = contractMapper.toDTO(savedContract);
             contractDTO.setCustomerName(customerName);
             contractDTO.setContractDetails(contractDetails);
-            
+
             return contractDTO;
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
-    
+
     private BigDecimal calculateTotalAmount(List<OrderDTO> orders) {
         BigDecimal total = BigDecimal.ZERO;
         for (OrderDTO order : orders) {
@@ -323,21 +345,21 @@ public List<ContractDTO> getAllContracts() {
         }
         return total;
     }
-    
+
     private BigDecimal calculateDepositAmount(BigDecimal total) {
         // Tính tiền đặt cọc (30% tổng tiền thuê, tối thiểu 500k)
         BigDecimal depositPercent = new BigDecimal("0.30");
         BigDecimal depositAmount = total.multiply(depositPercent);
         BigDecimal minDeposit = new BigDecimal("500000");
-        
+
         if (depositAmount.compareTo(minDeposit) < 0) {
             depositAmount = minDeposit;
         }
-        
+
         // Làm tròn đến hàng nghìn
         depositAmount = depositAmount.divide(new BigDecimal("1000"), 0, RoundingMode.UP)
-                                   .multiply(new BigDecimal("1000"));
-        
+                .multiply(new BigDecimal("1000"));
+
         return depositAmount;
     }
 }

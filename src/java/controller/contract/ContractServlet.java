@@ -40,7 +40,7 @@ public class ContractServlet extends HttpServlet {
             // Hiển thị danh sách hợp đồng
             List<ContractDTO> contracts = contractService.getAllContracts();
             request.setAttribute("contracts", contracts);
-            request.getRequestDispatcher("/staff/contracts.jsp").forward(request, response);
+            request.getRequestDispatcher("/staff/staff.jsp").forward(request, response);
 
         } else if ("view".equals(action)) {
             // Xem chi tiết hợp đồng
@@ -117,7 +117,7 @@ public class ContractServlet extends HttpServlet {
             contractDTO.setEndDate(endDate);
             contractDTO.setTotalAmount(totalAmount);
             contractDTO.setDepositAmount(depositAmount);
-            contractDTO.setStatus("pending");
+            contractDTO.setStatus("PENDING");
 
             // Tạo hợp đồng
             boolean success = contractService.createContract(contractDTO);
@@ -196,7 +196,7 @@ public class ContractServlet extends HttpServlet {
 
     } catch (Exception e) {
         e.printStackTrace();
-        response.sendRedirect(request.getContextPath() + "/customer/error.jsp");
+        response.sendRedirect(request.getContextPath() + "/customer/error.jsp");    
     }
 }
 
