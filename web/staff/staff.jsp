@@ -189,56 +189,6 @@
                 <h1><i class="fas fa-tachometer-alt"></i> Staff Dashboard</h1>
                 <p class="mb-0">Xem và xử lý hợp đồng từ khách hàng</p>
             </div>
-
-            <!-- Statistics -->
-            <div class="row mb-4">
-                <div class="col-md-3">
-                    <div class="stats-card">
-                        <i class="fas fa-file-contract fa-2x text-primary mb-2"></i>
-                        <div class="stats-number">5</div>
-                        <div class="text-muted">Tổng hợp đồng</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card">
-                        <i class="fas fa-clock fa-2x text-warning mb-2"></i>
-                        <div class="stats-number">2</div>
-                        <div class="text-muted">Chờ xử lý</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card">
-                        <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
-                        <div class="stats-number">3</div>
-                        <div class="text-muted">Đã chấp nhận</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card">
-                        <i class="fas fa-dollar-sign fa-2x text-info mb-2"></i>
-                        <div class="stats-number">$15,000</div>
-                        <div class="text-muted">Tổng giá trị</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Filter Tabs -->
-            <div class="filter-tabs">
-                <h5 class="mb-3"><i class="fas fa-filter"></i> Lọc hợp đồng</h5>
-                <button class="filter-tab active">
-                    <i class="fas fa-list"></i> Tất cả
-                </button>
-                <button class="filter-tab">
-                    <i class="fas fa-clock"></i> Chờ xử lý
-                </button>
-                <button class="filter-tab">
-                    <i class="fas fa-check-circle"></i> Đã chấp nhận
-                </button>
-                <button class="filter-tab">
-                    <i class="fas fa-times-circle"></i> Đã từ chối
-                </button>
-            </div>
-
             <!-- Contract List -->
             <div class="row">
                 <div class="col-12">

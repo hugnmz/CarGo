@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import dto.ContractDetailDTO;
 
 @WebServlet("/ContractServlet")
 public class ContractServlet extends HttpServlet {
@@ -43,21 +44,29 @@ public class ContractServlet extends HttpServlet {
             request.getRequestDispatcher("/staff/staff.jsp").forward(request, response);
 
         } else if ("view".equals(action)) {
-            // Xem chi tiết hợp đồng
             String contractIdStr = request.getParameter("contractId");
             if (contractIdStr != null) {
                 try {
                     Integer contractId = Integer.parseInt(contractIdStr);
-                    contractService.getContractById(contractId).ifPresent(contract -> {
-                        request.setAttribute("contract", contract);
-                    });
-                    request.getRequestDispatcher("/staff/contract-detail.jsp").forward(request, response);
+
+                    var opt = contractService.getContractById(contractId);
+                    if (opt.isPresent()) {
+                        request.setAttribute("contract", opt.get());
+
+                        List<ContractDetailDTO> details = contractService.getContractDetails(contractId);
+                        request.setAttribute("details", details);
+
+                        request.getRequestDispatcher("/customer/contract-view.jsp").forward(request, response);
+                    } else {
+                        response.sendRedirect(request.getContextPath() + "/staff?error=contract_not_found");
+                    }
                 } catch (NumberFormatException e) {
                     response.sendRedirect(request.getContextPath() + "/staff");
                 }
             } else {
                 response.sendRedirect(request.getContextPath() + "/staff?error=missing_contract_id");
             }
+
         } else {
             // Mặc định hiển thị form tạo hợp đồng
             request.getRequestDispatcher("/staff/create-contract.jsp").forward(request, response);
@@ -67,12 +76,6 @@ public class ContractServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("staffId") == null) {
-            response.sendRedirect(request.getContextPath() + "/admin/admin_login.jsp");
-            return;
-        }
 
         String action = request.getParameter("action");
 
@@ -144,9 +147,9 @@ public class ContractServlet extends HttpServlet {
             boolean success = contractService.updateContractStatus(contractId, status);
 
             if (success) {
-                response.sendRedirect(request.getContextPath() + "/ContractServlet?action=view&contractId=" + contractId + "&success=status_updated");
+                response.sendRedirect(request.getContextPath() + "/staff?success=status_updated&contractId=" + contractId + "&status=" + status);
             } else {
-                response.sendRedirect(request.getContextPath() + "/ContractServlet?action=view&contractId=" + contractId + "&error=status_update_failed");
+                response.sendRedirect(request.getContextPath() + "/staff?error=status_update_failed&contractId=" + contractId + "&status=" + status);
             }
 
         } catch (Exception e) {
@@ -155,49 +158,49 @@ public class ContractServlet extends HttpServlet {
         }
     }
 
-   private void createContractAfterPayment(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
-    try {
-        // Lấy thông tin từ request sau khi customer thanh toán
-        Integer customerId = Integer.parseInt(request.getParameter("customerId"));
-        String startDateStr = request.getParameter("startDate");
-        String endDateStr = request.getParameter("endDate");
-        String totalAmountStr = request.getParameter("totalAmount");
-        String depositAmountStr = request.getParameter("depositAmount");
+    private void createContractAfterPayment(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            // Lấy thông tin từ request sau khi customer thanh toán
+            Integer customerId = Integer.parseInt(request.getParameter("customerId"));
+            String startDateStr = request.getParameter("startDate");
+            String endDateStr = request.getParameter("endDate");
+            String totalAmountStr = request.getParameter("totalAmount");
+            String depositAmountStr = request.getParameter("depositAmount");
 
-        // Parse thời gian
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-        LocalDateTime startDate = LocalDateTime.parse(startDateStr, formatter);
-        LocalDateTime endDate = LocalDateTime.parse(endDateStr, formatter);
+            // Parse thời gian
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+            LocalDateTime startDate = LocalDateTime.parse(startDateStr, formatter);
+            LocalDateTime endDate = LocalDateTime.parse(endDateStr, formatter);
 
-        // Parse tiền
-        BigDecimal totalAmount = new BigDecimal(totalAmountStr);
-        BigDecimal depositAmount = new BigDecimal(depositAmountStr);
+            // Parse tiền
+            BigDecimal totalAmount = new BigDecimal(totalAmountStr);
+            BigDecimal depositAmount = new BigDecimal(depositAmountStr);
 
-        // Tạo contract pending chờ staff duyệt
-        ContractDTO contractDTO = new ContractDTO();
-        contractDTO.setCustomerId(customerId);
-        contractDTO.setStaffId(null); // Chưa assign staff
-        contractDTO.setStartDate(startDate);
-        contractDTO.setEndDate(endDate);
-        contractDTO.setTotalAmount(totalAmount);
-        contractDTO.setDepositAmount(depositAmount);
-        contractDTO.setStatus("PENDING"); // Dùng chữ hoa để thống nhất
+            // Tạo contract pending chờ staff duyệt
+            ContractDTO contractDTO = new ContractDTO();
+            contractDTO.setCustomerId(customerId);
+            contractDTO.setStaffId(null); // Chưa assign staff
+            contractDTO.setStartDate(startDate);
+            contractDTO.setEndDate(endDate);
+            contractDTO.setTotalAmount(totalAmount);
+            contractDTO.setDepositAmount(depositAmount);
+            contractDTO.setStatus("PENDING"); // Dùng chữ hoa để thống nhất
 
-        // Lưu contract
-        boolean success = contractService.createContract(contractDTO);
+            // Lưu contract
+            boolean success = contractService.createContract(contractDTO);
 
-        if (success) {
-            // Chuyển sang trang thông báo chờ duyệt
-            response.sendRedirect(request.getContextPath() + "/customer/contract-pending.jsp");
-        } else {
-            response.sendRedirect(request.getContextPath() + "/customer/payment-failed.jsp");
+            if (success) {
+                // Chuyển sang trang thông báo chờ duyệt
+                response.sendRedirect(request.getContextPath() + "/customer/contract-pending.jsp");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/customer/payment-failed.jsp");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/customer/error.jsp");
         }
-
-    } catch (Exception e) {
-        e.printStackTrace();
-        response.sendRedirect(request.getContextPath() + "/customer/error.jsp");    
     }
-}
 
 }
