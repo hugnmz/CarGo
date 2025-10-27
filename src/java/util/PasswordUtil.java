@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package util;
 
 import java.nio.charset.StandardCharsets;
@@ -10,43 +6,41 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Base64;
 
-/**
- *
- * @author admin
- */
-// class xử lí password
+// class xu ly password
 public class PasswordUtil {
 
+    // so lan lap lai khi hash password
     public static final int ITERATIONS = 100_000;
 
-    // tra ve password da hash dang byte[] (de luu vao VARBINARY)
+    // tra ve password da hash dang byte[] (de luu vao varbinary)
     public static byte[][] hashPassword(String password, byte[] salt) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
 
-            // Kết hợp salt + password
+            // ket hop salt + password
             md.update(salt);
             byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
 
+            // lap lai nhieu lan de tang do bao mat
             for (int i = 1; i < ITERATIONS; i++) {
                 md.reset();
                 hash = md.digest(hash);
             }
 
-            // Tra ve byte[] thay vi Base64 string
+            // tra ve byte[] thay vi base64 string
             return new byte[][]{hash, salt};
         } catch (Exception e) {
             throw new RuntimeException("Error hashing password", e);
         }
     }
 
-    // tạo salt ngẫu nhiên
+    // tao salt ngau nhien
     public static byte[] generateSalt() {
 
-        // tạo secureRandom instance;
+        // tao securerandom instance
         SecureRandom random = new SecureRandom();
 
-        // tạo mảng byte 16 bytes
+        // tao mang byte 16 bytes
         byte[] salt = new byte[16];
 
         // dien so ngau nhien vao mang
@@ -55,21 +49,24 @@ public class PasswordUtil {
         return salt;
     }
 
+    // kiem tra password co dung khong
     public static boolean verifyPassword(String password, byte[] passwordHash, byte[] passwordSalt) {
         try {
-            // Hash password với salt từ database
+            // hash password voi salt tu database
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             md.update(passwordSalt);
             byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
 
+            // lap lai nhieu lan nhu khi tao hash
             for (int i = 1; i < ITERATIONS; i++) {
                 md.reset();
                 hash = md.digest(hash);
             }
 
-            // So sánh hash
+            // so sanh hash
             return Arrays.equals(hash, passwordHash);
         } catch (Exception e) {
+            // log loi neu co
             e.printStackTrace();
             return false;
         }

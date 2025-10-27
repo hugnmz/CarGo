@@ -170,7 +170,7 @@
             <!-- Link chuyển sang đăng nhập -->
             <div class="text-center">
                 <span>Bạn đã có tài khoản? </span>
-                <a href="login.jsp" class="text-danger">Đăng nhập ngay</a>
+                <a href="LoginServlet" class="text-danger">Đăng nhập ngay</a>
             </div>
         </div>
 

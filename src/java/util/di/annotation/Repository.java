@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
- */
 package util.di.annotation;
 
 import java.lang.annotation.ElementType;
@@ -9,14 +5,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- *
- * @author admin
- */
-
-//dùng để đánh dấu class là DAO
-// DI tự quản lí, tự tạo instance
-// có thể dc inject vào serive
+// annotation danh dau class la dao
+// di tu quan li, tu tao instance
+// co the duoc inject vao service
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Repository {

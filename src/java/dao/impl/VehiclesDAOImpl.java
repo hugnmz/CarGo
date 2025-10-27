@@ -127,15 +127,13 @@ public class VehiclesDAOImpl implements VehiclesDAO {
                 + "AND v.vehicleId NOT IN ("
                 + "    SELECT DISTINCT cd.vehicleId FROM dbo.ContractDetails cd "
                 + "    INNER JOIN dbo.Contracts ct ON ct.contractId = cd.contractId "
-                + "    WHERE ct.status = 'ACTIVE' "
+                + "    WHERE ct.status IN ('PENDING', 'ACCEPTED') "
                 + "    AND ("
-                + "        (ct.startDate <= ? AND ct.endDate >= ?) OR "
-                + "        (ct.startDate <= ? AND ct.endDate >= ?) OR "
-                + "        (ct.startDate >= ? AND ct.endDate <= ?)"
+                + "        (cd.rentStartDate < ? AND cd.rentEndDate > ?) "
                 + "    )"
                 + ")";
 
-        return JdbcTemplateUtil.query(sql, Vehicles.class, carId, startDate, startDate, endDate, endDate, startDate, endDate);
+        return JdbcTemplateUtil.query(sql, Vehicles.class, carId, endDate, startDate);
     }
 
     @Override
@@ -145,15 +143,13 @@ public class VehiclesDAOImpl implements VehiclesDAO {
                 + "AND v.vehicleId NOT IN ("
                 + "    SELECT DISTINCT cd.vehicleId FROM dbo.ContractDetails cd "
                 + "    INNER JOIN dbo.Contracts ct ON ct.contractId = cd.contractId "
-                + "    WHERE ct.status = 'ACTIVE' "
+                + "    WHERE ct.status IN ('PENDING', 'ACCEPTED') "
                 + "    AND ("
-                + "        (ct.startDate <= ? AND ct.endDate >= ?) OR "
-                + "        (ct.startDate <= ? AND ct.endDate >= ?) OR "
-                + "        (ct.startDate >= ? AND ct.endDate <= ?)"
+                + "        (cd.rentStartDate < ? AND cd.rentEndDate > ?) "
                 + "    )"
                 + ")";
 
-        int count = JdbcTemplateUtil.count(sql, vehicleId, startDate, startDate, endDate, endDate, startDate, endDate);
+        int count = JdbcTemplateUtil.count(sql, vehicleId, endDate, startDate);
         return count > 0;
     }
 

@@ -300,7 +300,6 @@ public class ContractServiceImpl implements ContractService {
     }
     
     private BigDecimal calculateDepositAmount(BigDecimal total) {
-        // Cố định tiền đặt cọc 30.000.000 VNĐ
         return new BigDecimal("30000000");
     }
 }

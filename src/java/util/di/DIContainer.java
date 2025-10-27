@@ -13,48 +13,38 @@ import util.di.annotation.Component;
 import util.di.annotation.Repository;
 import util.di.annotation.Service;
 
-/**
- * DIContainer - lightweight Dependency Injection container
- * ------------------------------------------------------
- * Phiên bản nâng cấp (2025) gồm các cải tiến:
- *  - Quét package linh hoạt hơn (dùng BASE_PACKAGE nếu được set).
- *  - Cảnh báo khi có nhiều implementation cho cùng interface.
- *  - Báo lỗi rõ ràng nếu inject interface chưa đăng ký implementation.
- *  - In rõ chuỗi dependency khi phát hiện vòng phụ thuộc.
- *  - Hỗ trợ @Autowired(required = false) hoạt động đúng.
- *  - Giữ nguyên toàn bộ logic cũ để đảm bảo tương thích.
- */
+// class container quan ly dependency injection
 public final class DIContainer {
 
-    // Không cho tạo instance của container
+    // khong cho tao instance cua container
     private DIContainer() {}
 
-    // Có thể set lại BASE_PACKAGE để quét theo package tùy chọn.
-    // Nếu rỗng -> dùng danh sách mặc định bên dưới.
+    // co the set lai base package de quet theo package tuy chon
+    // neu rong thi dung danh sach mac dinh ben duoi
     private static final String BASE_PACKAGE = "";
 
-    // Cache singletons: key = implementation Class, value = instance
+    // cache singletons: key = implementation class, value = instance
     private static final Map<Class<?>, Object> SINGLETONS = new ConcurrentHashMap<>();
 
-    // Map interface -> implementation class
+    // map interface -> implementation class
     private static final Map<Class<?>, Class<?>> IMPLEMENTATIONS = new ConcurrentHashMap<>();
 
-    // Thread-local set để theo dõi stack đang build, phát hiện vòng phụ thuộc
+    // thread-local set de theo doi stack dang build, phat hien vong phu thuoc
     private static final ThreadLocal<Set<Class<?>>> BUILD_STACK = ThreadLocal.withInitial(HashSet::new);
 
-    // Static block chạy khi class được load lần đầu -> tự động scan + register
+    // static block chay khi class duoc load lan dau -> tu dong scan + register
     static {
         autoScan();
     }
 
     // --------------------- Auto-scan & register ---------------------
 
-    // Quét các package được định nghĩa để đăng ký các implementation
+    // quet cac package duoc dinh nghia de dang ky cac implementation
     private static void autoScan() {
         try {
             Set<Class<?>> classes = getAllClassesInPackage(BASE_PACKAGE);
             for (Class<?> clazz : classes) {
-                // Nếu class có annotation đánh dấu là bean thì register
+                // neu class co annotation danh dau la bean thi register
                 if (clazz.isAnnotationPresent(Repository.class)
                         || clazz.isAnnotationPresent(Service.class)
                         || clazz.isAnnotationPresent(Component.class)) {
@@ -67,13 +57,13 @@ public final class DIContainer {
         }
     }
 
-    // Đăng ký implementation: ánh xạ interface -> implementation class
+    // dang ky implementation: anh xa interface -> implementation class
     private static void registerClass(Class<?> impl) {
         try {
             Class<?>[] itfs = impl.getInterfaces();
             if (itfs != null && itfs.length > 0) {
                 for (Class<?> itf : itfs) {
-                    // Nếu interface đã có implementation khác -> cảnh báo, giữ lại bản đầu tiên
+                    // neu interface da co implementation khac thi canh bao, giu lai ban dau tien
                     if (IMPLEMENTATIONS.containsKey(itf)) {
                         System.err.println("[DI] Cảnh báo: interface " + itf.getName()
                                 + " có nhiều implementation (" + IMPLEMENTATIONS.get(itf).getName()
@@ -83,7 +73,7 @@ public final class DIContainer {
                     IMPLEMENTATIONS.put(itf, impl);
                 }
             }
-            // Đồng thời lưu chính impl để có thể get(ImplClass.class)
+            // dong thoi luu chinh impl de co the get(ImplClass.class)
             IMPLEMENTATIONS.putIfAbsent(impl, impl);
         } catch (Exception e) {
             System.err.println("[DI] Lỗi registerClass " + impl.getName() + ": " + e.getMessage());
@@ -92,30 +82,28 @@ public final class DIContainer {
 
     // --------------------- Public API ---------------------
 
-    /**
-     * Lấy bean từ container theo interface hoặc implementation class.
-     * Trả về singleton instance (tạo mới nếu chưa có).
-     */
+    // lay bean tu container theo interface hoac implementation class
+    // tra ve singleton instance (tao moi neu chua co)
     @SuppressWarnings("unchecked")
     public static <T> T get(Class<T> type) {
         try {
-            // Nếu không có mapping cho interface và interface đó chưa có impl => trả về null (cho phép @Autowired(required=false))
+            // neu khong co mapping cho interface va interface do chua co impl thi tra ve null (cho phep @Autowired(required=false))
             if (!IMPLEMENTATIONS.containsKey(type) && type.isInterface()) {
                 return null;
             }
 
-            // Resolve implementation: nếu type là interface -> tìm implementation tương ứng
+            // resolve implementation: neu type la interface thi tim implementation tuong ung
             final Class<?> impl = IMPLEMENTATIONS.getOrDefault(type, type);
 
-            // Nếu instance đã tạo sẵn -> trả về luôn
+            // neu instance da tao san thi tra ve luon
             if (SINGLETONS.containsKey(impl)) {
                 return (T) SINGLETONS.get(impl);
             }
 
-            // Tạo và inject dependencies (có kiểm soát vòng lặp)
+            // tao va inject dependencies (co kiem soat vong lap)
             Object instance = createAndInjectSafely(impl);
 
-            // Lưu vào cache đảm bảo singleton
+            // luu vao cache dam bao singleton
             SINGLETONS.put(impl, instance);
 
             return (T) instance;

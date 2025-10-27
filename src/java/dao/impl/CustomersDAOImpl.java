@@ -37,8 +37,8 @@ public class CustomersDAOImpl implements CustomersDAO {
     public boolean addCustomer(Customers c) {
         String sql = "INSERT INTO Customers("
                 + "username, password_hash, password_salt, fullName, phone, email, dateOfBirth, "
-                + "isVerified, verifyCode, verifyCodeExpire, locationId"
-                + ") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "isVerified, verifyCode, verifyCodeExpire, locationId, createAt"
+                + ") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         int id = JdbcTemplateUtil.insertAndReturnKey(
                 sql,
                 c.getUsername(),
@@ -51,7 +51,8 @@ public class CustomersDAOImpl implements CustomersDAO {
                 c.isIsVerified(),
                 c.getVerifyCode(),
                 c.getVerifyCodeExpire() != null ? Timestamp.valueOf(c.getVerifyCodeExpire()) : null,
-                c.getLocationId()
+                c.getLocationId(),
+                c.getCreateAt()
         );
         if (id > 0) {
             c.setCustomerId(id);

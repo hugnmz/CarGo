@@ -16,14 +16,7 @@ import service.VehicleService;
 import util.di.DIContainer;
 import util.MessageUtil;
 
-/**
- * HomeManageCar - Servlet quản lý danh sách xe
- * 
- * CHỨC NĂNG:
- * - Lấy danh sách xe từ CarService
- * - Lấy danh sách Category, Fuel, Seating để hiển thị bộ lọc
- * - Chuyển dữ liệu sang trang JSP: manage_cars.jsp
- */
+
 @WebServlet(name = "HomeManageCar", urlPatterns = {"/managecar"})
 public class HomeManageCar extends HttpServlet {
 
