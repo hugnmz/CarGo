@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.CarService;
 import util.di.DIContainer;
+import util.MessageUtil;
 import java.io.IOException;
 import java.util.List;
 import dto.CarDTO;
@@ -44,7 +45,7 @@ public class HomeServlet extends HttpServlet {
         } catch (Exception e) {
             // xu ly loi he thong
             e.printStackTrace();
-            request.setAttribute("error", "khong the tai danh sach xe: " + e.getMessage());
+            request.setAttribute("error", MessageUtil.getError("error.home.cars.load.failed"));
             request.getRequestDispatcher("/customer/home.jsp").forward(request, response);
         }
     }

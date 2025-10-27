@@ -8,7 +8,6 @@ import dto.ContractDTO;
 import dto.ContractDetailDTO;
 import dto.OrderDTO;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +17,9 @@ import java.util.Optional;
 import mapper.ContractMapper;
 import mapper.ContractDetailMapper;
 import mapper.OrderMapper;
+import model.ContractDetails;
 import model.Contracts;
+import model.Customers;
 import service.ContractService;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
@@ -52,7 +53,7 @@ public class ContractServiceImpl implements ContractService {
         List<ContractDTO> contractDTOs = new ArrayList<>();
         
         // Lấy danh sách contracts từ DAO
-        List<model.Contracts> contracts = contractsDAO.getContractByCustomer(customerId);
+        List<Contracts> contracts = contractsDAO.getContractByCustomer(customerId);
         
         for (Contracts contract : contracts) {
             ContractDTO dto = contractMapper.toDTO(contract);
@@ -64,12 +65,11 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     public Optional<ContractDTO> getContractById(Integer contractId) {
-        Optional<model.Contracts> contract = contractsDAO.getContractById(contractId);
+        Optional<Contracts> contract = contractsDAO.getContractById(contractId);
         if (contract.isPresent()) {
             ContractDTO dto = contractMapper.toDTO(contract.get());
             
-            // Lấy tên khách hàng
-            Optional<model.Customers> customer = customersDAO.getCustomerById(dto.getCustomerId());
+            Optional<Customers> customer = customersDAO.getCustomerById(dto.getCustomerId());
             if (customer.isPresent() && customer.get().getFullName() != null) {
                 dto.setCustomerName(customer.get().getFullName());
             }
@@ -83,9 +83,9 @@ public class ContractServiceImpl implements ContractService {
     public List<ContractDetailDTO> getContractDetails(Integer contractId) {
         List<ContractDetailDTO> detailDTOs = new ArrayList<>();
         
-        List<model.ContractDetails> details = contractDetailsDAO.getContractDetailsByContractId(contractId);
+        List<ContractDetails> details = contractDetailsDAO.getContractDetailsByContractId(contractId);
         
-        for (model.ContractDetails detail : details) {
+        for (ContractDetails detail : details) {
             ContractDetailDTO dto = contractDetailMapper.toDTO(detail);
             detailDTOs.add(dto);
         }

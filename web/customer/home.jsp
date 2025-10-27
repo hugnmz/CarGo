@@ -233,7 +233,7 @@
                     <c:when test="${not empty allCars}">
                         <c:forEach var="car" items="${allCars}" varStatus="status" end="5">
                             <div class="col-md-6 col-lg-4">
-                                 <div class="card car-card-modern" onclick="window.location.href = '${pageContext.request.contextPath}/car-detail?carId=${car.carId}'" style="cursor: pointer;">
+                                 <div class="card car-card-modern car-card-clickable" onclick="window.location.href = '${pageContext.request.contextPath}/car-detail?carId=${car.carId}'">
                                     <div class="position-relative overflow-hidden">
                                         <c:choose>
                                             <c:when test="${not empty car.image}">

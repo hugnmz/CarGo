@@ -9,7 +9,7 @@ public class ContractDetailDTO {
     private Integer contractId;      // ID hợp đồng
     private Integer vehicleId;       // ID xe
     private String plateNumber;       // Biển số xe
-    private String carName;          // Tên xe
+    private String name;          // Tên xe
     private BigDecimal price;        // Giá thuê
     private LocalDateTime rentStartDate; // Ngày bắt đầu thuê
     private LocalDateTime rentEndDate;   // Ngày kết thúc thuê
@@ -31,8 +31,8 @@ public class ContractDetailDTO {
     public String getPlateNumber() { return plateNumber; }
     public void setPlateNumber(String plateNumber) { this.plateNumber = plateNumber; }
     
-    public String getCarName() { return carName; }
-    public void setCarName(String carName) { this.carName = carName; }
+    public String getName() { return name; }
+    public void setName(String carName) { this.name = carName; }
     
     public BigDecimal getPrice() { return price; }
     public void setPrice(BigDecimal price) { this.price = price; }

@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import service.RoleService;
 import service.UserService;
 import util.di.DIContainer;
+import util.MessageUtil;
 
 /**
  *
@@ -36,7 +37,6 @@ public class ChangePassword extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Chuyển hướng về trang profile hoặc trang đổi mật khẩu
         request.getRequestDispatcher("/manager/user_profile.jsp").forward(request, response);
     }
 
@@ -45,12 +45,20 @@ public class ChangePassword extends HttpServlet {
             throws ServletException, IOException {
         String oldPass = request.getParameter("oldPassword");
         String newPass = request.getParameter("newPassword");
+        String confirmPass = request.getParameter("reNewPassword");
         Integer userId = Integer.valueOf(request.getParameter("userId"));
 
+        // Kiểm tra xác nhận mật khẩu
+        if (!newPass.equals(confirmPass)) {
+            request.setAttribute("errorMess", MessageUtil.getError("error.password.mismatch"));
+            request.getRequestDispatcher("/manager/user_profile.jsp").forward(request, response);
+            return;
+        }
+
         if (userService.changeUserPassword(userId, oldPass, newPass)) {
-            request.setAttribute("ok", "password.change.success");
+            request.setAttribute("ok", MessageUtil.getMessage("password.change.success"));
         } else {
-            request.setAttribute("errorMess", "error.password.change.failed");
+            request.setAttribute("errorMess", MessageUtil.getError("error.password.change.failed"));
         }
 
         // Sau khi đổi xong, trở lại trang profile

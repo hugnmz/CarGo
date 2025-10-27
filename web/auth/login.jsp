@@ -15,22 +15,18 @@
       rel="stylesheet"
     />
     <link
-      href="${pageContext.request.contextPath}/CSS/login.css"
+      href="${pageContext.request.contextPath}/css/auth/login.css"
       rel="stylesheet"
     />
   </head>
   <body class="d-flex justify-content-center align-items-center">
     <!-- Card login -->
-    <div
-      class="card shadow-lg p-4 text-center fade-in"
-      style="max-width: 400px; width: 100%; border-radius: 12px"
-    >
+    <div class="card shadow-lg p-4 text-center fade-in login-card">
       <!-- Logo -->
       <img
         src="https://img.freepik.com/vector-cao-cap/hinh-minh-hoa-vector-logo-xe-hoi-nen-trang_917213-258381.jpg"
         alt="Car Logo"
-        class="mx-auto d-block rounded-circle mb-3"
-        style="width: 150px; height: 150px; object-fit: cover"
+        class="mx-auto d-block rounded-circle mb-3 login-logo"
       />
 
       <!-- Tiêu đề -->

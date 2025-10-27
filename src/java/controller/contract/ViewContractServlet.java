@@ -5,7 +5,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +49,6 @@ public class ViewContractServlet extends HttpServlet {
             return;
         }
 
-        // Sử dụng service thay vì DAO trực tiếp
         Optional<ContractDTO> contractOpt = contractService.getContractById(contractId);
         
         if (!contractOpt.isPresent()) {
@@ -60,14 +58,12 @@ public class ViewContractServlet extends HttpServlet {
         
         ContractDTO contract = contractOpt.get();
 
-        // Authorization: Only owner can view
         Integer customerId = AuthUtil.getCustomerId(request);
         if (!customerId.equals(contract.getCustomerId())) {
             response.sendRedirect(request.getContextPath() + "/home");
             return;
         }
 
-        // Lấy chi tiết hợp đồng
         List<ContractDetailDTO> details = contractService.getContractDetails(contractId);
 
         request.setAttribute("contract", contract);

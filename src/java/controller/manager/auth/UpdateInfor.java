@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpSession;
 import service.RoleService;
 import service.UserService;
 import util.di.DIContainer;
+import util.MessageUtil;
 
 /**
  *
@@ -65,11 +66,11 @@ public class UpdateInfor extends HttpServlet {
             userService.updateUser(user);
 
             //Truyền dữ liệu về server
-            request.setAttribute("message", "Cập nhật user thành công!");
+            request.setAttribute("message", MessageUtil.getError("error.user.update.success"));
             request.getRequestDispatcher("profile").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Lỗi khi cập nhật user: " + e.getMessage());
+            request.setAttribute("error", MessageUtil.getError("error.user.update.error"));
         }
     }
 

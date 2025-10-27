@@ -91,7 +91,7 @@ public class LoginAdmin extends HttpServlet {
 
                 // Điều hướng theo role
                 if ("ADMIN".equals(primaryRole)) {
-                    response.sendRedirect(request.getContextPath() + "/admin/user.jsp");
+                    response.sendRedirect(request.getContextPath() + "/HomeAdmin");
                 } else if ("MANAGER".equals(primaryRole) || "STAFF".equals(primaryRole)) {
                     // TODO: tạo dashboard riêng cho MANAGER/STAFF nếu cần
                     response.sendRedirect(request.getContextPath() + "/home");

@@ -14,6 +14,7 @@ import java.util.List;
 import service.CarService;
 import service.VehicleService;
 import util.di.DIContainer;
+import util.MessageUtil;
 
 /**
  * HomeManageCar - Servlet quản lý danh sách xe
@@ -36,7 +37,7 @@ public class HomeManageCar extends HttpServlet {
             vehicleService = DIContainer.get(VehicleService.class);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ServletException("Không thể khởi tạo các service: " + e.getMessage());
+            throw new ServletException(MessageUtil.getError("error.car.init.failed"));
         }
     }
 
@@ -65,7 +66,7 @@ public class HomeManageCar extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Không thể tải danh sách xe: " + e.getMessage());
+            request.setAttribute("error", MessageUtil.getError("error.car.load.failed"));
             request.getRequestDispatcher("manager/manage_cars.jsp").forward(request, response);
         }
     }

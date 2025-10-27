@@ -194,8 +194,8 @@
                                             <div class="col-md-6">
                                                 <div class="info-item">
                                                     <label for="joinDate"><i class="fa fa-calendar text-muted"></i> Ngày tham gia</label>
-                                                    <input type="text" class="form-control" id="joinDate" name="joinDate" 
-                                                           value="${not empty customer.createAt ? customer.createAt : ''}" 
+                                                    <input type="date" class="form-control" id="joinDate" name="joinDate" 
+                                                           value="${not empty customer.createAt ? customer.createAt.toLocalDate() : ''}" 
                                                            readonly>
                                                 </div>
                                             </div>
@@ -275,7 +275,7 @@
                                 </div>
 
                                 <div class="booking-list">
-                                   
+
                                     <c:choose>
                                         <c:when test="${not empty listContract}">
                                             <c:forEach var="contract" items="${listContract}">
@@ -384,29 +384,36 @@
                                     <form method="POST" action="${pageContext.request.contextPath}/ChangePasswordServlet">
                                         <div class="setting-item">
                                             <div class="row">
-                                                <div class="col-md-6">
+                                                <div class="col-md-4">
                                                     <div class="mb-3">
                                                         <label for="oldPassword" class="form-label">Mật khẩu cũ</label>
                                                         <input type="password" class="form-control" id="oldPassword" name="old" 
                                                                placeholder="Nhập mật khẩu cũ" required>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6">
+                                                <div class="col-md-4">
                                                     <div class="mb-3">
                                                         <label for="newPassword" class="form-label">Mật khẩu mới</label>
                                                         <input type="password" class="form-control" id="newPassword" name="new" 
                                                                placeholder="Nhập mật khẩu mới" required>
                                                     </div>
                                                 </div>
+                                                <div class="col-md-4">
+                                                    <div class="mb-3">
+                                                        <label for="confirmPassword" class="form-label">Xác nhận mật khẩu</label>
+                                                        <input type="password" class="form-control" id="confirmPassword" name="confirm" 
+                                                               placeholder="Nhập lại mật khẩu mới" required>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            
+
                                             <!-- Thêm hidden field cho customerId -->
                                             <input type="hidden" name="customerId" value="${not empty customer.customerId ? customer.customerId : sessionScope.customerId}">
-                                            
+
                                             <div class="mb-3">
                                                 <p class="text-muted">Cập nhật mật khẩu để bảo vệ tài khoản</p>
                                             </div>
-                                            
+
                                             <button type="submit" class="btn btn-outline-primary">
                                                 <i class="fa fa-key"></i> Đổi mật khẩu
                                             </button>

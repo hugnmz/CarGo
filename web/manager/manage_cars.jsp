@@ -21,51 +21,7 @@
         <title>Quản lý xe - Manager</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-        <style>
-            body {
-                background-color: #f8f9fa;
-            }
-            .sidebar {
-                height: 100vh;
-                background-color: #212529;
-                color: white;
-                position: fixed;
-                width: 240px;
-                top: 0;
-                left: 0;
-                padding-top: 20px;
-            }
-            .sidebar a {
-                color: #adb5bd;
-                text-decoration: none;
-                display: block;
-                padding: 10px 20px;
-            }
-            .sidebar a:hover {
-                background-color: #343a40;
-                color: #fff;
-            }
-            .content {
-                margin-left: 250px;
-                padding: 20px;
-            }
-            .table th {
-                background-color: #0d6efd;
-                color: white;
-            }
-            .car-img {
-                width: 100px;
-                height: 60px;
-                object-fit: cover;
-                border-radius: 6px;
-                border: 1px solid #ddd;
-            }
-
-            .sidebar a.active {
-                background-color: #0d6efd;
-                color: #fff !important;
-            }
-        </style>
+        <link href="${pageContext.request.contextPath}/css/manager/manage_cars.css" rel="stylesheet">
     </head>
     <body>
         <!-- Sidebar -->

@@ -39,7 +39,7 @@ public class ContractDetailsDAOImpl implements ContractDetailsDAO {
     
     @Override
     public List<ContractDetails> getContractDetailsByContractId(Integer contractId) {
-        String sql = "SELECT * FROM dbo.ContractDetails WHERE contractId = ? ORDER BY contractDetailId";
+        String sql = "SELECT ct.*, v.plateNumber, c.name FROM dbo.ContractDetails ct JOIN dbo.Vehicles v ON v.vehicleId = ct.vehicleId JOIN dbo.Cars c ON c.carId = v.carId WHERE  ct.contractId = ? ORDER BY contractDetailId";
         return JdbcTemplateUtil.query(sql, ContractDetails.class, contractId);
     }
 

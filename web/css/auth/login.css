@@ -1,44 +1,156 @@
-/* Login Page Styles */
-/* Nền gradient toàn màn hình */
+/* Login page styles - CSS is working! */
 body {
-  background: linear-gradient(135deg, #74ebd5 0%, #acb6e5 100%);
-  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  min-height: 100vh !important;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important;
 }
 
-/* Hiệu ứng fadeIn */
+.login-card {
+  max-width: 400px;
+  width: 100%;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  /* Debug: Add a visible border to confirm CSS is loading */
+  border: 3px solid #ff6b6b !important;
+}
+
+.login-logo {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Fade in animation */
+.fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(30px) scale(0.95);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
-.fade-in {
-  animation: fadeIn 1s ease-in-out;
+/* Form styles */
+.form-control {
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  padding: 12px 16px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.9);
 }
 
-/* Style riêng cho nút Facebook */
-.btn-facebook {
-  background-color: #3b5998;
-  color: white;
+.form-control:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+  background: #fff;
 }
 
-.btn-facebook:hover {
-  background-color: #2d4373;
-  color: white;
+.form-check-input:checked {
+  background-color: #667eea;
+  border-color: #667eea;
 }
 
-/* Style riêng cho nút Google */
-.btn-google {
-  background-color: #db4437;
-  color: white;
+/* Button styles */
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
-.btn-google:hover {
-  background-color: #a33224;
-  color: white;
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+.btn-outline-primary {
+  border-color: #667eea;
+  color: #667eea;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+  background: #667eea;
+  border-color: #667eea;
+  transform: translateY(-1px);
+}
+
+.btn-outline-danger {
+  border-color: #dc3545;
+  color: #dc3545;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-danger:hover {
+  background: #dc3545;
+  border-color: #dc3545;
+  transform: translateY(-1px);
+}
+
+/* Alert styles */
+.alert {
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+}
+
+.alert-danger {
+  background: rgba(220, 53, 69, 0.1);
+  color: #721c24;
+  border-left: 4px solid #dc3545;
+}
+
+.alert-success {
+  background: rgba(25, 135, 84, 0.1);
+  color: #0f5132;
+  border-left: 4px solid #198754;
+}
+
+/* Link styles */
+a {
+  color: #667eea;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #5a6fd8;
+  text-decoration: underline;
+}
+
+/* Social login section */
+.mt-3 p {
+  color: #6c757d;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .login-card {
+    margin: 20px;
+    max-width: none;
+  }
+
+  .login-logo {
+    width: 120px;
+    height: 120px;
+  }
 }

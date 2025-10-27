@@ -83,6 +83,12 @@ public class CustomerServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // Nếu có thông báo từ ChangePasswordServlet, giữ lại và forward
+        if (request.getAttribute("ok") != null || request.getAttribute("errorMess") != null) {
+            doGet(request, response);
+            return;
+        }
+
         List<String> errors = new ArrayList<>();
         try {
             // Lấy thông tin từ form

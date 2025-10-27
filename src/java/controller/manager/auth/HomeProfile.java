@@ -18,6 +18,7 @@ import java.util.List;
 import model.Users;
 import service.RoleService;
 import service.UserService;
+import util.MessageUtil;
 import util.di.DIContainer;
 
 /**
@@ -57,7 +58,7 @@ public class HomeProfile extends HttpServlet {
         List<LocationDTO> locationList = userService.getAllLocation();
         
         if (user == null) {
-            request.setAttribute("errorMessage", "Không tìm thấy thông tin người dùng.");
+            request.setAttribute("errorMessage", MessageUtil.getError("error.user.not.found"));
             return;
         }
         

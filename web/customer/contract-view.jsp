@@ -147,7 +147,6 @@ contentType="text/html; charset=UTF-8" language="java" %>
                     >
                       <div>
                         <h6 class="fw-bold mb-1">
-                          ${d.carName != null ? d.carName : 'Xe'} -
                           ${d.plateNumber != null ? d.plateNumber : 'N/A'}
                         </h6>
                         <small class="text-muted"

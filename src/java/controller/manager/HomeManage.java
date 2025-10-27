@@ -47,7 +47,7 @@ public class HomeManage extends HttpServlet {
 //        request.setAttribute("totalCustomers", totalCustomers);
 //        request.setAttribute("totalContracts", totalContracts);
 
-        request.getRequestDispatcher("manager_home.jsp").forward(request, response);
+        request.getRequestDispatcher("/manager/manager_home.jsp").forward(request, response);
         
     } 
 

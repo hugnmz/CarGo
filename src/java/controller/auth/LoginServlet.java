@@ -1,4 +1,3 @@
-
 package controller.auth;
 
 import dto.CustomerDTO;
@@ -7,10 +6,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+
 import service.CustomerService;
 import service.UserService;
-import service.impl.CustomerServiceImpl;
+import util.MessageUtil;
 import util.di.DIContainer;
 
 @WebServlet("/LoginServlet")
@@ -34,115 +36,128 @@ public class LoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // Chỉ lấy session nếu đã tồn tại
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("username") != null) {
-            // Đã đăng nhập thì về home
+            // Đã login
             response.sendRedirect(request.getContextPath() + "/home");
             return;
         }
 
-        request.getRequestDispatcher("login.jsp").forward(request, response);
-        /*
-        // Chi lay session neu da ton tai
-        HttpSession session = request.getSession(false);
-        if (session != null && session.getAttribute("customerId") != null) {
-            // Da login
-            response.sendRedirect(request.getContextPath() + "/home");
-            return;
-        }
-
-        // Chua login -> check cookie
-        String rememberUsername = null;
-
-        // Doc cookie tu request
-        Cookie[] cookies = request.getCookies();
-
-        if (cookies != null) {
-            // Duyet tat ca cac cookie hien co de tim dung ten cookie
-            for (Cookie c : cookies) {
-                if ("rememberMeUser".equals(c.getName())) { // SUA: rememberUsername -> rememberMeUser
-                    // Lay gia tri username da luu
-                    rememberUsername = c.getValue();
-                    break; // Thoat khoi vong lap khi tim thay
-                }
-            }
-
-            // Neu co username tu cookie
-            if (rememberUsername != null) {
-                // Tim user trong cookie theo username
-                Optional<CustomerDTO> customerOpt = customerService.getCustomerByUsername(rememberUsername);
-
-                if (customerOpt.isPresent()) {
-                    CustomerDTO customer = customerOpt.get();
-
-                    // Tao session moi neu chua co
-                    session = request.getSession(true);
-                    // Gan cac thuoc tinh phien cho nguoi dung
-                    setSessionAttributes(session, customer);
-                    response.sendRedirect(request.getContextPath() + "/home");
-                    return;
-                }
-            }
-        }
-
-        // Ko co cookie -> ve login 
-        response.sendRedirect("login.jsp");
-         */
+        // Chưa login -> vào trang login của bản 1
+        request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Lay tham so tu form
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
+        // Lấy tham số từ form
+        String username   = request.getParameter("username");
+        String password   = request.getParameter("password");
         String rememberMe = request.getParameter("rememberMe");
 
-        // Check du lieu dau vao
-        if (username == null || username.trim().isEmpty()
-                || password == null || password.trim().isEmpty()) {
-            request.setAttribute("error", "Vui lòng nhập đầy đủ thông tin");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+        // Thu thập lỗi theo style bản 1
+        List<String> errors = new ArrayList<>();
+
+        if (username == null || username.trim().isEmpty()) {
+            errors.add(MessageUtil.getError("error.username.required"));
+        }
+        if (password == null || password.trim().isEmpty()) {
+            errors.add(MessageUtil.getError("error.password.required"));
+        }
+
+        // Nếu có lỗi validation
+        if (!errors.isEmpty()) {
+            request.setAttribute("errors", errors);
+            request.setAttribute("username", username);
+            request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
             return;
         }
 
         try {
-            // 🔹 1. Đăng nhập với vai trò Customer
+            // 1) Đăng nhập với vai trò CUSTOMER (giữ logic bản 1)
             Optional<CustomerDTO> customerOpt = customerService.loginCustomer(username, password);
             if (customerOpt.isPresent()) {
                 CustomerDTO customer = customerOpt.get();
+
+                // Hủy session cũ (nếu có) và giữ redirectAfterLogin
+                HttpSession old = request.getSession(false);
+                String redirectURL = null;
+                if (old != null) {
+                    redirectURL = (String) old.getAttribute("redirectAfterLogin");
+                    old.invalidate();
+                }
+
+                // Tạo session mới
                 HttpSession session = request.getSession(true);
-                setCustomerSession(session, customer);
+                setCustomerSession(session, customer);       // set theo bản 2 + bổ sung trường của bản 1
+                if (redirectURL != null) {
+                    session.setAttribute("redirectAfterLogin", redirectURL);
+                }
+                session.removeAttribute("redirectURL");
+
+                // Remember-me (giữ từ bản 2)
                 handleRememberMe(response, username, request.getContextPath(), rememberMe);
-                redirectByRole(response, request, "CUSTOMER");
+
+                // Nếu có redirectAfterLogin hợp lệ thì về đó, còn không thì về /home
+                String currURL = (String) session.getAttribute("redirectAfterLogin");
+                String targetPath = (isSafeInternalPath(currURL) ? currURL : "/home?login=success");
+                response.sendRedirect(request.getContextPath() + targetPath);
                 return;
             }
 
-            // 🔹 2. Đăng nhập với vai trò Staff / Manager
+            // 2) Nếu không phải Customer -> thử STAFF / MANAGER (thêm từ bản 2)
             Optional<UserDTO> userOpt = userService.loginUser(username, password);
             if (userOpt.isPresent()) {
                 UserDTO user = userOpt.get();
 
+                // Hủy session cũ (nếu có) và giữ redirectAfterLogin cho đồng nhất hành vi
+                HttpSession old = request.getSession(false);
+                String redirectURL = null;
+                if (old != null) {
+                    redirectURL = (String) old.getAttribute("redirectAfterLogin");
+                    old.invalidate();
+                }
+
                 HttpSession session = request.getSession(true);
                 setUserSession(session, user);
+                if (redirectURL != null) {
+                    session.setAttribute("redirectAfterLogin", redirectURL);
+                }
+                session.removeAttribute("redirectURL");
+
                 handleRememberMe(response, username, request.getContextPath(), rememberMe);
-                redirectByRole(response, request, user.getRoleName());
+
+                // Ưu tiên redirectAfterLogin nếu có và hợp lệ,
+                // nếu không thì điều hướng theo role (bản 2)
+                String currURL = (String) session.getAttribute("redirectAfterLogin");
+                if (isSafeInternalPath(currURL)) {
+                    response.sendRedirect(request.getContextPath() + currURL);
+                } else {
+                    redirectByRole(response, request, user.getRoleName());
+                }
                 return;
             }
 
-            // 🔹 3. Sai thông tin đăng nhập
-            request.setAttribute("errorMessage", "Sai tên đăng nhập hoặc mật khẩu.");
-            request.getRequestDispatcher("auth/login.jsp").forward(request, response);
+            // 3) Sai thông tin đăng nhập
+            errors.add(MessageUtil.getError("error.login.invalid"));
+            request.setAttribute("errors", errors);
+            request.setAttribute("username", username);
+            request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Đã xảy ra lỗi khi đăng nhập.");
-            request.getRequestDispatcher("auth/login.jsp").forward(request, response);
+            errors.add(MessageUtil.getError("error.system.login"));
+            request.setAttribute("errors", errors);
+            request.setAttribute("username", username);
+            request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
         }
     }
 
-    // Set attribute cho session
+    /* ===== Helpers ===== */
+
+    // Session cho CUSTOMER (kết hợp trường của bản 1)
     private void setCustomerSession(HttpSession session, CustomerDTO customer) {
         session.setAttribute("userType", "CUSTOMER");
         session.setAttribute("customerId", customer.getCustomerId());
@@ -151,9 +166,12 @@ public class LoginServlet extends HttpServlet {
         session.setAttribute("email", customer.getEmail());
         session.setAttribute("phone", customer.getPhone());
         session.setAttribute("city", customer.getCity());
-        session.setMaxInactiveInterval(60 * 60);
+        session.setAttribute("dateOfBirth", customer.getDateOfBirth()); // từ bản 1
+        session.setAttribute("loginTime", System.currentTimeMillis());   // từ bản 1
+        session.setMaxInactiveInterval(60 * 60); // 60 phút
     }
 
+    // Session cho STAFF/MANAGER (từ bản 2)
     private void setUserSession(HttpSession session, UserDTO user) {
         session.setAttribute("userType", user.getRoleName());
         session.setAttribute("userId", user.getUserId());
@@ -161,13 +179,14 @@ public class LoginServlet extends HttpServlet {
         session.setAttribute("fullName", user.getFullName());
         session.setAttribute("email", user.getEmail());
         session.setAttribute("roleName", user.getRoleName());
+        session.setAttribute("loginTime", System.currentTimeMillis());   // cho đồng nhất
         session.setMaxInactiveInterval(60 * 60);
     }
-    
+
     private void handleRememberMe(HttpServletResponse response, String username, String contextPath, String rememberMe) {
         if ("on".equals(rememberMe)) {
             Cookie cookie = new Cookie("rememberMeUser", username);
-            cookie.setMaxAge(30 * 24 * 60 * 60);
+            cookie.setMaxAge(30 * 24 * 60 * 60); // 30 ngày
             cookie.setHttpOnly(true);
             cookie.setPath((contextPath == null || contextPath.isEmpty()) ? "/" : contextPath);
             response.addCookie(cookie);
@@ -175,11 +194,12 @@ public class LoginServlet extends HttpServlet {
     }
 
     private void redirectByRole(HttpServletResponse response, HttpServletRequest request, String role)
-            throws IOException, ServletException {
+            throws IOException {
         String path = request.getContextPath();
-
-        switch (role.toUpperCase()) {
+        switch (role == null ? "" : role.toUpperCase()) {
             case "MANAGER":
+                // NOTE: đường "/homemange" trong code gốc có vẻ là typo,
+                // nếu route thực tế của bạn là "/homeManager" thì đổi lại ở đây.
                 response.sendRedirect(path + "/homemange");
                 break;
             case "STAFF":
@@ -192,17 +212,12 @@ public class LoginServlet extends HttpServlet {
                 response.sendRedirect(path + "/error403.jsp");
         }
     }
+
+    // Chặn open-redirect
     private boolean isSafeInternalPath(String url) {
-        if (url == null || url.isEmpty()) {
-            return false;
-        }
-        if (!url.startsWith("/")) {
-            return false;
-        }
-        // chặn chuỗi có "://" hoặc mã độc kiểu CR/LF
-        if (url.contains("://") || url.contains("\r") || url.contains("\n")) {
-            return false;
-        }
+        if (url == null || url.isEmpty()) return false;
+        if (!url.startsWith("/")) return false;
+        if (url.contains("://") || url.contains("\r") || url.contains("\n")) return false;
         return true;
     }
 }

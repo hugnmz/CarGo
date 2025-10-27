@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import service.UserService;
 import util.di.DIContainer;
+import util.MessageUtil;
 
 @WebServlet(name = "LoginAdmin", urlPatterns = {"/LoginAdmin"})
 public class LoginAdmin extends HttpServlet {
@@ -46,7 +47,7 @@ public class LoginAdmin extends HttpServlet {
         String password = request.getParameter("password");
 
         if (username == null || username.isBlank() || password == null || password.isBlank()) {
-            request.setAttribute("error", "Vui lòng nhập đầy đủ thông tin");
+            request.setAttribute("error", MessageUtil.getError("error.admin.login.required"));
             request.getRequestDispatcher("admin/admin_login.jsp").forward(request, response);
             return;
         }
@@ -59,7 +60,7 @@ public class LoginAdmin extends HttpServlet {
 
                 // Kiểm tra quyền ADMIN
                 if (!"ADMIN".equalsIgnoreCase(admin.getRoleName())) {
-                    request.setAttribute("error", "Tài khoản này không có quyền truy cập trang quản trị");
+                    request.setAttribute("error", MessageUtil.getError("error.admin.no.permission"));
                     request.getRequestDispatcher("admin/admin_login.jsp").forward(request, response);
                     return;
                 }
@@ -70,13 +71,13 @@ public class LoginAdmin extends HttpServlet {
 
                 response.sendRedirect("HomeAdmin");
             } else {
-                request.setAttribute("error", "Sai tên đăng nhập hoặc mật khẩu");
+                request.setAttribute("error", MessageUtil.getError("error.admin.login.invalid"));
                 request.getRequestDispatcher("admin/admin_login.jsp").forward(request, response);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Đã xảy ra lỗi khi đăng nhập");
+            request.setAttribute("error", MessageUtil.getError("error.admin.login.error"));
             request.getRequestDispatcher("admin/admin_login.jsp").forward(request, response);
         }
     }

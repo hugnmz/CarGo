@@ -58,7 +58,7 @@
             <c:when test="${not empty allCars}">
                 <c:forEach var="car" items="${allCars}">
                     <div class="col-md-4">
-                        <div class="card car-card shadow-sm" onclick="window.location.href='${pageContext.request.contextPath}/car-detail?carId=${car.carId}'" style="cursor: pointer;">
+                        <div class="card car-card shadow-sm car-card-clickable" onclick="window.location.href='${pageContext.request.contextPath}/car-detail?carId=${car.carId}'">
                             <div class="car-image-container position-relative">
                                 <c:choose>
                                     <c:when test="${not empty car.image}">

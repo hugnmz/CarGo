@@ -45,7 +45,15 @@ public class ChangePasswordServlet extends HttpServlet {
             throws ServletException, IOException {
         String oldPass = request.getParameter("old");
         String newPass = request.getParameter("new");
+        String confirmPass = request.getParameter("confirm");
         Integer customerId = Integer.valueOf(request.getParameter("customerId"));
+
+        // Kiểm tra xác nhận mật khẩu
+        if (!newPass.equals(confirmPass)) {
+            request.setAttribute("errorMess", MessageUtil.getError("error.password.mismatch"));
+            request.getRequestDispatcher("/CustomerServlet").forward(request, response);
+            return;
+        }
 
         if (customerService.changeCustomerPassword(customerId, oldPass, newPass)) {
             request.setAttribute("ok", MessageUtil.getMessage("password.change.success"));

@@ -56,7 +56,8 @@ public class CustomerMapper {
         user.setPhone(dto.getPhone());
         user.setEmail(dto.getEmail());
         user.setDateOfBirth(dto.getDateOfBirth());
-        user.setIsVerified(dto.getIsVerified()); // Thêm mapping cho isVerified
+        user.setIsVerified(dto.getIsVerified());
+        user.setCreateAt(dto.getCreateAt());
         if (dto.getCity() != null || dto.getAddress() != null) {
             Locations location = new Locations();
             location.setCity(dto.getCity());
