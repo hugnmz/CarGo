@@ -19,10 +19,12 @@ import util.di.annotation.Repository;
 
 @Repository
 public class ContractsDAOImpl implements ContractsDAO {
+
     @Override
     public BigDecimal getTotalAmount(Integer contractId) {
-        String sql = "SELECT total_amount FROM contracts WHERE contract_id = ?";
-        return JdbcTemplateUtil.queryOne(sql, BigDecimal.class, contractId);
+        String sql = "SELECT totalAmount FROM contracts WHERE contractId = ?";
+        Contracts contract = JdbcTemplateUtil.queryOne(sql, Contracts.class, contractId);
+        return contract != null ? contract.getTotalAmount() : null;
     }
 
     @Override
