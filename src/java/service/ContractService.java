@@ -30,12 +30,6 @@ public interface ContractService {
 
     boolean createContract(ContractDTO contractDTO);
     
-    /**
-     * Tạo hợp đồng từ giỏ hàng (checkout)
-     * @param customerId - ID khách hàng
-     * @param selectedOrderIds - Danh sách ID orders được chọn (null = tất cả)
-     * @return List<ContractDTO> - Danh sách hợp đồng đã tạo
-     */
     List<ContractDTO> createContractsFromCart(Integer customerId, Integer[] selectedOrderIds);
 
 }

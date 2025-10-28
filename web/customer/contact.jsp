@@ -1,5 +1,4 @@
-<% Document : contact Created on : 16 thg 10, 2025, 10:43:00 Author : HOANGNAM
---%> <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="vi">
   <head>
@@ -13,168 +12,108 @@
   </head>
   <body>
     <div class="container">
-      <h1>Liên Hệ Với Chúng Tôi</h1>
-      <p class="header-subtitle">Chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7</p>
+      <header>
+        <h1>Liên Hệ Với Chúng Tôi</h1>
+        <p class="header-subtitle">
+          Chúng tôi luôn sẵn sàng lắng nghe bạn. Gửi yêu cầu hoặc ghé thăm văn
+          phòng của chúng tôi.
+        </p>
+      </header>
 
-      <div class="contact-grid">
-        <!-- Contact Information -->
-        <div class="contact-info">
-          <h2>Thông Tin Liên Hệ</h2>
-
-          <div class="contact-item">
-            <i class="fas fa-map-marker-alt"></i>
-            <div class="info">
-              <strong>Địa Chỉ</strong>
-              <span>123 Đường ABC, Quận 1, TP.HCM</span>
-            </div>
-          </div>
-
-          <div class="contact-item">
-            <i class="fas fa-phone"></i>
-            <div class="info">
-              <strong>Điện Thoại</strong>
-              <span>+84 123 456 789</span>
-            </div>
-          </div>
-
-          <div class="contact-item">
-            <i class="fas fa-envelope"></i>
-            <div class="info">
-              <strong>Email</strong>
-              <span>info@carrental.com</span>
-            </div>
-          </div>
-
-          <div class="contact-item">
-            <i class="fas fa-clock"></i>
-            <div class="info">
-              <strong>Giờ Làm Việc</strong>
-              <span>24/7 - Hỗ trợ khách hàng</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Contact Form -->
-        <div class="contact-form">
-          <h2>Gửi Tin Nhắn</h2>
-          <form action="#" method="post">
+      <main class="contact-grid">
+        <%-- Form liên hệ bên trái --%>
+        <section class="contact-form">
+          <h3>Gửi Yêu Cầu Tư Vấn</h3>
+          <form action="handleContact" method="post">
             <div class="form-group">
-              <label for="name">Họ và Tên *</label>
-              <input type="text" id="name" name="name" required />
+              <label for="fullName">Họ và Tên</label>
+              <input
+                type="text"
+                id="fullName"
+                name="fullName"
+                placeholder="Ví dụ: Nguyễn Văn A"
+                required
+              />
             </div>
-
             <div class="form-group">
-              <label for="email">Email *</label>
-              <input type="email" id="email" name="email" required />
+              <label for="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="vidu@email.com"
+                required
+              />
             </div>
-
             <div class="form-group">
               <label for="phone">Số Điện Thoại</label>
-              <input type="tel" id="phone" name="phone" />
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                placeholder="0987xxxxxx"
+                required
+              />
             </div>
-
             <div class="form-group">
-              <label for="subject">Chủ Đề *</label>
-              <select id="subject" name="subject" required>
-                <option value="">-- Chọn chủ đề --</option>
-                <option value="booking">Đặt xe</option>
-                <option value="support">Hỗ trợ kỹ thuật</option>
-                <option value="complaint">Khiếu nại</option>
-                <option value="feedback">Góp ý</option>
-                <option value="other">Khác</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="message">Nội Dung *</label>
+              <label for="message">Nội dung</label>
               <textarea
                 id="message"
                 name="message"
-                placeholder="Nhập nội dung tin nhắn của bạn..."
+                placeholder="Nội dung bạn muốn trao đổi..."
                 required
               ></textarea>
             </div>
-
-            <button type="submit" class="submit-btn">
-              <i class="fas fa-paper-plane"></i> Gửi Tin Nhắn
-            </button>
+            <button type="submit" class="submit-btn">Gửi Yêu Cầu</button>
           </form>
-        </div>
-      </div>
+        </section>
 
-      <!-- Map Section -->
-      <div class="map-section">
-        <h2>Vị Trí Của Chúng Tôi</h2>
-        <div class="map-container">
-          <div class="map-placeholder">
-            <i
-              class="fas fa-map-marked-alt"
-              style="font-size: 2em; margin-bottom: 10px"
-            ></i>
-            <p>Bản đồ sẽ được hiển thị tại đây</p>
-            <p>123 Đường ABC, Quận 1, TP.HCM</p>
+        <%-- Thông tin và bản đồ bên phải --%>
+        <aside class="contact-info">
+          <h3>Thông Tin Công Ty</h3>
+          <div class="info-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path
+                d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+              />
+            </svg>
+            <span>Sơn Tây, Hà Nội, Việt Nam</span>
           </div>
-        </div>
-      </div>
+          <div class="info-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path
+                d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.02.74-.25 1.02l-2.2 2.2z"
+              />
+            </svg>
+            <span>(+84) 123 456 789</span>
+          </div>
+          <div class="info-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path
+                d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+              />
+            </svg>
+            <span>hotro@thuexe.com.vn</span>
+          </div>
 
-      <!-- FAQ Section -->
-      <div class="faq-section">
-        <h2>Câu Hỏi Thường Gặp</h2>
+          <div class="map-container">
+            <%-- Sử dụng iframe để nhúng bản đồ Google Maps --%>
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d59587.97785318588!2d105.47414336829827!3d21.022738700000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31345c589e41e319%3A0x868b1a3c8e54146a!2zSOG7jWMgdmnhu4duIEjDoG5nIGtow7RuZyBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v1729050146313!5m2!1svi!2s"
+              width="600"
+              height="450"
+              style="border: 0"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
+        </aside>
+      </main>
 
-        <div class="faq-item">
-          <div class="faq-question" onclick="toggleFAQ(this)">
-            <i class="fas fa-question-circle"></i> Làm thế nào để đặt xe?
-          </div>
-          <div class="faq-answer">
-            <p>
-              Bạn có thể đặt xe trực tuyến thông qua website của chúng tôi hoặc
-              gọi hotline 24/7. Chúng tôi sẽ hỗ trợ bạn trong vòng 15 phút.
-            </p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question" onclick="toggleFAQ(this)">
-            <i class="fas fa-question-circle"></i> Phí thuê xe được tính như thế
-            nào?
-          </div>
-          <div class="faq-answer">
-            <p>
-              Phí thuê xe được tính theo ngày với mức giá cạnh tranh. Chúng tôi
-              có nhiều gói ưu đãi cho khách hàng thuê dài hạn.
-            </p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question" onclick="toggleFAQ(this)">
-            <i class="fas fa-question-circle"></i> Tôi có thể hủy đặt xe không?
-          </div>
-          <div class="faq-answer">
-            <p>
-              Có, bạn có thể hủy đặt xe miễn phí trước 24 giờ. Sau thời gian này
-              sẽ có phí hủy theo quy định.
-            </p>
-          </div>
-        </div>
-      </div>
+      <footer class="footer">
+        <p>&copy; 2025 Công Ty Cho Thuê Xe ABC. Mọi quyền được bảo lưu.</p>
+      </footer>
     </div>
-
-    <script>
-      function toggleFAQ(element) {
-        const answer = element.nextElementSibling;
-        const isOpen = answer.classList.contains("show");
-
-        // Close all other FAQs
-        document.querySelectorAll(".faq-answer.show").forEach((item) => {
-          item.classList.remove("show");
-        });
-
-        // Toggle current FAQ
-        if (!isOpen) {
-          answer.classList.add("show");
-        }
-      }
-    </script>
   </body>
 </html>

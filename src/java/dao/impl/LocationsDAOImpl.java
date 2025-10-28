@@ -54,12 +54,4 @@ public class LocationsDAOImpl implements LocationsDAO {
         return JdbcTemplateUtil.query(sql, Locations.class);
     }
 
-    public static void main(String[] args) {
-        LocationsDAOImpl l = new LocationsDAOImpl();
-        List<Locations> list = l.getAllLocations();
-        for (Locations locations : list) {
-            System.out.println(locations.toString());
-        }
-    }
-
 }

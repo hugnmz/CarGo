@@ -76,10 +76,9 @@ public class CustomerServiceImpl implements CustomerService {
                 return false; // Dữ liệu không hợp lệ
             }
 
-            // resolve locationId
             Integer locationId = null;
             if (customerDTO.getCity() != null) {
-                locationId = locationsDAO.getOrCreateIdByCity(customerDTO.getCity());
+                locationId = locationsDAO.findIdByCity(customerDTO.getCity());
             }
 
             // Bước 4: Mã hóa mật khẩu với salt ngẫu nhiên
@@ -95,7 +94,7 @@ public class CustomerServiceImpl implements CustomerService {
             Customers customer = customerMapper.toUsers(customerDTO);
             customer.setPasswordHash(passwordHash); // Lưu hash password (byte[])
             customer.setPasswordSalt(passwordSalt); // Lưu salt (byte[])
-                customer.setLocationId(locationId);
+            customer.setLocationId(locationId);
 
             customer.setIsVerified(false);
             customer.setVerifyCode(code);
@@ -197,15 +196,14 @@ public class CustomerServiceImpl implements CustomerService {
             return false; // Dữ liệu không hợp lệ
         }
         try {
-            // Lấy thông tin customer hiện tại để preserve các trường quan trọng
             Optional<Customers> existingCustomer = customersDAO.getCustomerById(customerDTO.getCustomerId());
             if (existingCustomer.isEmpty()) {
                 return false;
             }
-            
+
             // Lấy customer hiện tại từ database
             Customers existing = existingCustomer.get();
-            
+
             // Chỉ update các trường cần thiết
             if (customerDTO.getFullName() != null) {
                 existing.setFullName(customerDTO.getFullName());
@@ -219,16 +217,19 @@ public class CustomerServiceImpl implements CustomerService {
             if (customerDTO.getDateOfBirth() != null) {
                 existing.setDateOfBirth(customerDTO.getDateOfBirth());
             }
-            
+
             // Chỉ update isVerified nếu có trong DTO
             if (customerDTO.getIsVerified() != null) {
                 existing.setIsVerified(customerDTO.getIsVerified());
             }
-            // Nếu không có trong DTO, giữ nguyên giá trị hiện tại
-            
+
             // Cập nhật locationId nếu có
-            if (customerDTO.getCity() != null) {
-                Integer locationId = locationsDAO.getOrCreateIdByCity(customerDTO.getCity());
+            if (customerDTO.getLocationId() != null) {
+                // Nếu có locationId (từ dropdown), sử dụng trực tiếp
+                existing.setLocationId(customerDTO.getLocationId());
+            } else if (customerDTO.getCity() != null) {
+                // Nếu chỉ có city (từ input text), tìm locationId
+                Integer locationId = locationsDAO.findIdByCity(customerDTO.getCity());
                 existing.setLocationId(locationId);
             }
 
@@ -287,16 +288,15 @@ public class CustomerServiceImpl implements CustomerService {
             return false; // Có lỗi xảy ra
         }
     }
-    
 
     @Override
     public boolean changeCustomerPassword(Integer customerId, String oldPassword, String newPassword) {
         // Thay đổi mật khẩu khách hàng
         try {
-            if(oldPassword.equals(newPassword)){
+            if (oldPassword.equals(newPassword)) {
                 return false;
             }
-            
+
             // Bước 1: Lấy thông tin khách hàng từ database
             Optional<Customers> oc = customersDAO.getCustomerById(customerId);
             if (!oc.isPresent()) {
@@ -311,7 +311,6 @@ public class CustomerServiceImpl implements CustomerService {
                 return false; // Mật khẩu cũ không đúng
             }
 
-            
             // Bước 3: Mã hóa mật khẩu mới
             byte[] newSalt = PasswordUtil.generateSalt(); // Tạo salt mới
             byte[][] newHash = PasswordUtil.hashPassword(newPassword, newSalt); // Hash mật khẩu mới

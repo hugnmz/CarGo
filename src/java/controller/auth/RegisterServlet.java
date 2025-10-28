@@ -13,15 +13,17 @@ import java.util.List;
 import java.util.ArrayList;
 import util.MessageUtil;
 import service.CustomerService;
+import service.LocationService;
+import dto.LocationDTO;
 import util.EmailUtil;
 import util.di.DIContainer;
-
 
 @WebServlet("/RegisterServlet")
 public class RegisterServlet extends HttpServlet {
 
     // service xu ly thong tin khach hang
     private CustomerService customerService;
+    private LocationService locationService;
 
     @Override
     public void init() throws ServletException {
@@ -29,6 +31,8 @@ public class RegisterServlet extends HttpServlet {
         try {
             // khoi tao customer service tu di container
             customerService = DIContainer.get(CustomerService.class);
+            // khoi tao location service tu di container
+            locationService = DIContainer.get(LocationService.class);
         } catch (Exception e) {
             // nem loi neu khoi tao service that bai
             throw new RuntimeException(e);
@@ -38,8 +42,18 @@ public class RegisterServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // chuyen huong cac request get den trang dang ky
-        response.sendRedirect(request.getContextPath() + "/auth/register.jsp");
+        try {
+            // lay danh sach locations tu database
+            List<LocationDTO> locations = locationService.getAllLocations();
+            request.setAttribute("locations", locations);
+
+            // chuyen huong den trang dang ky
+            request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            // neu co loi thi chuyen huong den trang dang ky khong co locations
+            response.sendRedirect(request.getContextPath() + "/auth/register.jsp");
+        }
     }
 
     @Override
@@ -54,46 +68,50 @@ public class RegisterServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String confirmPassword = request.getParameter("confirmPassword");
-        
+
         // tao danh sach de luu cac loi validation
         List<String> errors = new ArrayList<>();
-        
+
         try {
             // kiem tra cac truong bat buoc
             if (fullname == null || fullname.trim().isEmpty()) {
                 errors.add(MessageUtil.getError("error.fullname.required"));
             }
-            
+
             if (phone == null || phone.trim().isEmpty()) {
                 errors.add(MessageUtil.getError("error.phone.required"));
             }
-            
+
             if (email == null || email.trim().isEmpty()) {
                 errors.add(MessageUtil.getError("error.email.required"));
             }
-            
+
             if (username == null || username.trim().isEmpty()) {
                 errors.add(MessageUtil.getError("error.username.required"));
             }
-            
+
             if (password == null || password.trim().isEmpty()) {
                 errors.add(MessageUtil.getError("error.password.required"));
             }
-            
+
             if (confirmPassword == null || confirmPassword.trim().isEmpty()) {
                 errors.add(MessageUtil.getError("error.confirm.password.required"));
+            }
+
+            if (city == null || city.trim().isEmpty()) {
+                errors.add(MessageUtil.getError("error.city.required"));
             }
 
             // kiem tra mat khau khop
             if (password != null && confirmPassword != null && !confirmPassword.equals(password)) {
                 errors.add(MessageUtil.getError("error.password.mismatch"));
             }
-            
+
             // kiem tra dinh dang email
             if (email != null && !email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
                 errors.add(MessageUtil.getError("error.email.invalid"));
             }
-            
+
             // kiem tra dinh dang so dien thoai
             if (phone != null && !phone.matches("^[0-9]{10,11}$")) {
                 errors.add(MessageUtil.getError("error.phone.invalid"));
@@ -195,5 +213,8 @@ public class RegisterServlet extends HttpServlet {
         request.setAttribute("email", email);
         request.setAttribute("city", city);
         request.setAttribute("username", username);
+        List<LocationDTO> locations = locationService.getAllLocations();
+        request.setAttribute("locations", locations);
+
     }
 }

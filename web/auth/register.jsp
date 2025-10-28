@@ -99,10 +99,11 @@
                 <div class="mb-3">
                     <select name="city" class="form-select" required>
                         <option value="" disabled ${city == null ? 'selected' : ''}>Tỉnh/ thành phố (*)</option>
-                        <option value="Hà Nội" ${city == 'Hà Nội' ? 'selected' : ''}>Hà Nội</option>
-                        <option value="Hồ Chí Minh" ${city == 'Hồ Chí Minh' ? 'selected' : ''}>Hồ Chí Minh</option>
-                        <option value="Đà Nẵng" ${city == 'Đà Nẵng' ? 'selected' : ''}>Đà Nẵng</option>
-                        <option value="Khác..." ${city == 'Khác...' ? 'selected' : ''}>Khác...</option>
+                        <c:forEach var="location" items="${locations}">
+                            <option value="${location.city}" ${city == location.city ? 'selected' : ''}>
+                                ${location.city}
+                            </option>
+                        </c:forEach>
                     </select>
                 </div>
 

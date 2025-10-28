@@ -6,6 +6,7 @@ package controller.customer;
 
 import dto.ContractDTO;
 import dto.CustomerDTO;
+import dto.LocationDTO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -18,8 +19,8 @@ import java.util.List;
 import java.util.Optional;
 import service.ContractService;
 import service.CustomerService;
+import service.LocationService;
 import util.di.DIContainer;
-
 
 @WebServlet(name = "CustomerServlet", urlPatterns = {"/CustomerServlet"})
 public class CustomerServlet extends HttpServlet {
@@ -29,6 +30,8 @@ public class CustomerServlet extends HttpServlet {
     // service xu ly hop dong
     private ContractService contractService;
 
+    private LocationService locationService;
+
     @Override
     public void init() throws ServletException {
         super.init();
@@ -37,6 +40,8 @@ public class CustomerServlet extends HttpServlet {
             customerService = DIContainer.get(CustomerService.class);
             // khoi tao contract service tu di container
             contractService = DIContainer.get(ContractService.class);
+
+            locationService = DIContainer.get(LocationService.class);
         } catch (Exception e) {
             // log loi khi khoi tao service
             e.printStackTrace();
@@ -54,7 +59,7 @@ public class CustomerServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/auth/login.jsp");
             return;
         }
-        
+
         // lay customer id tu session
         Integer customerId = (Integer) session.getAttribute("customerId");
         if (customerId == null) {
@@ -75,13 +80,16 @@ public class CustomerServlet extends HttpServlet {
                 // khong luu customer object vao session de tiet kiem bo nho
             }
 
+            //lay danh sach locations
+            List<LocationDTO> locations = locationService.getAllLocations();
+            request.setAttribute("locations", locations);
+
             // lay danh sach hop dong cua khach hang tu database
             List<ContractDTO> listContract = contractService.getContractsByCustomer(customerId);
             // dat danh sach hop dong vao request de truyen sang jsp
             request.setAttribute("listContract", listContract);
-            
-            // khong luu listContract vao session, chi load tu database khi can
 
+            // khong luu listContract vao session, chi load tu database khi can
             // chuyen huong den trang profile.jsp
             request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
 
@@ -89,7 +97,7 @@ public class CustomerServlet extends HttpServlet {
             // log loi chi tiet ra console
             System.err.println("Error in CustomerServlet: " + e.getMessage());
             e.printStackTrace();
-            
+
             // dat thong bao loi cho nguoi dung
             request.setAttribute("error", "Có lỗi xảy ra khi tải thông tin. Vui lòng thử lại sau.");
             // dat danh sach hop dong rong neu co loi

@@ -3,7 +3,7 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ page import="jakarta.servlet.http.*, jakarta.servlet.*" %>
 <%
-    String username = (String) session.getAttribute("username"); // dùng đúng tên từ Servlet
+    String username = (String) session.getAttribute("username");
     String avatar = (String) session.getAttribute("avatar");
     if (avatar == null || avatar.isEmpty()) {
         avatar = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
@@ -39,6 +39,8 @@
                     <ul class="navbar-nav ms-auto align-items-center">
                         <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/home">Trang chủ</a></li>
                         <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/cars">Xe cho thuê</a></li>
+                        <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/contact.jsp">Chúng Tôi</a></li>
+
                         <% if (username != null && !username.isEmpty()) { %>
                         <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/my-contracts">Hợp đồng</a></li>
                         <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/ViewCartDetail"><i class="fas fa-shopping-cart"></i></a></li>
@@ -233,7 +235,7 @@
                     <c:when test="${not empty allCars}">
                         <c:forEach var="car" items="${allCars}" varStatus="status" end="5">
                             <div class="col-md-6 col-lg-4">
-                                 <div class="card car-card-modern car-card-clickable" onclick="window.location.href = '${pageContext.request.contextPath}/car-detail?carId=${car.carId}'">
+                                <div class="card car-card-modern car-card-clickable" onclick="window.location.href = '${pageContext.request.contextPath}/car-detail?carId=${car.carId}'">
                                     <div class="position-relative overflow-hidden">
                                         <c:choose>
                                             <c:when test="${not empty car.image}">

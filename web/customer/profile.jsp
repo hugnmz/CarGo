@@ -251,10 +251,15 @@
                                             <div class="col-md-6">
                                                 <div class="info-item">
                                                     <label for="city"><i class="fa fa-map-marker-alt text-muted"></i> Thành phố</label>
-                                                    <input type="text" class="form-control" 
-                                                           id="city" name="city" 
-                                                           value="${not empty customer.city ? customer.city : city}" 
-                                                           placeholder="Nhập thành phố">
+                                                    <select class="form-control" id="city" name="city" required>
+                                                        <option value="">-- Chọn thành phố --</option>
+                                                        <c:forEach var="location" items="${locations}">
+                                                            <option value="${location.city}" 
+                                                                    ${(not empty customer.city ? customer.city : city) == location.city ? 'selected' : ''}>
+                                                                ${location.city}
+                                                            </option>
+                                                        </c:forEach>
+                                                    </select>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">

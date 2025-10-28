@@ -35,8 +35,8 @@ public class CustomerMapper {
         dto.setIsVerified(customer.isIsVerified());
 
         if (customer.getLocationId() != null && customer.getLocation() != null) {
+            dto.setLocationId(customer.getLocationId());
             dto.setCity(customer.getLocation().getCity());
-            dto.setAddress(customer.getLocation().getAddress());
         }
 
         return dto;
@@ -58,7 +58,10 @@ public class CustomerMapper {
         user.setDateOfBirth(dto.getDateOfBirth());
         user.setIsVerified(dto.getIsVerified());
         user.setCreateAt(dto.getCreateAt());
-        if (dto.getCity() != null || dto.getAddress() != null) {
+
+        if (dto.getLocationId() != null) {
+            user.setLocationId(dto.getLocationId());
+        } else if (dto.getCity() != null) {
             Locations location = new Locations();
             location.setCity(dto.getCity());
             location.setAddress(dto.getAddress());
