@@ -1,9 +1,11 @@
 package service.impl;
 
+import dao.CarsDAO;
 import dao.ContractsDAO;
 import dao.ContractDetailsDAO;
 import dao.CustomersDAO;
 import dao.OrdersDAO;
+import dao.VehiclesDAO;
 import dto.ContractDTO;
 import dto.ContractDetailDTO;
 import dto.OrderDTO;
@@ -17,9 +19,7 @@ import java.util.Optional;
 import mapper.ContractMapper;
 import mapper.ContractDetailMapper;
 import mapper.OrderMapper;
-import model.ContractDetails;
 import model.Contracts;
-import model.Customers;
 import service.ContractService;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
@@ -38,6 +38,12 @@ public class ContractServiceImpl implements ContractService {
 
     @Autowired
     private OrdersDAO ordersDAO;
+
+    @Autowired
+    private VehiclesDAO vehicleDAO;
+
+    @Autowired
+    private CarsDAO carDAO;
 
     @Autowired
     private ContractMapper contractMapper;
@@ -77,13 +83,8 @@ public class ContractServiceImpl implements ContractService {
             //lấy số điện thoại
             if (customer.isPresent() && customer.get().getPhone() != null) {
                 dto.setCustomerPhone(customer.get().getPhone());
-            }  
-            //lấy contract details
-            List<ContractDetailDTO> cdDTO = this.getContractDetails(contractId);
-            if (cdDTO !=null) {
-                dto.setContractDetails(cdDTO);
-            } 
-            
+            }
+
             return Optional.of(dto);
         }
         return Optional.empty();
@@ -94,8 +95,17 @@ public class ContractServiceImpl implements ContractService {
         List<ContractDetailDTO> detailDTOs = new ArrayList<>();
 
         List<model.ContractDetails> details = contractDetailsDAO.getContractDetailsByContractId(contractId);
+        //lấy vehicle ứng với contract detail
 
         for (model.ContractDetails detail : details) {
+            Optional<model.Vehicles> vehicle = vehicleDAO.getVehicleById(detail.getVehicleId());
+            Optional<model.Cars> car = carDAO.getCarById(vehicle.get().getCarId());
+            if (car.isPresent()) {
+                vehicle.get().setCar(car.get());
+            }
+            if (vehicle.isPresent()) {
+                detail.setVehicle(vehicle.get());
+            }
             ContractDetailDTO dto = contractDetailMapper.toDTO(detail);
             detailDTOs.add(dto);
         }
@@ -320,9 +330,6 @@ public class ContractServiceImpl implements ContractService {
         }
 
         // Làm tròn đến hàng nghìn
-        depositAmount = depositAmount.divide(new BigDecimal("1000"), 0, RoundingMode.UP)
-                .multiply(new BigDecimal("1000"));
-
         return depositAmount;
     }
 
@@ -340,10 +347,26 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     public void updateContractTotalAmount(Integer contractId, BigDecimal totalAmount) {
-       boolean result = contractsDAO.updateContractTotalAmount(contractId, totalAmount);
-       if(!result){
-           throw new RuntimeException("Không thể cập nhật tổng tiền hợp đồng mã "+contractId);
-       }
+        boolean result = contractsDAO.updateContractTotalAmount(contractId, totalAmount);
+        if (!result) {
+            throw new RuntimeException("Không thể cập nhật tổng tiền hợp đồng mã " + contractId);
+        }
     }
+
+    @Override
+    public void updateStaffId(Integer staffId, Integer contractId) {
+        boolean result = contractsDAO.updateStaffId(staffId, contractId);
+        if (!result) {
+            throw new RuntimeException("Không thể cập nhật mã nhân viên hợp đồng mã " + contractId);
+        }
+    }
+
+    public void updateNote(String note, Integer contractId) {
+        boolean result = contractsDAO.updateNote(note, contractId);
+        if (!result) {
+            throw new RuntimeException("Không thể cập nhật ghi chú hợp đồng mã " + contractId);
+        }
+    }
+;
 
 }

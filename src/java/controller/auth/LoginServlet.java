@@ -213,7 +213,7 @@ public class LoginServlet extends HttpServlet {
                 response.sendRedirect(path + "/homemange");
                 break;
             case "STAFF":
-                response.sendRedirect(path + "/home");
+                response.sendRedirect(path + "/staff/staff.jsp");
                 break;
             case "CUSTOMER":
                 response.sendRedirect(path + "/home");

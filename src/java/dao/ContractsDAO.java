@@ -27,4 +27,6 @@ public interface ContractsDAO {
     List<Contracts> getContractByStatus(String status);
     boolean calculateTotalAmout(Integer contractId);
     public boolean updateContractTotalAmount(Integer contractId, BigDecimal totalAmount);
+    boolean updateStaffId(Integer staffId,Integer contractId);
+    boolean updateNote(String note,Integer contractId);
 }

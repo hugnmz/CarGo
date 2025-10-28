@@ -59,7 +59,6 @@ public class ProcessReturnCar extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/returncar");
             return;
         }
-
         //  Kiểm tra CSRF
         String csrfSession = (String) session.getAttribute("csrf");
         String csrfParam = req.getParameter("csrf");
@@ -112,9 +111,10 @@ public class ProcessReturnCar extends HttpServlet {
         // ========== POST #2: XÁC NHẬN & CẬP NHẬT ==========
         try {
             // Lấy dữ liệu form xác nhận (phí muộn + hư hại)
+
             //tiền phạt trả muộn
             String lateFeeParam = req.getParameter("lateFee");
-            BigDecimal lateFee = "custom_damageFee".equalsIgnoreCase(lateFeeParam)
+            BigDecimal lateFee = "custom_lateFee".equalsIgnoreCase(lateFeeParam)
                     ? parseMoney(req.getParameter("customAmountLateFee"), "0")
                     : parseMoney(lateFeeParam, "0");
             //tiền phạt hư hại
@@ -122,7 +122,7 @@ public class ProcessReturnCar extends HttpServlet {
             BigDecimal damageFee = "custom_damageFee".equalsIgnoreCase(damageFeeParam)
                     ? parseMoney(req.getParameter("customAmountDamageFee"), "0")
                     : parseMoney(damageFeeParam, "0");
-
+            //lấy note
             String note = req.getParameter("note");
 
             // Lấy hợp đồng từ DB
@@ -137,6 +137,9 @@ public class ProcessReturnCar extends HttpServlet {
 
             //update tổng tiền sau khi trả xe
             contractService.updateContractTotalAmount(contractId, totalAmount);
+
+            //update note vào hợp đồng
+            contractService.updateNote(note, contractId);
 
             // Dọn dẹp: bỏ khỏi whitelist theo phiên + hàng chờ service
             pendingMap.remove(contractId);

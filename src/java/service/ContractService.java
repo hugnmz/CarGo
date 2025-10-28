@@ -20,6 +20,9 @@ public interface ContractService {
     boolean updateContractStatus(Integer contractId, String status);
 
     void updateContractTotalAmount(Integer contractId, BigDecimal totalAmount);
+    
+    void updateStaffId(Integer staffId,Integer contractId);
+    void updateNote(String note,Integer contractId);
 
     // Tính tổng tiền hợp đồng
     boolean calculateTotalAmount(Integer contractId);

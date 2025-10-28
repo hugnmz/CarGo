@@ -8,39 +8,7 @@
         <meta charset="UTF-8">
         <title>Xử lý trả xe</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-        <style>
-            body {
-                background: #f7f7f9;
-            }
-            a{
-                text-decoration: none;
-                color: white;
-            }
-            .navbar {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            }
-
-            .navbar-brand {
-                font-weight: bold;
-                color: white !important;
-            }
-
-            .staff-header {
-                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-                color: white;
-                padding: 2rem 0;
-                margin-bottom: 2rem;
-                border-radius: 15px;
-            }
-            .staff-header {
-                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-                color: white;
-                padding: 2rem 0;
-                margin-bottom: 2rem;
-                border-radius: 15px;
-            }
-        </style>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/CSS/staff/process_returncar.css"/>
     </head>
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark">
@@ -50,7 +18,7 @@
                 </a>
                 <div class="navbar-nav ms-auto">
                     <span class="navbar-text me-3">
-                        <i class="fas fa-user"></i> Staff ID: 001
+                        <i class="fas fa-user" name="staffId"></i> Staff ID: ${sessionScope.staffId}
                     </span>
                     <a class="btn btn-outline-light" href="#">
                         <i class="fas fa-sign-out-alt"></i> Logout
@@ -69,29 +37,41 @@
             <div class="container py-4">
                 <h2 class="mb-4">Xử lý trả xe - Chi tiết hợp đồng mã: #${currentRequest.getContract().getContractId()}</h2>
 
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <p><strong>Tên KH:</strong> ${currentRequest.getContract().getCustomerName()}</p>
-                        <p><strong>SĐT:</strong> ${currentRequest.getContract().getCustomerPhone()}</p>
-                        <p><strong>Thời gian mượn:</strong> ${currentRequest.getContract().startDateToString()}</p>
-                        <p><strong>Trả theo HĐ:</strong> ${currentRequest.getContract().endDateToString()}</p>
-                        <p><strong>Trả thực tế:</strong> ${currentRequest.timeRequestToString()}</p>
-                        <p>
-                            <strong>Trạng thái:</strong>
-                            <c:choose>
-                                <c:when test="${currentRequest.late}"><span style="color: red">Trễ ${currentRequest.lateTime()}</span></c:when>
-                                <c:otherwise><span style="color: green">Đúng/Sớm </span></c:otherwise>
-                            </c:choose>
-                        </p>
-                    </div>
-                        <c:forEach var="v" items="${currentRequest.getContract().getContractDetails()}">
-                        <div>
-                            <p><strong>Tên xe:</strong> ${v.getCarName()}</p>
-                        <p><strong>Giá:</strong> ${v.getPrice()}</p>
-                        <p><strong>Biển số:</strong> ${v.getPlateNumber()}</p>
-                       
+                <div class="contract-wrapper">
+                    <div class="row g-4 align-items-start">
+                        <!-- Cột trái: Thông tin khách hàng -->
+                        <div class="col-12 col-lg-6">
+                            <h5 class="contract-header">Thông tin khách hàng</h5>
+                            <p><span class="info-label">Tên KH:</span> ${currentRequest.getContract().getCustomerName()}</p>
+                            <p><span class="info-label">SĐT:</span> ${currentRequest.getContract().getCustomerPhone()}</p>
+                            <p><span class="info-label">Thời gian mượn:</span> ${currentRequest.getContract().startDateToString()}</p>
+                            <p><span class="info-label">Trả theo HĐ:</span> ${currentRequest.getContract().endDateToString()}</p>
+                            <p><span class="info-label">Trả thực tế:</span> ${currentRequest.timeRequestToString()}</p>
+                            <p>
+                                <span class="info-label">Trạng thái:</span>
+                                <c:choose>
+                                    <c:when test="${currentRequest.late}">
+                                        <span class="status-late">Trễ ${currentRequest.lateTime()}</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="status-ontime">Đúng/Sớm</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </p>
                         </div>
-                        </c:forEach>
+
+                        <!-- Cột phải: Thông tin xe -->
+                        <div class="col-12 col-lg-6">
+                            <h5 class="contract-header">Thông tin xe</h5>
+                            <c:forEach var="v" items="${currentRequest.getContract().getContractDetails()}">
+                                <div class="vehicle-card">
+                                    <p><span class="info-label">Tên xe:</span> ${v.name}</p>
+                                    <p><span class="info-label">Giá:</span> ${v.price}</p>
+                                    <p><span class="info-label">Biển số:</span> ${v.plateNumber}</p>
+                                </div>
+                            </c:forEach>
+                        </div>
+                    </div>
                 </div>
 
                 <form method="post" action="${pageContext.request.contextPath}/processreturncar">
@@ -111,7 +91,7 @@
                     </div>
                     <div class="mb-3" id="customAmountWrapper1" style="display: none;">
                         <label class="form-label">Số tiền phạt muộn khác </label>
-                        <input type="number" name="customAmountLateFee" class="form-control" min="0" step="10000" placeholder="Nhập số tiền (đ)">
+                        <input type="number" name="customAmountLateFee" class="form-control" min="0" step="1000" placeholder="Nhập số tiền (đ)">
                         <div class="form-text text-muted">Nhập khi tiền phạt không nằm trong danh sách trên.</div>
                     </div>
 
@@ -131,7 +111,7 @@
 
                     <div class="mb-3" id="customAmountWrapper2" style="display: none;">
                         <label class="form-label">Số tiền hư hại khác </label>
-                        <input type="number" name="customAmountDamageFee" class="form-control" min="0" step="10000" placeholder="Nhập số tiền (đ)">
+                        <input type="number" name="customAmountDamageFee" class="form-control" min="0" step="1000" placeholder="Nhập số tiền (đ)">
                         <div class="form-text text-muted">Nhập khi thiệt hại không nằm trong danh sách trên.</div>
                     </div>
 
@@ -146,11 +126,13 @@
                     <div class="text-end">
                         <input type="hidden" name="confirm" value="1" />
                         <input type="hidden" name="csrf" value="${sessionScope.csrf}">
-                        <button type="submit" class="btn btn-success">Xác nhận hoàn tất</button>
+                        <button type="button" id="confirmBtn" class="btn btn-success">Xác nhận hoàn tất</button>
                         <a href="${pageContext.request.contextPath}/returncar" class="btn btn-secondary">Hủy</a>
                     </div>
                 </form>
             </div>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
             <script>
                 //nhập số tiền phạt muộn khác
                 document.getElementById("lateFee").addEventListener("change", function () {
@@ -169,6 +151,65 @@
                     } else {
                         wrapper.style.display = "none";
                     }
+                });
+                //hộp thoại xác nhận thông tin
+                document.getElementById("confirmBtn").addEventListener("click", function () {
+                    // Lấy dữ liệu từ form (ví dụ totalAmount và note)
+
+                    function getDamageFee() {
+                        const select = document.getElementById("damageFee");
+                        let value = 0;
+                        if (select.value === "custom_damageFee") {
+                            // Lấy giá trị người dùng nhập vào ô input khác
+                            const custom = document.querySelector("[name='customAmountDamageFee']");
+                            value = parseInt(custom?.value) || 0;
+                        } else {
+                            // Lấy giá trị bình thường từ select
+                            value = parseInt(select.value) || 0;
+                        }
+
+                        return value;
+                    }
+
+                    function getLateFee() {
+                        const select = document.getElementById("lateFee");
+                        let value = 0;
+                        if (select.value === "custom_lateFee") {
+                            // Lấy giá trị người dùng nhập vào ô input khác
+                            const custom = document.querySelector("[name='customAmountLateFee']");
+                            value = parseInt(custom?.value) || 0;
+                        } else {
+                            // Lấy giá trị bình thường từ select
+                            value = parseInt(select.value) || 0;
+                        }
+
+                        return value;
+                    }
+
+                    const damageFee = getDamageFee();
+                    const lateFee = getLateFee();
+                    const note = document.querySelector("textarea[name='note']").value || "(Không có ghi chú)";
+                    const totalAmount = damageFee + lateFee;
+                    const contractId = "${currentRequest.getContract().getContractId()}";
+                    const html =
+                            '<p><strong>Mã hợp đồng:</strong> ' + contractId + '</p>' +
+                            '<p><strong>Tổng phí:</strong> ' + totalAmount.toLocaleString() + 'đ</p>' +
+                            '<p><strong>Ghi chú:</strong> ' + note + '</p>' +
+                            '<p class="text-danger mt-2"><i class="fas fa-exclamation-triangle"></i> Bạn có chắc chắn muốn xác nhận hoàn tất không?</p>';
+                    Swal.fire({
+                        title: "Xác nhận hoàn tất?",
+                        html: html,
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Có, xác nhận!",
+                        cancelButtonText: "Hủy",
+                        reverseButtons: true,
+                        focusCancel: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            document.querySelector("form").submit();
+                        }
+                    });
                 });
 
 

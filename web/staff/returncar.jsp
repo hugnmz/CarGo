@@ -12,56 +12,8 @@
         <title>Yêu cầu trả xe</title>
         <!-- Bootstrap 5 -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-        <style>
-            body {
-                background: #f7f7f9;
-            }
-            .a{
-                text-decoration: none;
-                color: white;
-            }
-            .navbar {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            }
-
-            .navbar-brand {
-                font-weight: bold;
-                color: white !important;
-            }
-
-            .staff-header {
-                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-                color: white;
-                padding: 2rem 0;
-                margin-bottom: 2rem;
-                border-radius: 15px;
-            }
-            .staff-header {
-                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-                color: white;
-                padding: 2rem 0;
-                margin-bottom: 2rem;
-                border-radius: 15px;
-            }
-            .badge-late {
-                background: #dc3545;
-            }
-            .badge-on-time {
-                background: #198754;
-            }
-            .table thead th {
-                white-space: nowrap;
-            }
-            .empty-state {
-                text-align: center;
-                padding: 60px 0;
-                color: #6c757d; /* Màu xám nhẹ */
-                font-size: 1.1rem;
-                font-style: italic;
-                opacity: 0.8;
-            }
-        </style>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/CSS/staff/returncar.css"/>
+        
     </head>
 
     <%
@@ -82,7 +34,7 @@
                 </a>
                 <div class="navbar-nav ms-auto">
                     <span class="navbar-text me-3">
-                        <i class="fas fa-user"></i> Staff ID: 001
+                        <i class="fas fa-user" name="staffId"></i> Staff ID: ${sessionScope.staffId}
                     </span>
                     <a class="btn btn-outline-light" href="#">
                         <i class="fas fa-sign-out-alt"></i> Logout

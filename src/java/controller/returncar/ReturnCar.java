@@ -19,8 +19,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import model.RequestReturnCar;
 import service.ContractService;
 import service.ReturnCarService;
@@ -54,6 +52,9 @@ public class ReturnCar extends HttpServlet {
         // Lấy danh sách tạm thời từ queue (state toàn ứng dụng)
         List<RequestReturnCar> requests = new ArrayList<>(returnCarService.all());
         req.setAttribute("requests", requests);
+        
+        //giả định mã nhân viên
+        req.getSession().setAttribute("staffId", 1);
         //tạo mã csrf để bảo mật
         String csrf = java.util.UUID.randomUUID().toString();
         req.getSession().setAttribute("csrf", csrf);
@@ -116,6 +117,7 @@ public class ReturnCar extends HttpServlet {
 
         // Không lỗi → thêm/ cập nhật vào queue theo contractId (chống trùng)
         ContractDTO dto = dtoOpt.get();
+        dto.setContractDetails(contractService.getContractDetails(id));
         int cid = dto.getContractId();
 
         RequestReturnCar existing = returnCarService.get(cid);
