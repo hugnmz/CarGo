@@ -33,6 +33,9 @@ public class CustomerMapper {
         dto.setDateOfBirth(customer.getDateOfBirth());
         dto.setCreateAt(customer.getCreateAt());
         dto.setIsVerified(customer.isIsVerified());
+        
+        dto.setLocationId(customer.getLocationId());
+
 
         if (customer.getLocationId() != null && customer.getLocation() != null) {
             dto.setCity(customer.getLocation().getCity());
@@ -64,6 +67,14 @@ public class CustomerMapper {
             user.setLocation(location);
         }
         //tra ve user
+        if (dto.getLocationId() != null) {
+            Locations location = new Locations();
+            location.setLocationId(dto.getLocationId()); // Set locationId
+            location.setCity(dto.getCity());
+            location.setAddress(dto.getAddress());
+            user.setLocation(location);
+            user.setLocationId(dto.getLocationId()); // Set cho field locationId trong Customers
+        }
         return user;
     }
 }

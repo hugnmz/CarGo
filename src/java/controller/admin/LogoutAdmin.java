@@ -20,7 +20,7 @@ public class LogoutAdmin extends HttpServlet {
             session.invalidate(); // huỷ session
         }
         // Redirect về trang login admin
-        response.sendRedirect("LoginAdmin");
+        response.sendRedirect("home");
     }
 
     @Override

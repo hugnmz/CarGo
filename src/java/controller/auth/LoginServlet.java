@@ -41,53 +41,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        request.getRequestDispatcher("login.jsp").forward(request, response);
-        /*
-        // Chi lay session neu da ton tai
-        HttpSession session = request.getSession(false);
-        if (session != null && session.getAttribute("customerId") != null) {
-            // Da login
-            response.sendRedirect(request.getContextPath() + "/home");
-            return;
-        }
-
-        // Chua login -> check cookie
-        String rememberUsername = null;
-
-        // Doc cookie tu request
-        Cookie[] cookies = request.getCookies();
-
-        if (cookies != null) {
-            // Duyet tat ca cac cookie hien co de tim dung ten cookie
-            for (Cookie c : cookies) {
-                if ("rememberMeUser".equals(c.getName())) { // SUA: rememberUsername -> rememberMeUser
-                    // Lay gia tri username da luu
-                    rememberUsername = c.getValue();
-                    break; // Thoat khoi vong lap khi tim thay
-                }
-            }
-
-            // Neu co username tu cookie
-            if (rememberUsername != null) {
-                // Tim user trong cookie theo username
-                Optional<CustomerDTO> customerOpt = customerService.getCustomerByUsername(rememberUsername);
-
-                if (customerOpt.isPresent()) {
-                    CustomerDTO customer = customerOpt.get();
-
-                    // Tao session moi neu chua co
-                    session = request.getSession(true);
-                    // Gan cac thuoc tinh phien cho nguoi dung
-                    setSessionAttributes(session, customer);
-                    response.sendRedirect(request.getContextPath() + "/home");
-                    return;
-                }
-            }
-        }
-
-        // Ko co cookie -> ve login 
-        response.sendRedirect("login.jsp");
-         */
+        request.getRequestDispatcher("auth/login.jsp").forward(request, response);
     }
 
     @Override
@@ -103,7 +57,7 @@ public class LoginServlet extends HttpServlet {
         if (username == null || username.trim().isEmpty()
                 || password == null || password.trim().isEmpty()) {
             request.setAttribute("error", "Vui lòng nhập đầy đủ thông tin");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+            request.getRequestDispatcher("auth/login.jsp").forward(request, response);
             return;
         }
 
@@ -157,7 +111,7 @@ public class LoginServlet extends HttpServlet {
     private void setUserSession(HttpSession session, UserDTO user) {
         session.setAttribute("userType", user.getRoleName());
         session.setAttribute("userId", user.getUserId());
-        session.setAttribute("username", user.getUsername());
+        session.setAttribute("usernameu", user.getUsername());
         session.setAttribute("fullName", user.getFullName());
         session.setAttribute("email", user.getEmail());
         session.setAttribute("roleName", user.getRoleName());
@@ -188,8 +142,9 @@ public class LoginServlet extends HttpServlet {
             case "CUSTOMER":
                 response.sendRedirect(path + "/home");
                 break;
-            default:
-                response.sendRedirect(path + "/error403.jsp");
+            case "ADMIN":
+                response.sendRedirect(request.getContextPath() + "/HomeAdmin");
+                break;
         }
     }
     private boolean isSafeInternalPath(String url) {

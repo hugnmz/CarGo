@@ -9,7 +9,7 @@
 
     String role = (String) session.getAttribute("roleName");
     if (role == null || !"MANAGER".equalsIgnoreCase(role)) {
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("auth/login.jsp");
         return;
     }
 %>
@@ -73,8 +73,8 @@
             <h4 class="text-center text-white mb-4"><i class="fa-solid fa-car"></i> Car Rental</h4>
             <a href="homemange"><i class="fa-solid fa-house"></i> Trang chủ</a>
             <a href="profile"><i class="fa-solid fa-user-gear"></i> Thông tin cá nhân</a>
-            <a href="manage_customers.jsp"><i class="fa-solid fa-users"></i> Quản lý khách hàng</a>
-            <a href="manage_cars.jsp"
+            <a href="managecus"><i class="fa-solid fa-users"></i> Quản lý khách hàng</a>
+            <a href="managecar"
                class="<%= request.getRequestURI().contains("manage_cars.jsp") ? "active" : "" %>">
                 <i class="fa-solid fa-car-side"></i> Quản lý xe
             </a>

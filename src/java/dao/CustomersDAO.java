@@ -15,4 +15,5 @@ public interface CustomersDAO {
     boolean existsUsername(String username);
     boolean existEmail(String email);
     boolean existPhone(String phone);
+    public int countCustomer();
 }

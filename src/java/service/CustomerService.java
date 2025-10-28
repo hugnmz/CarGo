@@ -5,6 +5,7 @@
 package service;
 
 import dto.CustomerDTO;
+import dto.LocationDTO;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +30,7 @@ public interface CustomerService {
 
     boolean addCustomer(CustomerDTO customerDTO);
 
-    boolean updateCustomer(CustomerDTO customerDTO);
+    boolean updateCustomer(CustomerDTO customerDTO) throws Exception;
 
     boolean deleteCustomer(Integer customerId);
 
@@ -48,4 +49,8 @@ public interface CustomerService {
     boolean verifyAccount(String username, String code);
 
     Optional<String> generateAndStoreVerificationCode(String username);
+    
+    List<LocationDTO> getAllLocation();
+    
+    int countCustomer();
 }

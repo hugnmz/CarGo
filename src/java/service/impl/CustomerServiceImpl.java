@@ -7,6 +7,7 @@ package service.impl;
 import dao.CustomersDAO;
 import dao.LocationsDAO;
 import dto.CustomerDTO;
+import dto.LocationDTO;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +96,7 @@ public class CustomerServiceImpl implements CustomerService {
             Customers customer = customerMapper.toUsers(customerDTO);
             customer.setPasswordHash(passwordHash); // Lưu hash password (byte[])
             customer.setPasswordSalt(passwordSalt); // Lưu salt (byte[])
-                customer.setLocationId(locationId);
+            customer.setLocationId(locationId);
 
             customer.setIsVerified(false);
             customer.setVerifyCode(code);
@@ -191,52 +192,46 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public boolean updateCustomer(CustomerDTO customerDTO) {
-        // Cập nhật thông tin khách hàng
-        if (customerDTO == null) {
-            return false; // Dữ liệu không hợp lệ
-        }
-        try {
-            // Lấy thông tin customer hiện tại để preserve các trường quan trọng
-            Optional<Customers> existingCustomer = customersDAO.getCustomerById(customerDTO.getCustomerId());
-            if (existingCustomer.isEmpty()) {
-                return false;
-            }
-            
-            // Lấy customer hiện tại từ database
-            Customers existing = existingCustomer.get();
-            
-            // Chỉ update các trường cần thiết
-            if (customerDTO.getFullName() != null) {
-                existing.setFullName(customerDTO.getFullName());
-            }
-            if (customerDTO.getEmail() != null) {
-                existing.setEmail(customerDTO.getEmail());
-            }
-            if (customerDTO.getPhone() != null) {
-                existing.setPhone(customerDTO.getPhone());
-            }
-            if (customerDTO.getDateOfBirth() != null) {
-                existing.setDateOfBirth(customerDTO.getDateOfBirth());
-            }
-            
-            // Chỉ update isVerified nếu có trong DTO
-            if (customerDTO.getIsVerified() != null) {
-                existing.setIsVerified(customerDTO.getIsVerified());
-            }
-            // Nếu không có trong DTO, giữ nguyên giá trị hiện tại
-            
-            // Cập nhật locationId nếu có
-            if (customerDTO.getCity() != null) {
-                Integer locationId = locationsDAO.getOrCreateIdByCity(customerDTO.getCity());
-                existing.setLocationId(locationId);
-            }
+    public boolean updateCustomer(CustomerDTO customerDTO) throws Exception {
 
-            return customersDAO.updateCustomer(existing);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false; // Có lỗi xảy ra
+        // Kiểm tra khách hàng có tồn tại chưa
+        Optional<Customers> existingCustomer = customersDAO.getCustomerById(customerDTO.getCustomerId());
+        if (existingCustomer.isEmpty()) {
+            throw new IllegalArgumentException("Không tìm thấy khách hàng ID = " + customerDTO.getCustomerId());
         }
+
+        Customers oldCustomer = existingCustomer.get();
+
+        // Kiểm tra email, phone nếu có thay đổi
+        if (customerDTO.getEmail() != null && !customerDTO.getEmail().equals(oldCustomer.getEmail())
+                && customersDAO.existEmail(customerDTO.getEmail())) {
+            throw new IllegalArgumentException("Email '" + customerDTO.getEmail() + "' đã được sử dụng!");
+        }
+
+        if (customerDTO.getPhone() != null && !customerDTO.getPhone().equals(oldCustomer.getPhone())
+                && customersDAO.existPhone(customerDTO.getPhone())) {
+            throw new IllegalArgumentException("Số điện thoại '" + customerDTO.getPhone() + "' đã tồn tại!");
+        }
+
+        // Resolve locationId từ city nếu locationId chưa có
+        Integer locationId = customerDTO.getLocationId();
+        if (locationId == null && customerDTO.getCity() != null && !customerDTO.getCity().isBlank()) {
+            locationId = locationsDAO.getOrCreateIdByCity(customerDTO.getCity());
+            customerDTO.setLocationId(locationId);
+        }
+
+        // Chuyển DTO sang Model
+        Customers customer = customerMapper.toUsers(customerDTO);
+        customer.setLocationId(locationId);
+
+        // Gọi DAO để update
+        boolean success = customersDAO.updateCustomer(customer);
+        if (!success) {
+            throw new RuntimeException("Không thể cập nhật thông tin khách hàng (ID = " + customerDTO.getCustomerId() + ")");
+        }
+
+        return true;
+
     }
 
     @Override
@@ -287,16 +282,15 @@ public class CustomerServiceImpl implements CustomerService {
             return false; // Có lỗi xảy ra
         }
     }
-    
 
     @Override
     public boolean changeCustomerPassword(Integer customerId, String oldPassword, String newPassword) {
         // Thay đổi mật khẩu khách hàng
         try {
-            if(oldPassword.equals(newPassword)){
+            if (oldPassword.equals(newPassword)) {
                 return false;
             }
-            
+
             // Bước 1: Lấy thông tin khách hàng từ database
             Optional<Customers> oc = customersDAO.getCustomerById(customerId);
             if (!oc.isPresent()) {
@@ -311,7 +305,6 @@ public class CustomerServiceImpl implements CustomerService {
                 return false; // Mật khẩu cũ không đúng
             }
 
-            
             // Bước 3: Mã hóa mật khẩu mới
             byte[] newSalt = PasswordUtil.generateSalt(); // Tạo salt mới
             byte[][] newHash = PasswordUtil.hashPassword(newPassword, newSalt); // Hash mật khẩu mới
@@ -402,6 +395,36 @@ public class CustomerServiceImpl implements CustomerService {
 
         customersDAO.updateCustomer(c);
         return Optional.of(code);
+    }
+
+    @Override
+    public List<LocationDTO> getAllLocation() {
+        try {
+            // Lấy toàn bộ danh sách Location từ Database
+            var locations = locationsDAO.getAllLocations();
+
+            // Chuyển sang DTO
+            return locations.stream()
+                    .map(loc -> {
+                        LocationDTO dto = new LocationDTO();
+                        dto.setLocationId(loc.getLocationId());
+                        dto.setCity(loc.getCity());
+                        dto.setAddress(loc.getAddress());
+                        return dto;
+                    })
+                    .toList();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Trả về danh sách rỗng nếu lỗi
+            return List.of();
+        }
+
+    }
+
+    @Override
+    public int countCustomer() {
+        return customersDAO.countCustomer();
     }
 
 }

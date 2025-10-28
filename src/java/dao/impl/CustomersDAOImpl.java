@@ -20,7 +20,7 @@ import util.di.annotation.Repository;
 public class CustomersDAOImpl implements CustomersDAO {
     @Override
     public List<Customers> getAllCustomers() {
-        String sql = "select * from Customers";
+        String sql = "select * from Customers c JOIN Locations l ON c.locationId = l.locationId";
         return JdbcTemplateUtil.query(sql, Customers.class);
     }
 
@@ -125,6 +125,12 @@ public class CustomersDAOImpl implements CustomersDAO {
         String sql = "select COUNT(*) FROM Customers WHERE phone = ?";
         int count = JdbcTemplateUtil.count(sql, phone);
         return count > 0;
+    }
+
+    @Override
+    public int countCustomer() {
+        String sql = "SELECT COUNT(*) FROM dbo.Customers";
+        return JdbcTemplateUtil.count(sql);
     }
 
 }

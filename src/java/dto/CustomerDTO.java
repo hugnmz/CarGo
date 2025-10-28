@@ -14,6 +14,7 @@ public class CustomerDTO {
     private String city;             // Thành phố
     private String address;          // Dia chi
     private Boolean isVerified;
+    private Integer locationId;
     
     // Constructors
     public CustomerDTO() {}
@@ -53,6 +54,16 @@ public class CustomerDTO {
     public void setIsVerified(Boolean isVerified) {
         this.isVerified = isVerified;
     }
+
+    public Integer getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(Integer locationId) {
+        this.locationId = locationId;
+    }
+    
+    
     
     
 }

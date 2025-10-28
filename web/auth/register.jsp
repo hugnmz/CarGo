@@ -16,7 +16,7 @@
             />
         <link
 
-            href="${pageContext.request.contextPath}/CSS/register.css"
+            href="${pageContext.request.contextPath}/css/auth/register.css"
 
             rel="stylesheet"
             />

@@ -90,7 +90,7 @@
                             <div class="col-md-6">
                                 <label class="form-label">Vai trò:</label>
                                 <select name="roleid" class="form-control" required>
-                                    <option value="">-- Chọn vai trò --</option>
+                                    <option value="" hidden>-- Chọn vai trò --</option>
                                     <c:forEach var="r" items="${roles}">
                                         <option value="${r.roleId}">${r.roleName}</option>
                                     </c:forEach>
@@ -100,7 +100,7 @@
                             <div class="col-md-6">
                                 <label class="form-label">Thành phố:</label>
                                 <select name="locationid" class="form-control">
-                                    <option value="">-- Chọn thành phố --</option>
+                                    <option value="" hidden>-- Chọn thành phố --</option>
                                     <c:forEach var="l" items="${locations}">
                                         <option value="${l.locationId}">${l.city}</option>
                                     </c:forEach>

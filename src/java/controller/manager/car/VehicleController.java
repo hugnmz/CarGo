@@ -42,23 +42,6 @@ public class VehicleController extends HttpServlet {
             v.setIsActive(isActive);
             v.setLocationId(locationId);
 
-//            boolean added = vehicleService.addVehicle(v);
-//            if (added) {
-//                request.setAttribute("message", "Thêm vehicle thành công!");
-//            } else {
-//                request.setAttribute("error", "Thêm vehicle thất bại!");
-//            }
-//
-//            request.getRequestDispatcher("cardetail?action=detail&carId=" + carId)
-//                    .forward(request, response);
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            request.setAttribute("error", "Lỗi khi thêm vehicle: " + e.getMessage());
-//            request.getRequestDispatcher("cardetail?action=detail&carId="
-//                    + Integer.parseInt(request.getParameter("carId")))
-//                    .forward(request, response);
-//        }
             vehicleService.addVehicle(v);
 
             request.setAttribute("message", "Thêm vehicle thành công!");
@@ -90,23 +73,6 @@ public class VehicleController extends HttpServlet {
             v.setLocationId(locationId);
             v.setCarId(carId);
 
-//            boolean updated = vehicleService.updateVehicle(v);
-//            if (updated) {
-//                request.setAttribute("message", "Cập nhật vehicle thành công!");
-//            } else {
-//                request.setAttribute("error", "Cập nhật vehicle thất bại!");
-//            }
-//
-//           request.getRequestDispatcher("cardetail?action=detail&carId=" + carId)
-//                    .forward(request, response);
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            request.setAttribute("error", "Lỗi khi cập nhật vehicle: " + e.getMessage());
-//            request.getRequestDispatcher("cardetail?action=detail&carId=" + 
-//                    Integer.parseInt(request.getParameter("carId")))
-//                    .forward(request, response);
-//        }
             // Gọi service có ném Exception
             vehicleService.updateVehicle(v);
 

@@ -1,5 +1,22 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%
+    
+    response.setHeader("Cache-Control","no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma","no-cache");
+    response.setDateHeader("Expires", 0);
+    
+    String role = (String) session.getAttribute("roleName");
+    if (role == null) {
+        response.sendRedirect("LoginAdmin");
+        return;
+    }
+    if (!"ADMIN".equalsIgnoreCase(role)) {
+        request.setAttribute("error", "Bạn không có quyền truy cập trang này!");
+        request.getRequestDispatcher("error.jsp").forward(request, response);
+        return;
+    }
+%>
 <html>
 <head>
     <title>Sửa thông tin User</title>
@@ -11,11 +28,6 @@
     <form action="ControllerAdmin" method="post" class="row g-3">
         <input type="hidden" name="action" value="update">
         <input type="hidden" name="userId" value="${editUser.userId}">
-
-<!--        <div class="col-md-6">
-            <label class="form-label">Tên đăng nhập:</label>
-            <input type="text" name="username" class="form-control" value="${editUser.username}" required>
-        </div>-->
 
         <div class="col-md-6">
             <label class="form-label">Họ tên:</label>
@@ -46,9 +58,12 @@
         <div class="col-md-6">
             <label class="form-label">Thành phố:</label>
             <select name="locationid" class="form-control">
-                <option value="">-- Chọn thành phố --</option>
+                <option value="" hidden>-- Chọn thành phố --</option>
                 <c:forEach var="l" items="${locations}">
-                    <option value="${l.locationId}" <c:if test="${l.locationId == editUser.locationId}">selected</c:if>>
+                    <option value="${l.locationId}" 
+                            <c:if test="${l.locationId == editUser.locationId}">
+                                selected
+                            </c:if>>
                         ${l.city}
                     </option>
                 </c:forEach>

@@ -145,7 +145,6 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public int countVehical() {
         return vehiclesDAO.countVehicles();
-
     }
 
 }

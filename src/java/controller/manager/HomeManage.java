@@ -32,6 +32,7 @@ public class HomeManage extends HttpServlet {
     public void init() throws ServletException {
         try {
             vehiclesService = DIContainer.get(VehicleService.class);
+            customerService = DIContainer.get(CustomerService.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -40,11 +41,11 @@ public class HomeManage extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         int totalVehicles = vehiclesService.countVehical();
-//        int totalCustomers = customerService.getTotalCustomers();
+        int totalCustomers = customerService.countCustomer();
 //        int totalContracts = contractService.getTotalActiveContracts();
 
         request.setAttribute("totalCars", totalVehicles);
-//        request.setAttribute("totalCustomers", totalCustomers);
+        request.setAttribute("totalCustomers", totalCustomers);
 //        request.setAttribute("totalContracts", totalContracts);
 
         request.getRequestDispatcher("manager_home.jsp").forward(request, response);

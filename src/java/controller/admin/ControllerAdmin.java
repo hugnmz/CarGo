@@ -113,25 +113,6 @@ public class ControllerAdmin extends HttpServlet {
                 e.printStackTrace();
                 request.setAttribute("error", "Thêm user thành công nhưng lỗi gửi email: " + e.getMessage());
             }
-//            try {
-//                String roleName = switch (user.getRoleId()) {
-//                    case 1 ->
-//                        "Admin";
-//                    case 2 ->
-//                        "Staff";
-//                    case 3 ->
-//                        "Customer";
-//                    default ->
-//                        "Người dùng";
-//                };
-//
-//                if (email != null && !email.isEmpty()) {
-//                    util.EmailUtil.sendCredentials(email, username, password, roleName);
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                request.setAttribute("error", "User thêm thành công nhưng lỗi gửi email: " + e.getMessage());
-//            }
 
             request.setAttribute("message", "Thêm user thành công!");
             request.getRequestDispatcher("HomeAdmin").forward(request, response);

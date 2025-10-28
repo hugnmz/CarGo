@@ -83,8 +83,8 @@
         <div class="sidebar">
             <h4 class="text-center text-white mb-4"><i class="fa-solid fa-car"></i> Car Rental</h4>
             <a href="homemange"><i class="fa-solid fa-house"></i> Trang chủ</a>
-            <a href="user_profile.jsp" class="active"><i class="fa-solid fa-user-gear"></i> Thông tin cá nhân</a>
-            <a href="../manage_customers.jsp"><i class="fa-solid fa-users"></i> Quản lý khách hàng</a>
+            <a href="profile" class="active"><i class="fa-solid fa-user-gear"></i> Thông tin cá nhân</a>
+            <a href="managecus"><i class="fa-solid fa-users"></i> Quản lý khách hàng</a>
             <a href="managecar"><i class="fa-solid fa-car-side"></i> Quản lý xe</a>
             <a href="#"><i class="fa-solid fa-file-contract"></i> Hợp đồng</a>
             <a href="${pageContext.request.contextPath}/LogoutServlet">
@@ -92,7 +92,6 @@
             </a>
         </div>
 
-        <!-- Nội dung chính -->
         <!-- Nội dung chính -->
         <div class="content">
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -148,6 +147,11 @@
                 </div>
 
                 <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p><span class="profile-label">🧩  Quyền hạn:</span>
+                            <span class="profile-value"><c:out value="${sessionScope.roleName}" /></span>
+                        </p>
+                    </div>
                     <div class="col-md-6">
                         <p><span class="profile-label">📅 Ngày tạo:</span>
                             <span class="profile-value"><c:out value="${user.createdAtFormatted}" /></span>

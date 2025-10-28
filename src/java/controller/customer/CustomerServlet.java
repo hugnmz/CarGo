@@ -33,7 +33,7 @@ public class CustomerServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        super.init(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+        super.init();
         try {
             customerService = DIContainer.get(CustomerService.class);
             contractService = DIContainer.get(ContractService.class);

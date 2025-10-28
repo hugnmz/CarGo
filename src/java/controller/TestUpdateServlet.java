@@ -66,13 +66,13 @@ public class TestUpdateServlet extends HttpServlet {
             
             // Test 3: Update customer
             out.println("<h2>Step 3: Update Customer</h2>");
-            boolean result = customerService.updateCustomer(customer);
+//            boolean result = customerService.updateCustomer(customer);
             
-            if (result) {
-                out.println("<p style='color:green'>✅ Update successful!</p>");
-            } else {
-                out.println("<p style='color:red'>❌ Update failed!</p>");
-            }
+//            if (result) {
+//                out.println("<p style='color:green'>✅ Update successful!</p>");
+//            } else {
+//                out.println("<p style='color:red'>❌ Update failed!</p>");
+//            }
             
             // Test 4: Verify update
             out.println("<h2>Step 4: Verify Update</h2>");

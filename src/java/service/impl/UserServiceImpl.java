@@ -80,7 +80,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void addUser(UserDTO userDTO, String password) {
         try {
-            // 
+            // check lỗi
             if (usersDAO.getUserByUsername(userDTO.getUsername()).isPresent()) {
                 throw new IllegalArgumentException("Tên đăng nhập '" + userDTO.getUsername() + "' đã tồn tại!");
             }
