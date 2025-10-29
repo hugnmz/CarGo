@@ -26,7 +26,11 @@ public class ContractsDAOImpl implements ContractsDAO {
         Contracts contract = JdbcTemplateUtil.queryOne(sql, Contracts.class, contractId);
         return contract != null ? contract.getTotalAmount() : null;
     }
-
+@Override
+    public boolean addPaymentLog(Integer contractId, String message) {
+        String sql = "INSERT INTO payment_logs (contract_id, message, created_at) VALUES (?, ?, NOW())";
+        return JdbcTemplateUtil.update(sql, contractId, message) > 0;
+    }
     @Override
     public List<Contracts> getAllContracts() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody

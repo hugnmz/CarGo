@@ -1,45 +1,68 @@
-<%@page contentType="text/html;charset=UTF-8" language="java" %>
-<%@taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Thanh toán</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>.qr-code img {max-width:200px;margin:20px auto;display:block;}</style>
+    <title>Thanh toán #${contractId}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
+        .card { max-width: 420px; margin: 2rem auto; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .card-header { background: #007bff; color: white; border-radius: 16px 16px 0 0; }
+        .qr-img { width: 220px; height: 220px; border: 10px solid white; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .amount { font-size: 2rem; font-weight: 700; color: #dc3545; }
+        .spinner { width: 1.2rem; height: 1.2rem; border: 2px solid #f3f3f3; border-top: 2px solid #007bff; border-radius: 50%; animation: spin 1s linear infinite; display: inline-block; margin-right: 8px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
 </head>
 <body>
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Thanh toán hợp đồng</h2>
+<div class="container">
     <div class="card">
-        <div class="card-body">
-            <p>Hợp đồng: <c:out value="${contractId}" /></p>
-            <p>Số tiền: <strong><c:out value="${totalAmount}" /> VNĐ</strong></p>
-            <div class="qr-code">
-                <img src="<c:out value='${qrUrl}' />" alt="QR Code">
+        <div class="card-header text-center py-3">
+            <h4 class="mb-0">Thanh toán hợp đồng #${contractId}</h4>
+        </div>
+        <div class="card-body text-center p-4">
+            <img src="${qrUrl}" alt="QR Code" class="qr-img mb-4">
+            <p class="mb-1"><strong>Số tiền:</strong></p>
+            <p class="amount">${totalAmount} VNĐ</p>
+            
+            <div id="status" class="mt-4">
+                <p class="text-warning"><span class="spinner"></span> Đang chờ thanh toán...</p>
             </div>
-            <a href="calculateTotalAmount?contractId=${contractId}" class="btn btn-secondary mt-3">Return Car</a>
-            <div id="paymentStatus" class="mt-3"></div>
         </div>
     </div>
 </div>
 
 <script>
-    function checkPayment() {
-        const cid = "${contractId}", amt = "${totalAmount}";
-        fetch(`/CarGo/checkPayment?contractId=\${cid}&amount=\${amt}`)
+    const contractId = "${contractId}";
+    const amount = "${totalAmount}";
+    let interval;
+
+    function check() {
+        fetch(`checkPayment?contractId=${contractId}&amount=${amount}`)
             .then(r => r.json())
-            .then(d => {
-                document.getElementById("paymentStatus").innerHTML =
-                    `<div class="alert alert-\${d.status === 'SUCCESS' ? 'success' : 'warning'}">
-                        Trạng thái: \${d.status}
-                    </div>`;
-                if (d.status === "SUCCESS") alert("Thanh toán thành công!");
+            .then(data => {
+                if (data.status === "SUCCESS") {
+                    clearInterval(interval);
+                    document.getElementById("status").innerHTML = `
+                        <div class="text-success text-center p-4">
+                            <i class="fas fa-check-circle fa-4x mb-3"></i>
+                            <h4 class="fw-bold">THÀNH CÔNG!</h4>
+                            <p>Hợp đồng #${contractId} đã được xác nhận.</p>
+                            <p class="text-muted">Đang chuyển về trang chủ...</p>
+                        </div>
+                    `;
+                    setTimeout(() => location.href = "home.jsp", 3000);
+                }
             })
-            .catch(e => console.error(e));
+            .catch(err => console.error("Lỗi:", err));
     }
-    checkPayment();
-    setInterval(checkPayment, 30000);
+
+    window.onload = () => {
+        check();
+        interval = setInterval(check, 5000);
+    };
 </script>
 </body>
 </html>

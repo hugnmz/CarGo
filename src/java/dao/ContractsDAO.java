@@ -27,4 +27,5 @@ public interface ContractsDAO {
     List<Contracts> getContractByStatus(String status);
     boolean calculateTotalAmout(Integer contractId);
     public BigDecimal getTotalAmount(Integer contractId);
+      public boolean addPaymentLog(Integer contractId, String message);
 }

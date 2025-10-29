@@ -15,7 +15,7 @@ public class Payments {
     // Các đối tượng liên quan
     private Contracts contract;      // Hợp đồng
     private PaymentMethods paymentMethod; // Phương thức thanh toán
-    
+    private String transactionCode;
     // Constructors
     public Payments() {}
     
@@ -25,6 +25,14 @@ public class Payments {
         this.methodId = methodId;
         this.status = "pending";
         this.paymentDate = LocalDateTime.now();
+    }
+
+    public String getTransactionCode() {
+        return transactionCode;
+    }
+
+    public void setTransactionCode(String transactionCode) {
+        this.transactionCode = transactionCode;
     }
     
     // Getters and Setters

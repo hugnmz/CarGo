@@ -119,4 +119,19 @@ public class PaymentsDAOImpl implements PaymentsDAO {
         int count = JdbcTemplateUtil.count(sql, paymentId);
         return count > 0;
     }
+
+
+    @Override
+    public Payments findPendingPayment(Integer contractId, BigDecimal amount) {
+        String sql = "SELECT * FROM payments WHERE contract_id = ? AND amount = ? AND status = 'pending' ORDER BY payment_date DESC LIMIT 1";
+        List<Payments> list = JdbcTemplateUtil.query(sql, Payments.class, contractId, amount);
+        return list.isEmpty() ? null : list.get(0);
+    }
+@Override
+    public Payments findPendingPaymentByCode(Integer contractId, BigDecimal amount) {
+        String sql = "SELECT * FROM payments WHERE contract_id = ? AND amount = ? AND status = 'pending' AND transaction_code IS NOT NULL ORDER BY payment_date DESC LIMIT 1";
+        List<Payments> list = JdbcTemplateUtil.query(sql, Payments.class, contractId, amount);
+        return list.isEmpty() ? null : list.get(0);
+    }
+
 }
