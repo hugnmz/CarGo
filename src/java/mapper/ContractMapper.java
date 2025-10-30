@@ -24,7 +24,7 @@ public class ContractMapper {
         dto.setCreateAt(contract.getCreateAt());
         dto.setTotalAmount(contract.getTotalAmount());
         dto.setDepositAmount(contract.getDepositAmount());
-        
+        dto.setRejectionReason(contract.getRejectionReason());
         return dto;
     }
 
@@ -45,7 +45,7 @@ public class ContractMapper {
         contract.setCreateAt(dto.getCreateAt());
         contract.setTotalAmount(dto.getTotalAmount());
         contract.setDepositAmount(dto.getDepositAmount());
-        
+        contract.setRejectionReason(dto.getRejectionReason());
         return contract;
     }
 }

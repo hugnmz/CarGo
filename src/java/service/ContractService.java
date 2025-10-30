@@ -29,7 +29,7 @@ public interface ContractService {
     List<ContractDTO> getAllContracts();
 
     boolean createContract(ContractDTO contractDTO);
-    
+    boolean updateContractStatus(Integer contractId, String status, String reason);
     List<ContractDTO> createContractsFromCart(Integer customerId, Integer[] selectedOrderIds);
 
 }
