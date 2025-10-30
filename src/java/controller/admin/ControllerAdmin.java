@@ -6,7 +6,7 @@ package controller.admin;
 
 import dto.LocationDTO;
 import dto.RoleDTO;
-import dto.UserDTO;
+import dto.UseDTO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -15,11 +15,11 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
-import model.Users;
+import model.User;
 import service.RoleService;
-import service.UserService;
 import util.di.DIContainer;
 import util.EmailUtil;
+import service.UseService;
 
 /**
  *
@@ -28,13 +28,13 @@ import util.EmailUtil;
 @WebServlet(name = "ControllerAdmin", urlPatterns = {"/ControllerAdmin"})
 public class ControllerAdmin extends HttpServlet {
 
-    private UserService userService;
+    private UseService userService;
     private RoleService roleService;
 
     @Override
     public void init() throws ServletException {
         try {
-            userService = DIContainer.get(UserService.class);
+            userService = DIContainer.get(UseService.class);
             roleService = DIContainer.get(RoleService.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -79,7 +79,7 @@ public class ControllerAdmin extends HttpServlet {
             String locationIdStr = request.getParameter("locationid");
 
             // Tạo DTO
-            UserDTO user = new UserDTO();
+            UseDTO user = new UseDTO();
             user.setUsername(username);
             user.setFullName(fullname);
             user.setEmail(email);
@@ -107,7 +107,7 @@ public class ControllerAdmin extends HttpServlet {
                 }
 
                 if (email != null && !email.isEmpty()) {
-                    util.EmailUtil.sendCredentials(email, username, password, roleName);
+                    util.EmailUtil.sendCredentials(email, fullname ,username, password, roleName);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -138,7 +138,7 @@ public class ControllerAdmin extends HttpServlet {
             }
 
             //Khởi tạo dto để truyền tham số
-            UserDTO user = new UserDTO();
+            UseDTO user = new UseDTO();
             user.setUserId(Integer.parseInt(userIdStr));
             user.setUsername(request.getParameter("username"));
             user.setFullName(request.getParameter("fullname"));
@@ -190,7 +190,7 @@ public class ControllerAdmin extends HttpServlet {
         if (userIdStr != null && !userIdStr.isEmpty()) {
             Integer userId = Integer.parseInt(userIdStr);
             // Tạo phương thức getUserById ở Service
-            UserDTO user = userService.getUserById(userId);
+            UseDTO user = userService.getUserById(userId);
             // Lấy danh sách vai trò
             List<RoleDTO> roleList = roleService.getAllRole();
             // Lấy danh sách địa điểm (thành phố)
