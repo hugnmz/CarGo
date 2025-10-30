@@ -3,7 +3,7 @@ package test;
 import dao.VehiclesDAO;
 import mapper.VehicleMapper;
 import dto.VehicleDTO;
-import service.impl.CarServiceImpl;
+import service.impl.CarSerImpl;
 import java.util.List;
 import util.di.DIContainer;
 
@@ -14,7 +14,7 @@ public class TestGetVehicleByCarId {
             
 
             // ⚙️ Inject thủ công các dependency cần thiết
-            CarServiceImpl carService = DIContainer.get(CarServiceImpl.class);
+            CarSerImpl carService = DIContainer.get(CarSerImpl.class);
 
             // ✅ Giả sử bạn muốn test carId = 2
             int carId = 2;

@@ -14,8 +14,8 @@
         return;
     }
     if (!"MANAGER".equalsIgnoreCase(role)) {
-        request.setAttribute("error", "Bạn không có quyền truy cập trang này!");
-        request.getRequestDispatcher("error.jsp").forward(request, response);
+        request.setAttribute("errors", "Bạn không có quyền truy cập trang này!");
+        request.getRequestDispatcher("auth/login.jsp").forward(request, response);
         return;
     }
 %>

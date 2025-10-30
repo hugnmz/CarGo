@@ -5,8 +5,8 @@
 package test;
 
 import util.PasswordUtil;
-import model.Users;
-import dao.impl.UserDaoImp;
+import model.User;
+import dao.impl.UseDaoImp;
 import java.util.Optional;
 
 /**
@@ -18,10 +18,10 @@ public class AdminTest {
     public static void main(String[] args) {
         try {
             // Khởi tạo DAO
-            UserDaoImp userDao = new UserDaoImp();
+            UseDaoImp userDao = new UseDaoImp();
 
             // Tạo đối tượng admin
-            Users admin = new Users();
+            User admin = new User();
             admin.setUsername("admin");
             admin.setFullName("System Administrator");
             admin.setPhone("0111111114");
@@ -54,11 +54,11 @@ public class AdminTest {
             e.printStackTrace();
         }
 
-//        UserDaoImp userDao = new UserDaoImp();
+//        UseDaoImp userDao = new UseDaoImp();
 //        Optional<Users> adminOpt = userDao.getUserByUsername("admin");
 //
 //        if (adminOpt.isPresent()) {
-//            Users admin = adminOpt.get();
+//            User admin = adminOpt.get();
 //            System.out.println("✅ Found user:");
 //            System.out.println("ID: " + admin.getUserId());
 //            System.out.println("Username: " + admin.getUsername());

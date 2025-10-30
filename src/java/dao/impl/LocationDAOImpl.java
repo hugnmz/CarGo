@@ -5,19 +5,19 @@
  */
 package dao.impl;
 
-import dao.LocationsDAO;
 import java.util.List;
 import model.Locations;
-import model.Users;
+import model.User;
 import util.JdbcTemplateUtil;
 import util.di.annotation.Repository;
+import dao.LocDAO;
 
 /**
  *
  * @author admin
  */
 @Repository
-public class LocationsDAOImpl implements LocationsDAO {
+public class LocationDAOImpl implements LocDAO {
 
     @Override
     public Integer findIdByCity(String city) {
@@ -54,12 +54,5 @@ public class LocationsDAOImpl implements LocationsDAO {
         return JdbcTemplateUtil.query(sql, Locations.class);
     }
 
-    public static void main(String[] args) {
-        LocationsDAOImpl l = new LocationsDAOImpl();
-        List<Locations> list = l.getAllLocations();
-        for (Locations locations : list) {
-            System.out.println(locations.toString());
-        }
-    }
 
 }

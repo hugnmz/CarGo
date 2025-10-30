@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
  * UserDTO - Dùng để trao đổi dữ liệu người dùng giữa tầng Controller / View.
  * Tương thích hoàn toàn với model Users và database hiện tại.
  */
-public class UserDTO {
+public class UseDTO {
 
     private Integer userId;          // ID người dùng
     private String username;         // Tên đăng nhập
@@ -23,7 +23,7 @@ public class UserDTO {
     private Integer roleId;          // ID vai trò (FK)
     private Integer locationId;      // ID địa điểm (FK)
 
-    public UserDTO() {
+    public UseDTO() {
     }
 
     // ===== GETTERS & SETTERS =====

@@ -19,8 +19,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import service.ContractService;
-import service.CustomerService;
 import util.di.DIContainer;
+import service.CusService;
 
 /**
  *
@@ -29,14 +29,14 @@ import util.di.DIContainer;
 @WebServlet(name = "ControllerInforCustomer", urlPatterns = {"/controllerinformationcustomer"})
 public class ControllerInforCustomer extends HttpServlet {
 
-    private CustomerService customerService;
+    private CusService customerService;
     private ContractService contractService;
 
     @Override
     public void init() throws ServletException {
         super.init();
         try {
-            customerService = DIContainer.get(CustomerService.class);
+            customerService = DIContainer.get(CusService.class);
             contractService = DIContainer.get(ContractService.class);
         } catch (Exception e) {
             e.printStackTrace();
@@ -106,8 +106,8 @@ public class ControllerInforCustomer extends HttpServlet {
 
     private void editCustomer(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        try {           
+
+        try {
             String idStr = request.getParameter("customerId");
             if (idStr == null) {
                 throw new IllegalArgumentException("Không có customerId trong request!");
@@ -129,7 +129,7 @@ public class ControllerInforCustomer extends HttpServlet {
             }
 
             Boolean isVerified = "1".equals(isVerify);
-            
+
             CustomerDTO customerDTO = new CustomerDTO();
             customerDTO.setCustomerId(customerId);
             customerDTO.setFullName(fullName);
@@ -153,6 +153,34 @@ public class ControllerInforCustomer extends HttpServlet {
         request.getRequestDispatcher("managecus").forward(request, response);
     }
 
+    private void deleteCustomer(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            String idStr = request.getParameter("customerId");
+            if (idStr == null || idStr.isEmpty()) {
+                throw new IllegalArgumentException("Không có ID khách hàng cần xóa!");
+            }
+
+            int customerId = Integer.parseInt(idStr);
+
+            // Gọi service để xóa
+            boolean deleted = customerService.deleteCustomer(customerId);
+
+            if (deleted) {
+                request.setAttribute("message", "Xóa khách hàng thành công!");
+            } else {
+                request.setAttribute("error", "Không tìm thấy khách hàng để xóa!");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Xóa thất bại: " + e.getMessage());
+        }
+
+        // Quay lại danh sách sau khi xóa
+        request.getRequestDispatcher("managecus").forward(request, response);
+    }
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
@@ -163,6 +191,8 @@ public class ControllerInforCustomer extends HttpServlet {
             showEditForm(request, response);
         } else if ("update".equals(action)) {
             editCustomer(request, response);
+        } else if ("delete".equals(action)) {
+            deleteCustomer(request, response);
         } else {
             response.sendRedirect("managecus");
         }

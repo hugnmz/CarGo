@@ -127,14 +127,11 @@
                                         <a href="controllerinformationcustomer?action=detail&customerId=${cus.customerId}" class="btn btn-info btn-sm text-white">
                                             <i class="fa-solid fa-circle-info"></i> Chi tiết
                                         </a>
-                                        <form action="controllerinformationcustomer" method="post" style="display:inline;">
-                                            <input type="hidden" name="action" value="delete">
-                                            <input type="hidden" name="customerId" value="${cus.customerId}">
-                                            <button type="submit" class="btn btn-danger btn-sm"
-                                                    onclick="return confirm('Bạn có chắc muốn xóa khách hàng này không?')">
-                                                <i class="fa-solid fa-trash"></i> Xóa
-                                            </button>
-                                        </form>
+                                        <a href="controllerinformationcustomer?action=delete&customerId=${c.customerId}" 
+                                           class="btn btn-danger btn-sm"
+                                           onclick="return confirm('Bạn có chắc chắn muốn xóa khách hàng này không?');">
+                                            Xóa
+                                        </a>
                                     </td>
                                 </tr>
                             </c:forEach>

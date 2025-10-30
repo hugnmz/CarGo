@@ -6,11 +6,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import service.CustomerService;
 import util.di.DIContainer;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import service.CusService;
 
 /**
  * Test servlet để kiểm tra update customer
@@ -29,9 +29,9 @@ public class TestUpdateServlet extends HttpServlet {
         out.println("<h1>Test Update Customer</h1>");
         
         try {
-            // Test 1: Khởi tạo CustomerService
+            // Test 1: Khởi tạo CusService
             out.println("<h2>Step 1: Initialize CustomerService</h2>");
-            CustomerService customerService = DIContainer.get(CustomerService.class);
+            CusService customerService = DIContainer.get(CusService.class);
             
             if (customerService == null) {
                 out.println("<p style='color:red'>❌ CustomerService is NULL!</p>");

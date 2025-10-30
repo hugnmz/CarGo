@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import model.Customers;
 
-public interface CustomersDAO {
+public interface CusDAO {
     List<Customers> getAllCustomers();
     Optional<Customers> getCustomerById(Integer customerId);
     Optional<Customers> getCustomerByUserName(String username);

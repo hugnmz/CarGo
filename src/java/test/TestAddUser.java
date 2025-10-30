@@ -1,17 +1,17 @@
 package test;
 
-import dto.UserDTO;
-import service.UserService;
+import dto.UseDTO;
 import util.di.DIContainer;
+import service.UseService;
 
 public class TestAddUser {
     public static void main(String[] args) {
         try {
-            // Lấy instance UserService từ DI Container
-            UserService userService = DIContainer.get(UserService.class);
+            // Lấy instance UseService từ DI Container
+            UseService userService = DIContainer.get(UseService.class);
 
             // Tạo DTO user mới
-            UserDTO newUser = new UserDTO();
+            UseDTO newUser = new UseDTO();
             newUser.setUsername("admin_test");
             newUser.setFullName("Nguyễn Văn Test");
             newUser.setEmail("testadmin@example.com");

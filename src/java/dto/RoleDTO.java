@@ -10,7 +10,7 @@ public class RoleDTO {
     private Integer userCount;       // Số lượng người dùng có vai trò này
     
     // Danh sách người dùng (optional)
-    private List<UserDTO> users;     // Danh sách người dùng có vai trò này
+    private List<UseDTO> users;     // Danh sách người dùng có vai trò này
     
     // Constructors
     public RoleDTO() {}
@@ -30,6 +30,6 @@ public class RoleDTO {
     public Integer getUserCount() { return userCount; }
     public void setUserCount(Integer userCount) { this.userCount = userCount; }
     
-    public List<UserDTO> getUsers() { return users; }
-    public void setUsers(List<UserDTO> users) { this.users = users; }
+    public List<UseDTO> getUsers() { return users; }
+    public void setUsers(List<UseDTO> users) { this.users = users; }
 }

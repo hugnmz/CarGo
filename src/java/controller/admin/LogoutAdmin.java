@@ -29,9 +29,4 @@ public class LogoutAdmin extends HttpServlet {
         // Gọi doGet để logout cũng được
         doGet(request, response);
     }
-
-    @Override
-    public String getServletInfo() {
-        return "Logout admin servlet";
-    }
 }

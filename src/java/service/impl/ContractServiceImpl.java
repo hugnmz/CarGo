@@ -2,7 +2,6 @@ package service.impl;
 
 import dao.ContractsDAO;
 import dao.ContractDetailsDAO;
-import dao.CustomersDAO;
 import dao.OrdersDAO;
 import dto.ContractDTO;
 import dto.ContractDetailDTO;
@@ -22,6 +21,7 @@ import model.Contracts;
 import service.ContractService;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
+import dao.CusDAO;
 
 @Service
 public class ContractServiceImpl implements ContractService {
@@ -33,7 +33,7 @@ public class ContractServiceImpl implements ContractService {
     private ContractDetailsDAO contractDetailsDAO;
     
     @Autowired
-    private CustomersDAO customersDAO;
+    private CusDAO customersDAO;
     
     @Autowired
     private OrdersDAO ordersDAO;

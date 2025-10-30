@@ -1,21 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
-    
     response.setHeader("Cache-Control","no-cache, no-store, must-revalidate");
     response.setHeader("Pragma","no-cache");
     response.setDateHeader("Expires", 0);
-    
-    String role = (String) session.getAttribute("roleName");
-    if (role == null) {
-        response.sendRedirect("LoginAdmin");
-        return;
-    }
-    if (!"ADMIN".equalsIgnoreCase(role)) {
-        request.setAttribute("error", "Bạn không có quyền truy cập trang này!");
-        request.getRequestDispatcher("error.jsp").forward(request, response);
-        return;
-    }
 %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -31,7 +19,7 @@
             <div class="container-fluid d-flex justify-content-between align-items-center">
                 <!-- Left: Logo -->
                 <a class="navbar-brand" href="HomeAdmin">🚗 Admin</a>
-                
+
                 <!-- Right: Nút thêm và logout -->
                 <div>
                     <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#addUserForm">
@@ -116,7 +104,8 @@
                             <div class="col-12 d-flex justify-content-end mt-3">
                                 <button type="submit" class="btn btn-primary px-5"
                                         onclick="return confirm('Bạn có chắc chắn muốn tạo tài khoản này?')"
-                                        >Lưu</button>
+                                        >Lưu
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -165,7 +154,7 @@
                                             </form>
                                             <a href="ControllerAdmin?action=edit&userId=${user.userId}" 
                                                class="btn btn-warning btn-sm"
-                                               
+
                                                >Sửa</a>
                                         </c:if>
                                     </td>

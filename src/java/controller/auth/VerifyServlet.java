@@ -12,9 +12,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-import service.CustomerService;
 import util.di.DIContainer;
 import util.MessageUtil;
+import service.CusService;
 
 /**
  *
@@ -23,14 +23,14 @@ import util.MessageUtil;
 @WebServlet("/VerifyServlet")
 public class VerifyServlet extends HttpServlet {
     
-    private CustomerService customerService;
+    private CusService customerService;
     
     @Override
     public void init() throws ServletException {
         super.init(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
 
         try {
-            customerService = DIContainer.get(CustomerService.class);
+            customerService = DIContainer.get(CusService.class);
         } catch (Exception e) {
             e.printStackTrace();
         }

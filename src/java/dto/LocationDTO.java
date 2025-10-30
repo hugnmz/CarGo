@@ -14,7 +14,7 @@ public class LocationDTO {
     private Integer vehicleCount;    // Số lượng xe thực tế
     
     // Danh sách liên quan (optional)
-    private List<UserDTO> users;         // Danh sách người dùng
+    private List<UseDTO> users;         // Danh sách người dùng
     private List<CustomerDTO> customers; // Danh sách khách hàng
     private List<CarDTO> cars;          // Danh sách xe
     private List<VehicleDTO> vehicles;  // Danh sách xe thực tế
@@ -55,8 +55,8 @@ public class LocationDTO {
     public Integer getVehicleCount() { return vehicleCount; }
     public void setVehicleCount(Integer vehicleCount) { this.vehicleCount = vehicleCount; }
     
-    public List<UserDTO> getUsers() { return users; }
-    public void setUsers(List<UserDTO> users) { this.users = users; }
+    public List<UseDTO> getUsers() { return users; }
+    public void setUsers(List<UseDTO> users) { this.users = users; }
     
     public List<CustomerDTO> getCustomers() { return customers; }
     public void setCustomers(List<CustomerDTO> customers) { this.customers = customers; }

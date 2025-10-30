@@ -11,19 +11,19 @@ import java.util.*;
  *
  * @author DELL
  */
-public interface UserService {
+public interface UseService {
 
-    Optional<UserDTO> loginUser(String username, String password);
+    Optional<UseDTO> loginUser(String username, String password);
 
-    List<UserDTO> getAllUser();
+    List<UseDTO> getAllUser();
     
     List<LocationDTO> getAllLocation();
     
-    UserDTO getUserById(Integer userId);
+    UseDTO getUserById(Integer userId);
 
-    void addUser(UserDTO user, String password);
+    void addUser(UseDTO user, String password);
 
-    void updateUser(UserDTO user);
+    void updateUser(UseDTO user);
 
     void deleteUser(Integer userId);
     

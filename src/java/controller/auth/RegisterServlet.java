@@ -11,22 +11,22 @@ import java.util.Optional;
 import java.util.List;
 import java.util.ArrayList;
 import util.MessageUtil;
-import service.CustomerService;
 import util.EmailUtil;
 import util.di.DIContainer;
+import service.CusService;
 
 // servlet xu ly dang ky tai khoan
 @WebServlet("/RegisterServlet")
 public class RegisterServlet extends HttpServlet {
 
-    private CustomerService customerService;
+    private CusService customerService;
 
     @Override
     public void init() throws ServletException {
         super.init();
         // khoi tao customerservice tu di container
         try {
-            customerService = DIContainer.get(CustomerService.class);
+            customerService = DIContainer.get(CusService.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

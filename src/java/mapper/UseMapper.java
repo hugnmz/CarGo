@@ -1,25 +1,26 @@
 
 package mapper;
 
-import dto.UserDTO;
-import model.Users;
+import dto.UseDTO;
+import java.time.LocalDateTime;
+import model.User;
 import model.Locations;
 import model.Roles;
 import util.di.annotation.Component;
 
 /**
- * UserMapper - Chuyển đổi giữa UserDTO và Users Model
+ * UseMapper - Chuyển đổi giữa UseDTO và User Model
  */
 @Component
-public class UserMapper {
+public class UseMapper {
 
     // ===== Chuyển từ Model -> DTO =====
-    public UserDTO toDTO(Users user) {
+    public UseDTO toDTO(User user) {
         if (user == null) {
             return null;
         }
 
-        UserDTO dto = new UserDTO();
+        UseDTO dto = new UseDTO();
 
         // Thông tin cơ bản
         dto.setUserId(user.getUserId());
@@ -28,7 +29,7 @@ public class UserMapper {
         dto.setPhone(user.getPhone());
         dto.setEmail(user.getEmail());
         dto.setDateOfBirth(user.getDateOfBirth());
-        dto.setCreateAt(user.getCreateAt());
+        dto.setCreateAt(user.getCreateTime());
 
         // Thông tin địa điểm
         if (user.getLocation() != null) {
@@ -47,12 +48,12 @@ public class UserMapper {
     }
 
     // ===== Chuyển từ DTO -> Model =====
-    public Users toModel(UserDTO dto) {
+    public User toModel(UseDTO dto) {
         if (dto == null) {
             return null;
         }
 
-        Users user = new Users();
+        User user = new User();
 
         // Thông tin cơ bản
         user.setUserId(dto.getUserId());
@@ -61,7 +62,7 @@ public class UserMapper {
         user.setPhone(dto.getPhone());
         user.setEmail(dto.getEmail());
         user.setDateOfBirth(dto.getDateOfBirth());
-        user.setCreateAt(dto.getCreateAt());
+        user.setCreateTime(dto.getCreateAt());
 
         // Gán trực tiếp FK
         user.setLocationId(dto.getLocationId());

@@ -13,21 +13,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import service.CustomerService;
 import util.EmailUtil;
 import util.di.DIContainer;
 import util.MessageUtil;
+import service.CusService;
 
 @WebServlet("/resend-code")
 public class ResendCodeServlet extends HttpServlet {
 
-    private CustomerService customerService;
+    private CusService customerService;
 
     @Override
     public void init() throws ServletException {
         super.init();
         try {
-            customerService = DIContainer.get(CustomerService.class);
+            customerService = DIContainer.get(CusService.class);
         } catch (Exception e) {
             e.printStackTrace();
         }

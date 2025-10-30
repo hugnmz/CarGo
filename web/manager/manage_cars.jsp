@@ -124,10 +124,6 @@
                                 <textarea class="form-control" id="description" name="description" rows="3" placeholder="Nhập mô tả chi tiết về xe..."></textarea>
                             </div>
                             <!-- Ảnh xe -->
-                            <!--                            <div class="col-md-6">
-                                                            <label for="image" class="form-label">Hình ảnh xe</label>
-                                                            <input type="text" class="form-control" id="image" name="image" accept="image/*" required>
-                                                        </div>-->
                             <div class="col-md-6">
                                 <label for="image" class="form-label">Hình ảnh xe (Link)</label>
                                 <input type="text" class="form-control" id="image" name="image" placeholder="Nhập link ảnh trực tuyến" required>

@@ -22,7 +22,7 @@ import util.di.annotation.Service;
 
 
 @Service
-public class CarServiceImpl implements CarService {
+public class CarSerImpl implements CarService {
 
     @Autowired
     private CarsDAO carsDAO;
@@ -43,7 +43,7 @@ public class CarServiceImpl implements CarService {
     private VehiclesDAO vehiclesDAO;
 
     @Autowired
-    private LocationsDAO locationsDAO;
+    private LocDAO locationsDAO;
 
     @Autowired
     private CarMapper carMapper;
@@ -63,7 +63,7 @@ public class CarServiceImpl implements CarService {
     @Override
     public List<CarDTO> getAllCars() {
         // lay danh sach tat ca xe
-        List<Cars> cars = carsDAO.getAllCars();
+        List<Cars> cars = carsDAO.getAllCar();
         List<CarDTO> carDTOs = new ArrayList<>();
 
         for (Cars car : cars) {

@@ -16,7 +16,7 @@ public class Locations {
     private String address;          // Dia chi
     
     // Các đối tượng liên quan
-    private List<Users> users;       // Danh sach nguoi dung
+    private List<User> users;       // Danh sach nguoi dung
     private List<Customers> customers; // Danh sách khách hàng
     private List<Cars> cars;         // Danh sách xe
     
@@ -38,8 +38,8 @@ public class Locations {
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
     
-    public List<Users> getUsers() { return users; }
-    public void setUsers(List<Users> users) { this.users = users; }
+    public List<User> getUsers() { return users; }
+    public void setUsers(List<User> users) { this.users = users; }
     
     public List<Customers> getCustomers() { return customers; }
     public void setCustomers(List<Customers> customers) { this.customers = customers; }

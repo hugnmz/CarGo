@@ -27,19 +27,37 @@ public class CarsDAOImpl implements CarsDAO {
                 + "LEFT JOIN dbo.Seatings s ON c.seatingId = s.seatingId "
                 + "LEFT JOIN dbo.CarPrices cp ON c.carId = cp.carId AND cp.endDate IS NULL";
 
-
         return JdbcTemplateUtil.query(sql, Cars.class);
     }
 
-    public static void main(String[] args) {
-        CarsDAOImpl d = new CarsDAOImpl();
-        List<Cars> list = d.getAllCars();
-        for (Cars cars : list) {
-            System.out.println(cars.toString());
-        }
-        
-        System.out.println(d.getCarById(1).toString());
+    @Override
+    public List<Cars> getAllCar() {
+        String sql = """
+        SELECT 
+            c.carId, c.name, c.year, c.description, c.image,
+            c.categoryId, c.fuelId, c.seatingId,
+            cat.categoryName,
+            f.fuelType,
+            s.seatingType,
+            cp.priceId AS cp_priceId,
+            cp.dailyPrice AS cp_dailyPrice,
+            cp.depositAmount AS cp_depositAmount,
+            cp.startDate AS cp_startDate,
+            cp.endDate AS cp_endDate,
+            cp.createAt AS cp_createAt
+        FROM dbo.Cars c
+        LEFT JOIN dbo.Categories cat ON c.categoryId = cat.categoryId
+        LEFT JOIN dbo.Fuels f ON c.fuelId = f.fuelId
+        LEFT JOIN dbo.Seatings s ON c.seatingId = s.seatingId
+        LEFT JOIN dbo.CarPrices cp ON cp.priceId = (
+            SELECT TOP 1 priceId
+            FROM dbo.CarPrices
+            WHERE carId = c.carId
+            ORDER BY createAt DESC
+        );
+    """;
 
+        return JdbcTemplateUtil.query(sql, Cars.class);
     }
 
     @Override
@@ -67,20 +85,20 @@ public class CarsDAOImpl implements CarsDAO {
     @Override
     public boolean addCar(Cars car) {
         String sql = "INSERT INTO dbo.Cars (name, year, description, image, categoryId, fuelId, seatingId) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        
-        int result = JdbcTemplateUtil.update(sql, 
-            car.getName(), 
-            car.getYear(), 
-            car.getDescription(), 
-            car.getImage(), 
-            car.getCategoryId(), 
-            car.getFuelId(), 
-            car.getSeatingId()
+
+        int result = JdbcTemplateUtil.update(sql,
+                car.getName(),
+                car.getYear(),
+                car.getDescription(),
+                car.getImage(),
+                car.getCategoryId(),
+                car.getFuelId(),
+                car.getSeatingId()
         );
-        
+
         return result > 0;
     }
-    
+
     @Override
     public int addCarAndReturnId(Cars car) {
         String sql = "INSERT INTO dbo.Cars (name, year, description, image, categoryId, fuelId, seatingId) "

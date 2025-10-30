@@ -10,9 +10,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import service.CustomerService;
 import util.di.DIContainer;
 import util.MessageUtil;
+import service.CusService;
 
 /**
  *
@@ -21,13 +21,13 @@ import util.MessageUtil;
 @WebServlet(name = "ChangePasswordServlet", urlPatterns = {"/ChangePasswordServlet"})
 public class ChangePasswordServlet extends HttpServlet {
 
-    private CustomerService customerService;
+    private CusService customerService;
 
     @Override
     public void init() throws ServletException {
         super.init(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
         try {
-            customerService = DIContainer.get(CustomerService.class);
+            customerService = DIContainer.get(CusService.class);
 
         } catch (Exception e) {
             e.printStackTrace();

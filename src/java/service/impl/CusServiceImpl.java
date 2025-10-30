@@ -4,8 +4,6 @@
  */
 package service.impl;
 
-import dao.CustomersDAO;
-import dao.LocationsDAO;
 import dto.CustomerDTO;
 import dto.LocationDTO;
 import java.time.LocalDateTime;
@@ -15,26 +13,28 @@ import java.util.Optional;
 import mapper.CustomerMapper;
 import model.Customers;
 import util.PasswordUtil;
-import service.CustomerService;
 import util.VerificationUtil;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
+import service.CusService;
+import dao.CusDAO;
+import dao.LocDAO;
 
 /**
  *
  * @author admin
  */
 @Service
-public class CustomerServiceImpl implements CustomerService {
+public class CusServiceImpl implements CusService {
 
     @Autowired
-    private CustomersDAO customersDAO;
+    private CusDAO customersDAO;
 
     @Autowired
     private CustomerMapper customerMapper;
 
     @Autowired
-    private LocationsDAO locationsDAO;
+    private LocDAO locationsDAO;
 
     @Override
     public Optional<CustomerDTO> loginCustomer(String username, String password) {

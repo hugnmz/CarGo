@@ -68,7 +68,8 @@ public class EmailUtil {
 
     
     //Admin gửi thông tin tài khoản cho nhân viên
-    public static void sendCredentials(String toEmail, String username, String password, String role) {
+    public static void sendCredentials(String toEmail, String fullname,
+            String username, String password, String role) {
         // Load cấu hình từ mail.properties
         final String fromEmail = props.getProperty("mail.from", props.getProperty("mail.username"));
         final String appPassword = props.getProperty("mail.password");
@@ -98,7 +99,7 @@ public class EmailUtil {
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
             message.setSubject("CarGo account your information");
 
-            String content = "<h3>Xin chào " + username + ",</h3>"
+            String content = "<h3>Xin chào " + fullname + ",</h3>"
                     + "<p>Tài khoản của bạn đã được tạo trong hệ thống CarGo.</p>"
                     + "<p><b>Tên đăng nhập:</b> " + username + "<br>"
                     + "<b>Mật khẩu:</b> " + password + "<br>"

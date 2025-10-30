@@ -24,13 +24,6 @@ public class RolesDaoImpl implements RolesDao{
         return JdbcTemplateUtil.query(sql, Roles.class);
     }
     
-    public static void main(String[] args) {
-        RolesDaoImpl r = new RolesDaoImpl();
-        List<Roles> list = r.getAllRoles();
-        for (Roles roles : list) {
-            System.out.println(roles.toString());
-        }
-    }
 
     @Override
     public Optional<Roles> getRoleById(Integer roleId) {

@@ -3,7 +3,7 @@ package dao;
 import java.util.List;
 import model.Locations;
 
-public interface LocationsDAO {
+public interface LocDAO {
 
     List<Locations> getAllLocations();
 

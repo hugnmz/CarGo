@@ -4,20 +4,20 @@
  */
 package dao.impl;
 
-import dao.CustomersDAO;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import model.Customers;
 import util.JdbcTemplateUtil;
 import util.di.annotation.Repository;
+import dao.CusDAO;
 
 /**
  *
  * @author admin
  */
 @Repository
-public class CustomersDAOImpl implements CustomersDAO {
+public class CusDAOImpl implements CusDAO {
     @Override
     public List<Customers> getAllCustomers() {
         String sql = "select * from Customers c JOIN Locations l ON c.locationId = l.locationId";

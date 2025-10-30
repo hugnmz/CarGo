@@ -1,40 +1,40 @@
 package service.impl;
 
-import dao.LocationsDAO;
-import dao.UsersDAO;
 import dto.LocationDTO;
-import dto.UserDTO;
+import dto.UseDTO;
 import java.util.List;
 import java.util.Optional;
-import mapper.UserMapper;
-import model.Users;
-import service.UserService;
+import mapper.UseMapper;
+import model.User;
 import util.PasswordUtil;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
+import dao.LocDAO;
+import dao.UseDAO;
+import service.UseService;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UseService {
 
     @Autowired
-    private UsersDAO usersDAO;
+    private UseDAO usersDAO;
 
     @Autowired
-    private UserMapper userMapper;
+    private UseMapper userMapper;
 
     @Autowired
-    private LocationsDAO locationsDAO;
+    private LocDAO locationsDAO;
 
     @Override
-    public Optional<UserDTO> loginUser(String username, String password) {
+    public Optional<UseDTO> loginUser(String username, String password) {
         try {
             // Tìm user theo username
-            Optional<Users> userOpt = usersDAO.getUserByUsername(username);
+            Optional<User> userOpt = usersDAO.getUserByUsername(username);
             if (userOpt.isEmpty()) {
                 return Optional.empty();
             }
 
-            Users user = userOpt.get();
+            User user = userOpt.get();
 
             // Kiểm tra mật khẩu
             boolean valid = PasswordUtil.verifyPassword(
@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
             }
 
             // Chuyển sang DTO
-            UserDTO dto = userMapper.toDTO(user);
+            UseDTO dto = userMapper.toDTO(user);
 
             // Nếu bạn chỉ muốn đăng nhập admin:
             // if (!hasAdminRole(user.getUserId())) return Optional.empty();
@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
 
     // Nếu bạn cần kiểm tra quyền admin
     private boolean hasAdminRole(Integer userId) {
-        // bạn có thể viết thêm query ở UsersDAO để kiểm tra role admin
+        // bạn có thể viết thêm query ở UseDAO để kiểm tra role admin
         // ví dụ SELECT COUNT(*) FROM UserRoles ur 
         // JOIN Roles r ON ur.roleId = r.roleId 
         // WHERE ur.userId = ? AND r.roleName = 'ADMIN'
@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> getAllUser() {
+    public List<UseDTO> getAllUser() {
         return usersDAO.getAllUsers()
                 .stream()
                 .map(userMapper::toDTO)
@@ -78,38 +78,46 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addUser(UserDTO userDTO, String password) {
+    public void addUser(UseDTO userDTO, String password) {
         try {
             // check lỗi
             if (usersDAO.getUserByUsername(userDTO.getUsername()).isPresent()) {
-                throw new IllegalArgumentException("Tên đăng nhập '" + userDTO.getUsername() + "' đã tồn tại!");
+                throw new IllegalArgumentException(
+                        String.format("Tên đăng nhập '%s' đã tồn tại!", userDTO.getUsername())
+                );
             }
+
             if (usersDAO.existsEmail(userDTO.getEmail())) {
-                throw new IllegalArgumentException("Email '" + userDTO.getEmail() + "' đã tồn tại!");
+                throw new IllegalArgumentException(
+                        String.format("Email '%s' đã tồn tại!", userDTO.getEmail())
+                );
             }
 
             if (usersDAO.existsPhone(userDTO.getPhone())) {
-                throw new IllegalArgumentException("Phone '" + userDTO.getPhone() + "' đã tồn tại!");
+                throw new IllegalArgumentException(
+                        String.format("Số điện thoại '%s' đã tồn tại!", userDTO.getPhone())
+                );
             }
 
-            // 2️⃣ Xử lý locationId
+            // Xử lí LocationId
             Integer locationId = userDTO.getLocationId();
             if (locationId == null && userDTO.getCity() != null) {
                 locationId = locationsDAO.getOrCreateIdByCity(userDTO.getCity());
             }
 
-            // 3️⃣ Hash mật khẩu với salt ngẫu nhiên
+            // Hash mật khẩu với salt ngẫu nhiên
             byte[] salt = PasswordUtil.generateSalt();
             byte[][] hashResult = PasswordUtil.hashPassword(password, salt);
             byte[] passwordHash = hashResult[0];
             byte[] passwordSalt = hashResult[1];
 
-            // 4️⃣ Chuyển DTO → Model
-            Users user = userMapper.toModel(userDTO);
+            // Chuyển DTO -> Model
+            User user = userMapper.toModel(userDTO);
             user.setPasswordHash(passwordHash);
             user.setPasswordSalt(passwordSalt);
             user.setLocationId(locationId);
 
+            //Gọi dao để thực hiện insert
             boolean created = usersDAO.createUser(user);
             if (!created) {
                 throw new RuntimeException("Không thể thêm người dùng vào cơ sở dữ liệu.");
@@ -127,25 +135,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUser(UserDTO userDTO) {
+    public void updateUser(UseDTO userDTO) {
         try {
             // Kiểm tra người dùng có tồn tại chưa
-            Optional<Users> existingUser = usersDAO.getUserById(userDTO.getUserId());
+            Optional<User> existingUser = usersDAO.getUserById(userDTO.getUserId());
             if (existingUser.isEmpty()) {
                 throw new IllegalArgumentException("Không tìm thấy người dùng ID = " + userDTO.getUserId());
             }
 
             // Kiểm tra email, phone (nếu có thay đổi)
-            Users oldUser = existingUser.get();
+            User oldUser = existingUser.get();
 
             if (!oldUser.getEmail().equals(userDTO.getEmail())
                     && usersDAO.existsEmail(userDTO.getEmail())) {
-                throw new IllegalArgumentException("Email '" + userDTO.getEmail() + "' đã được sử dụng!");
+                throw new IllegalArgumentException(String.format("Email '%s' đã được sử dụng!", userDTO.getEmail()));
             }
 
             if (!oldUser.getPhone().equals(userDTO.getPhone())
                     && usersDAO.existsPhone(userDTO.getPhone())) {
-                throw new IllegalArgumentException("Số điện thoại '" + userDTO.getPhone() + "' đã tồn tại!");
+                throw new IllegalArgumentException(String.format("Số điện thoại '%s' đã tồn tại!", userDTO.getPhone()));
             }
 
             // Resolve locationId
@@ -155,12 +163,12 @@ public class UserServiceImpl implements UserService {
             }
 
             // Chuyển đổi sang model
-            Users user = userMapper.toModel(userDTO);
+            User user = userMapper.toModel(userDTO);
             user.setLocationId(locationId);
 
             boolean success = usersDAO.updateUser(user);
             if (!success) {
-                throw new RuntimeException("Không thể cập nhật thông tin người dùng (ID = " + userDTO.getUserId() + ")");
+                throw new RuntimeException(String.format("Không thể cập nhật thông tin người dùng (ID = %d)", userDTO.getUserId()));
             }
 
             System.out.println("Cập nhật user thành công: " + user.getUsername());
@@ -177,6 +185,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Integer userId) {
         try {
+            //Gọi dao đề truyền dữ liệu
             boolean success = usersDAO.deleteUser(userId);
             if (!success) {
                 throw new RuntimeException("Không thể xóa user ID = " + userId);
@@ -213,14 +222,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO getUserById(Integer userId) {
-        Optional<Users> optionalUser = usersDAO.getUserById(userId);
+    public UseDTO getUserById(Integer userId) {
+        
+        Optional<User> optionalUser = usersDAO.getUserById(userId);
         if (optionalUser.isEmpty()) {
             return null;
         }
 
-        Users user = optionalUser.get();
-        UserDTO dto = new UserDTO();
+        User user = optionalUser.get();
+        UseDTO dto = new UseDTO();
 
         dto.setUserId(user.getUserId());
         dto.setUsername(user.getUsername());
@@ -228,7 +238,7 @@ public class UserServiceImpl implements UserService {
         dto.setPhone(user.getPhone());
         dto.setEmail(user.getEmail());
         dto.setDateOfBirth(user.getDateOfBirth());
-        dto.setCreateAt(user.getCreateAt());
+        dto.setCreateAt(user.getCreateTime());
         dto.setRoleId(user.getRoleId());
         dto.setLocationId(user.getLocationId());
 
@@ -244,19 +254,19 @@ public class UserServiceImpl implements UserService {
             }
 
             // Lấy thông tin user từ database
-            Optional<Users> ou = usersDAO.getUserById(userId);
+            Optional<User> ou = usersDAO.getUserById(userId);
             if (!ou.isPresent()) {
                 // Không tìm thấy user
                 return false;
             }
 
-            Users user = ou.get();
+            User user = ou.get();
 
             // Xác thực mật khẩu cũ
             if (!PasswordUtil.verifyPassword(oldPassword,
                     user.getPasswordHash(), user.getPasswordSalt())) {
                 // Mật khẩu cũ không đúng
-                return false; 
+                return false;
             }
 
             // Tạo salt mới và hash mật khẩu mới
@@ -271,7 +281,7 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             e.printStackTrace();
             // Có lỗi xảy ra
-            return false; 
+            return false;
         }
     }
 

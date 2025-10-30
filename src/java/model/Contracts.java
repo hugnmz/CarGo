@@ -31,7 +31,7 @@ public class Contracts {
     // Các đối tượng liên quan
     private Customers customer;      // Khách hàng
     @Nested
-    private Users staff;            // Nhân viên
+    private User staff;            // Nhân viên
     private List<ContractDetails> contractDetails; // Chi tiết hợp đồng
     private List<Payments> payments; // Thanh toán
 
@@ -130,11 +130,11 @@ public class Contracts {
         this.customer = customer;
     }
 
-    public Users getStaff() {
+    public User getStaff() {
         return staff;
     }
 
-    public void setStaff(Users staff) {
+    public void setStaff(User staff) {
         this.staff = staff;
     }
 

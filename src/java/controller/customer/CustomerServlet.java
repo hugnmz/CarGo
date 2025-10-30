@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import service.ContractService;
-import service.CustomerService;
 import util.AuthUtil;
 import util.di.DIContainer;
+import service.CusService;
 
 /**
  *
@@ -28,14 +28,14 @@ import util.di.DIContainer;
 @WebServlet(name = "CustomerServlet", urlPatterns = {"/CustomerServlet"})
 public class CustomerServlet extends HttpServlet {
 
-    private CustomerService customerService;
+    private CusService customerService;
     private ContractService contractService;
 
     @Override
     public void init() throws ServletException {
         super.init();
         try {
-            customerService = DIContainer.get(CustomerService.class);
+            customerService = DIContainer.get(CusService.class);
             contractService = DIContainer.get(ContractService.class);
         } catch (Exception e) {
             e.printStackTrace();

@@ -4,7 +4,6 @@
  */
 package service.impl;
 
-import dao.LocationsDAO;
 import dao.VehiclesDAO;
 import dto.LocationDTO;
 import dto.VehicleDTO;
@@ -17,13 +16,14 @@ import model.Vehicles;
 import service.VehicleService;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
+import dao.LocDAO;
 
 /**
  *
  * @author admin
  */
 @Service
-public class VehicleServiceImpl implements VehicleService {
+public class VehicleSerImpl implements VehicleService {
 
     @Autowired
     private VehiclesDAO vehiclesDAO;
@@ -32,7 +32,7 @@ public class VehicleServiceImpl implements VehicleService {
     private VehicleMapper vehicleMapper;
 
     @Autowired
-    private LocationsDAO locationsDAO;
+    private LocDAO locationsDAO;
 
     @Override
     public List<VehicleDTO> getVehicleByCarId(Integer carId) {

@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import util.di.annotation.Column;
 import util.di.annotation.Nested;
 
-public class Users {
+public class User {
 
     @Column(name = "userId")
     private Integer userId;
@@ -33,7 +33,7 @@ public class Users {
     private LocalDate dateOfBirth;
 
     @Column(name = "createAt")
-    private LocalDateTime createAt = LocalDateTime.now();
+    private LocalDateTime createTime;
 
     @Column(name = "locationId")
     private Integer locationId;
@@ -45,20 +45,20 @@ public class Users {
     @Nested
     private Locations location;
 
-    // QUAN HỆ 1-N (Role -> Users)
+    // QUAN HỆ 1-N (Role -> User)
     @Nested
     private Roles role;
 
     // CONSTRUCTOR
-    public Users() {
+    public User() {
     }
 
-    public Users(String username, String fullName, String phone, String email) {
+    public User(String username, String fullName, String phone, String email) {
         this.username = username;
         this.fullName = fullName;
         this.phone = phone;
         this.email = email;
-        this.createAt = LocalDateTime.now();
+        this.createTime = LocalDateTime.now();
     }
 
     // GETTERS & SETTERS
@@ -126,12 +126,12 @@ public class Users {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public LocalDateTime getCreateAt() {
-        return createAt;
+    public LocalDateTime getCreateTime() {
+        return createTime;
     }
 
-    public void setCreateAt(LocalDateTime createAt) {
-        this.createAt = createAt;
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
     }
 
     public Integer getLocationId() {
@@ -175,7 +175,7 @@ public class Users {
                 ", phone='" + phone + '\'' +
                 ", email='" + email + '\'' +
                 ", dateOfBirth=" + dateOfBirth +
-                ", createAt=" + createAt +
+                ", createAt=" + createTime +
                 ", locationId=" + locationId +
                 ", roleId=" + roleId +
                 ", location=" + location +

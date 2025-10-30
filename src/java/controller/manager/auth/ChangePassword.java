@@ -12,8 +12,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.RoleService;
-import service.UserService;
 import util.di.DIContainer;
+import service.UseService;
 
 /**
  *
@@ -22,12 +22,12 @@ import util.di.DIContainer;
 @WebServlet(name = "ChangePassword", urlPatterns = {"/changepass"})
 public class ChangePassword extends HttpServlet {
 
-    private UserService userService;
+    private UseService userService;
 
     @Override
     public void init() throws ServletException {
         try {
-            userService = DIContainer.get(UserService.class);
+            userService = DIContainer.get(UseService.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
