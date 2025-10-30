@@ -2,29 +2,29 @@
 package controller.auth;
 
 import dto.CustomerDTO;
-import dto.UserDTO;
+import dto.UseDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.Optional;
-import service.CustomerService;
-import service.UserService;
-import service.impl.CustomerServiceImpl;
+import service.impl.CusServiceImpl;
 import util.di.DIContainer;
+import service.CusService;
+import service.UseService;
 
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
 
-    private CustomerService customerService;
-    private UserService userService;
+    private CusService customerService;
+    private UseService userService;
 
     @Override
     public void init() throws ServletException {
         super.init();
         try {
-            customerService = DIContainer.get(CustomerService.class);
-            userService = DIContainer.get(UserService.class);
+            customerService = DIContainer.get(CusService.class);
+            userService = DIContainer.get(UseService.class);
         } catch (Exception e) {
             throw new RuntimeException("Dependency injection error", e);
         }
@@ -56,13 +56,13 @@ public class LoginServlet extends HttpServlet {
         // Check du lieu dau vao
         if (username == null || username.trim().isEmpty()
                 || password == null || password.trim().isEmpty()) {
-            request.setAttribute("error", "Vui lòng nhập đầy đủ thông tin");
+            request.setAttribute("errors", "Vui lòng nhập đầy đủ thông tin");
             request.getRequestDispatcher("auth/login.jsp").forward(request, response);
             return;
         }
 
         try {
-            // 🔹 1. Đăng nhập với vai trò Customer
+            //1. Đăng nhập với vai trò Customer
             Optional<CustomerDTO> customerOpt = customerService.loginCustomer(username, password);
             if (customerOpt.isPresent()) {
                 CustomerDTO customer = customerOpt.get();
@@ -73,10 +73,10 @@ public class LoginServlet extends HttpServlet {
                 return;
             }
 
-            // 🔹 2. Đăng nhập với vai trò Staff / Manager
-            Optional<UserDTO> userOpt = userService.loginUser(username, password);
+            //2. Đăng nhập với vai trò Staff / Manager
+            Optional<UseDTO> userOpt = userService.loginUser(username, password);
             if (userOpt.isPresent()) {
-                UserDTO user = userOpt.get();
+                UseDTO user = userOpt.get();
 
                 HttpSession session = request.getSession(true);
                 setUserSession(session, user);
@@ -85,13 +85,13 @@ public class LoginServlet extends HttpServlet {
                 return;
             }
 
-            // 🔹 3. Sai thông tin đăng nhập
-            request.setAttribute("errorMessage", "Sai tên đăng nhập hoặc mật khẩu.");
+            //3. Sai thông tin đăng nhập
+            request.setAttribute("errors", "Sai tên đăng nhập hoặc mật khẩu.");
             request.getRequestDispatcher("auth/login.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Đã xảy ra lỗi khi đăng nhập.");
+            request.setAttribute("errors", "Đã xảy ra lỗi khi đăng nhập.");
             request.getRequestDispatcher("auth/login.jsp").forward(request, response);
         }
     }
@@ -108,7 +108,7 @@ public class LoginServlet extends HttpServlet {
         session.setMaxInactiveInterval(60 * 60);
     }
 
-    private void setUserSession(HttpSession session, UserDTO user) {
+    private void setUserSession(HttpSession session, UseDTO user) {
         session.setAttribute("userType", user.getRoleName());
         session.setAttribute("userId", user.getUserId());
         session.setAttribute("usernameu", user.getUsername());
