@@ -43,6 +43,7 @@
         fetch(`checkPayment?contractId=${contractId}&amount=${amount}`)
             .then(r => r.json())
             .then(data => {
+                console.log("Phản hồi từ checkPayment:", data);
                 if (data.status === "SUCCESS") {
                     clearInterval(interval);
                     document.getElementById("status").innerHTML = `
@@ -54,15 +55,30 @@
                         </div>
                     `;
                     setTimeout(() => location.href = "home.jsp", 3000);
+                } else if (data.status === "ERROR") {
+                    clearInterval(interval);
+                    document.getElementById("status").innerHTML = `
+                        <div class="text-danger text-center p-4">
+                            <i class="fas fa-exclamation-circle fa-4x mb-3"></i>
+                            <h4 class="fw-bold">LỖI!</h4>
+                            <p>${data.message}</p>
+                        </div>
+                    `;
                 }
             })
-            .catch(err => console.error("Lỗi:", err));
+            .catch(err => {
+                console.error("Lỗi khi gọi checkPayment:", err);
+                clearInterval(interval);
+                document.getElementById("status").innerHTML = `
+                    <div class="text-danger text-center p-4">
+                        <i class="fas fa-exclamation-circle fa-4x mb-3"></i>
+                        <h4 class="fw-bold">LỖI KẾT NỐI!</h4>
+                        <p>Không thể kiểm tra thanh toán. Vui lòng thử lại sau.</p>
+                    </div>
+                `;
+            });
     }
 
     window.onload = () => {
         check();
         interval = setInterval(check, 5000);
-    };
-</script>
-</body>
-</html>

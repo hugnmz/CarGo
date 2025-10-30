@@ -22,15 +22,17 @@ public class ContractsDAOImpl implements ContractsDAO {
 
     @Override
     public BigDecimal getTotalAmount(Integer contractId) {
-        String sql = "SELECT totalAmount FROM contracts WHERE contractId = ?";
+        String sql = "SELECT totalAmount FROM Contracts WHERE contractId = ?";
         Contracts contract = JdbcTemplateUtil.queryOne(sql, Contracts.class, contractId);
         return contract != null ? contract.getTotalAmount() : null;
     }
-@Override
+
+    @Override
     public boolean addPaymentLog(Integer contractId, String message) {
-        String sql = "INSERT INTO payment_logs (contract_id, message, created_at) VALUES (?, ?, NOW())";
+        String sql = "INSERT INTO paymentLogs (contractId, message, createdAt) VALUES (?, ?, NOW())";
         return JdbcTemplateUtil.update(sql, contractId, message) > 0;
     }
+
     @Override
     public List<Contracts> getAllContracts() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
@@ -58,7 +60,9 @@ public class ContractsDAOImpl implements ContractsDAO {
 
     @Override
     public boolean updateContractStatus(Integer contractId, String status) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = "UPDATE Contracts SET status = ? WHERE contractId = ?";
+        int affected = JdbcTemplateUtil.update(sql, status, contractId);
+        return affected > 0;
     }
 
     @Override
