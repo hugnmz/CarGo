@@ -2,19 +2,31 @@ package model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import util.di.annotation.Column;
+import util.di.annotation.Nested;
 
 
 public class Payments {
+    
+    @Column()
     private Integer paymentId;       // ID thanh toán
+    @Column()
     private Integer contractId;      // ID hợp đồng
+    @Column()
     private BigDecimal amount;       // So tien thanh toan
+    @Column()
     private Integer methodId;        // ID phương thức thanh toán
+    @Column()
     private String status;           // Trạng thái thanh toán (pending, completed, failed)
+    @Column()
     private LocalDateTime paymentDate; // Ngày thanh toán
     
     // Các đối tượng liên quan
+    @Nested()
     private Contracts contract;      // Hợp đồng
+    @Nested()
     private PaymentMethods paymentMethod; // Phương thức thanh toán
+    @Nested()
     private String transactionCode;
     // Constructors
     public Payments() {}

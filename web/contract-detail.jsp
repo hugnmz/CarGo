@@ -13,7 +13,7 @@
             <div class="card">
                 <div class="card-body">
                   
-                        <a href="calculateTotalAmount?contractId=1" >
+                        <a href="${pageContext.request.contextPath}/calculateTotalAmount?contractId=1" >
                         <input type="button" value="Return Car">
                     </a>
 <!--                    <a href="calculateTotalAmount?contractId=${param.contractId}" >

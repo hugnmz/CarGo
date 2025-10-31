@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package util;
 
 import java.sql.*;
@@ -10,13 +6,9 @@ import java.util.List;
 import java.util.Optional;
 import model.Locations;
 
-/*
- *
- * @author admin
- */
-
-// trong dao ae chỉ cần viết câu sql rồi nhét tham só placeholder vào trong mấy hàm này
-// thiếu cái nào viết thêm vào
+// class xu ly cac cau lenh sql
+// trong dao chi can viet cau sql roi nhet tham so placeholder vao trong may ham nay
+// thieu cai nao viet them vao
 
 public class JdbcTemplateUtil {
 
@@ -33,6 +25,7 @@ public class JdbcTemplateUtil {
             return ps.executeUpdate();
 
         } catch (Exception e) {
+            // log loi neu co
             e.printStackTrace();
             return 0;
         }
@@ -48,7 +41,7 @@ public class JdbcTemplateUtil {
                 ps.setObject(i + 1, param[i]);
             }
 
-            // lay ket qua sau khi thu hien cau lenh select
+            // lay ket qua sau khi thuc hien cau lenh select
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     result.add(MapResultSet.mapResultSet(rs, type));
@@ -56,19 +49,20 @@ public class JdbcTemplateUtil {
 
             }
         } catch (Exception e) {
+            // log loi neu co
             e.printStackTrace();
         }
 
         return result;
     }
 
-    // thuc hien cac cau lenh select va tra ve 1 dong duy nhat(dong dau)
+    // thuc hien cac cau lenh select va tra ve 1 dong duy nhat (dong dau)
     public static <T> T queryOne(String sql, Class<T> type, Object... params) {
         List<T> list = query(sql, type, params);
-        return list.isEmpty() ? null : list.get(0); // Lấy phần tử đầu tiên
+        return list.isEmpty() ? null : list.get(0); // lay phan tu dau tien
     }
 
-    // thuc hien insert va tra ve key vua dc insert
+    // thuc hien insert va tra ve key vua duoc insert
     public static int insertAndReturnKey(String sql, Object... param) {
         try (Connection conn = DB.get(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -77,7 +71,7 @@ public class JdbcTemplateUtil {
             }
 
             ps.executeUpdate();
-            //lay key vua tao
+            // lay key vua tao
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
                     return rs.getInt(1);
@@ -86,15 +80,16 @@ public class JdbcTemplateUtil {
                 }
             }
         } catch (Exception e) {
+            // log loi neu co
             e.printStackTrace();
             return 0;
         }
     }
 
-    //thu hien select count(*) va tra ve 1 so nguyen
+    // thuc hien select count(*) va tra ve 1 so nguyen
     public static int count(String sql, Object... params) {
         try (Connection c = DB.get(); PreparedStatement ps = c.prepareStatement(sql)) {
-            // Bind tham số
+            // bind tham so
             for (int i = 0; i < params.length; i++) {
                 ps.setObject(i + 1, params[i]);
             }
@@ -103,6 +98,7 @@ public class JdbcTemplateUtil {
                 return rs.next() ? rs.getInt(1) : 0; 
             }
         } catch (Exception e) {
+            // log loi neu co
             e.printStackTrace();
             return 0;
         }
@@ -111,12 +107,14 @@ public class JdbcTemplateUtil {
     // sau to viet them
 //    public static <T> T inTransaction(SQLFunction<Connection, T> work) { ... }
 
+    // method chua duoc implement
     public Optional<Locations> queryForObject(String sql, Class<Locations> aClass, Integer id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    // method chua duoc implement
     public Integer queryForScalar(String checkSql, Class<Integer> aClass, String city) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

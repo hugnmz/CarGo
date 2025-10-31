@@ -39,6 +39,7 @@ public class PaymentCallbackServlet extends HttpServlet {
             System.out.println("Raw JSON: " + sb.toString());
 
             JSONObject json = new JSONObject(sb.toString());
+            
 
             // Kiểm tra error
             int errorCode = json.optInt("error", 1);
@@ -74,9 +75,13 @@ public class PaymentCallbackServlet extends HttpServlet {
             if (pendingPayment != null && !paymentsDAO.isPaymentCompleted(pendingPayment.getPaymentId())) {
                 boolean updatedPayment = paymentsDAO.updatePaymentStatus(pendingPayment.getPaymentId(), "COMPLETED");
                 boolean updatedContract = contractsDAO.updateContractStatus(contractId, "ACCEPTED");
+                System.out.println("[CALLBACK] UpdatedPayment=" + updatedPayment + ", UpdatedContract=" + updatedContract);
 
                 System.out.println("Payment updated: " + updatedPayment);
                 System.out.println("Contract status updated: " + updatedContract);
+                
+                String statusNow = paymentsDAO.getPaymentStatus(contractId);
+                System.out.println("[CALLBACK] Recheck DB status after update: " + statusNow);
 
                 responseJson.put("status", "ok");
                 responseJson.put("message", "Payment updated successfully for contract " + contractId);

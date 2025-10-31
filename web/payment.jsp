@@ -35,50 +35,42 @@
 </div>
 
 <script>
-    const contractId = "${contractId}";
-    const amount = "${totalAmount}";
-    let interval;
+const contractId = "${contractId}";
+let intervalId = null;
 
-    function check() {
-        fetch(`checkPayment?contractId=${contractId}&amount=${amount}`)
-            .then(r => r.json())
-            .then(data => {
-                console.log("Phản hồi từ checkPayment:", data);
-                if (data.status === "SUCCESS") {
-                    clearInterval(interval);
-                    document.getElementById("status").innerHTML = `
-                        <div class="text-success text-center p-4">
-                            <i class="fas fa-check-circle fa-4x mb-3"></i>
-                            <h4 class="fw-bold">THÀNH CÔNG!</h4>
-                            <p>Hợp đồng #${contractId} đã được xác nhận.</p>
-                            <p class="text-muted">Đang chuyển về trang chủ...</p>
-                        </div>
-                    `;
-                    setTimeout(() => location.href = "home.jsp", 3000);
-                } else if (data.status === "ERROR") {
-                    clearInterval(interval);
-                    document.getElementById("status").innerHTML = `
-                        <div class="text-danger text-center p-4">
-                            <i class="fas fa-exclamation-circle fa-4x mb-3"></i>
-                            <h4 class="fw-bold">LỖI!</h4>
-                            <p>${data.message}</p>
-                        </div>
-                    `;
-                }
-            })
-            .catch(err => {
-                console.error("Lỗi khi gọi checkPayment:", err);
-                clearInterval(interval);
-                document.getElementById("status").innerHTML = `
-                    <div class="text-danger text-center p-4">
-                        <i class="fas fa-exclamation-circle fa-4x mb-3"></i>
-                        <h4 class="fw-bold">LỖI KẾT NỐI!</h4>
-                        <p>Không thể kiểm tra thanh toán. Vui lòng thử lại sau.</p>
-                    </div>
-                `;
-            });
+async function check() {
+    try {
+        // 🔹 Dòng này — thêm ?t=${Date.now()} để chống cache
+        const response = await fetch(`checkPayment?contractId=${contractId}&t=${Date.now()}`, { cache: "no-store" });
+        const data = await response.json();
+        console.log("[checkPayment]", data);
+
+        if (data.status === "SUCCESS") {
+            clearInterval(interval);
+            document.getElementById("status").innerHTML = `
+                <div class="text-success text-center p-4">
+                    <i class="fas fa-check-circle fa-4x mb-3"></i>
+                    <h4 class="fw-bold">THÀNH CÔNG!</h4>
+                    <p>Hợp đồng #${contractId} đã được xác nhận thanh toán.</p>
+                    <p class="text-muted">Đang chuyển về trang chủ...</p>
+                </div>`;
+            setTimeout(() => location.href = "${pageContext.request.contextPath}/home.jsp", 3000);
+        } else if (data.status === "PENDING") {
+            console.log("⏳ Đang chờ thanh toán...");
+        } else {
+            console.warn("⚠️", data.message);
+        }
+
+    } catch (err) {
+        console.error("Lỗi khi gọi checkPayment:", err);
     }
+}
 
-    window.onload = () => {
-        check();
-        interval = setInterval(check, 5000);
+
+window.onload = () => {
+    check();                     // Gọi lần đầu
+    intervalId = setInterval(check, 5000);  // Poll mỗi 5 giây
+};
+</script>
+</body>
+</html>
