@@ -146,7 +146,7 @@ public class CarSerImpl implements CarService {
                 if (currentPrice.getDailyPrice().compareTo(newDailyPrice) != 0
                         || currentPrice.getDepositAmount().compareTo(newDeposit) != 0) {
                     // Kết thúc giá hiện tại
-                    carPricesDAO.endCurrentPrice(carDTO.getCarId(), java.time.LocalDate.now());
+                    carPricesDAO.endCurrentPrice(carDTO.getCarId());
 
                     // Thêm giá mới
                     model.CarPrices newPrice = new model.CarPrices();
