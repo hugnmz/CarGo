@@ -43,4 +43,5 @@ public interface PaymentsDAO {
     boolean isPaymentCompleted(Integer paymentId);
     public Payments findPendingPayment(Integer contractId, BigDecimal amount);
     Payments findPendingPaymentByCode(Integer contractId, BigDecimal amount);
+    public boolean completePaymentById(Integer paymentId);
 }

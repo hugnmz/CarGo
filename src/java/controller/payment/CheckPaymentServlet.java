@@ -15,13 +15,17 @@ import org.json.JSONObject;
 @WebServlet("/checkPayment")
 public class CheckPaymentServlet extends HttpServlet {
 
-   private final PaymentsDAOImpl paymentsDAO = new PaymentsDAOImpl();
+    private final PaymentsDAOImpl paymentsDAO = new PaymentsDAOImpl();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
         response.setContentType("application/json;charset=UTF-8");
+// no-cache
+        response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
         JSONObject result = new JSONObject();
 
         try {

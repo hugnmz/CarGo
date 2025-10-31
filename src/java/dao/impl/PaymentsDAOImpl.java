@@ -90,7 +90,7 @@ public class PaymentsDAOImpl implements PaymentsDAO {
 
     @Override
     public BigDecimal getTotalPaidAmount(Integer contractId) {
-         String sql = "SELECT COALESCE(SUM(amount), 0) AS total FROM Payments WHERE contractId = ? AND UPPER(status) = 'COMPLETED'";
+        String sql = "SELECT COALESCE(SUM(amount), 0) AS total FROM Payments WHERE contractId = ? AND UPPER(LTRIM(RTRIM(status))) = 'COMPLETED'";
         return JdbcTemplateUtil.queryOne(sql, BigDecimal.class, contractId);
     }
 
@@ -100,7 +100,7 @@ public class PaymentsDAOImpl implements PaymentsDAO {
             SELECT (c.totalAmount - COALESCE((SELECT SUM(amount)
                                               FROM Payments
                                               WHERE contractId = ?
-                                              AND UPPER(status) = 'COMPLETED'), 0)) AS remaining
+                                              AND UPPER(LTRIM(RTRIM(status))) = 'COMPLETED'), 0)) AS remaining
             FROM Contracts c WHERE c.contractId = ?
             """;
         return JdbcTemplateUtil.queryOne(sql, BigDecimal.class, contractId, contractId);
@@ -108,23 +108,22 @@ public class PaymentsDAOImpl implements PaymentsDAO {
 
     @Override
     public boolean isPaymentCompleted(Integer paymentId) {
-         String sql = "SELECT COUNT(*) FROM Payments WHERE paymentId = ? AND UPPER(status) = 'COMPLETED'";
+        String sql = "SELECT COUNT(*) FROM Payments WHERE paymentId = ? AND UPPER(LTRIM(RTRIM(status))) = 'COMPLETED'";
         int count = JdbcTemplateUtil.count(sql, paymentId);
         System.out.println("[isPaymentCompleted] paymentId=" + paymentId + " → count=" + count);
         return count > 0;
     }
 
-    
     @Override
     public Payments findPendingPayment(Integer contractId, BigDecimal amount) {
         String sql;
         List<Payments> list;
 
         if (amount == null) {
-            sql = "SELECT TOP 1 * FROM Payments WHERE contractId = ? AND UPPER(status) = 'PENDING' ORDER BY paymentDate DESC";
+            sql = "SELECT TOP 1 * FROM Payments WHERE contractId = ? AND UPPER(LTRIM(RTRIM(status))) = 'PENDING' ORDER BY paymentId DESC";
             list = JdbcTemplateUtil.query(sql, Payments.class, contractId);
         } else {
-            sql = "SELECT TOP 1 * FROM Payments WHERE contractId = ? AND CAST(amount AS DECIMAL(10,2)) = CAST(? AS DECIMAL(10,2)) AND UPPER(status) = 'PENDING' ORDER BY paymentDate DESC";
+            sql = "SELECT TOP 1 * FROM Payments WHERE contractId = ? AND CAST(amount AS DECIMAL(10,2)) = CAST(? AS DECIMAL(10,2)) AND UPPER(LTRIM(RTRIM(status))) = 'PENDING' ORDER BY paymentId DESC";
             list = JdbcTemplateUtil.query(sql, Payments.class, contractId, amount);
         }
 
@@ -138,29 +137,37 @@ public class PaymentsDAOImpl implements PaymentsDAO {
             SELECT TOP 1 * FROM Payments
             WHERE contractId = ?
               AND CAST(amount AS DECIMAL(10,2)) = CAST(? AS DECIMAL(10,2))
-              AND UPPER(status) = 'PENDING'
+              AND UPPER(LTRIM(RTRIM(status))) = 'PENDING'
               AND transactionCode IS NOT NULL
             ORDER BY paymentDate DESC
             """;
         List<Payments> list = JdbcTemplateUtil.query(sql, Payments.class, contractId, amount);
         return list.isEmpty() ? null : list.get(0);
     }
-    
+
+    // Guard tuyệt đối: đã có completed?
+    public boolean hasCompleted(int contractId) {
+        String sql = "SELECT COUNT(*) FROM Payments WHERE contractId = ? AND UPPER(LTRIM(RTRIM(status))) = 'COMPLETED'";
+        int c = JdbcTemplateUtil.count(sql, contractId);
+        System.out.println("[hasCompleted] contractId=" + contractId + " → " + c);
+        return c > 0;
+    }
+
     public String getPaymentStatus(int contractId) {
-    String sql = """
-        SELECT TOP 1 status 
-        FROM Payments 
-        WHERE contractId = ? 
-        ORDER BY paymentDate DESC, paymentId DESC
-        """;
-    String status = JdbcTemplateUtil.queryOne(sql, String.class, contractId);
-    System.out.println("[CheckPayment] contractId=" + contractId + " -> status=" + status);
-    return status;
-}
+        String sql = """
+            SELECT CASE 
+                     WHEN EXISTS (SELECT 1 FROM Payments WHERE contractId = ? AND UPPER(LTRIM(RTRIM(status)))='COMPLETED') THEN 'COMPLETED'
+                     WHEN EXISTS (SELECT 1 FROM Payments WHERE contractId = ? AND UPPER(LTRIM(RTRIM(status)))='PENDING') THEN 'PENDING'
+                     ELSE 'NONE'
+                   END AS status
+            """;
+        String status = JdbcTemplateUtil.queryOne(sql, String.class, contractId, contractId);
+        System.out.println("[getPaymentStatus] contractId=" + contractId + " -> status=" + status);
+        return status;
+    }
 
+    public boolean completePaymentById(Integer paymentId) {
+        String sql = "UPDATE Payments SET status = 'COMPLETED', paymentDate = GETDATE() WHERE paymentId = ?";
+        return JdbcTemplateUtil.update(sql, paymentId) > 0;
+    }
 }
-    
-    
-    
-    
-
