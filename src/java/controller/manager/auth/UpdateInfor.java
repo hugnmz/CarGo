@@ -4,7 +4,7 @@
  */
 package controller.manager.auth;
 
-import dto.UseDTO;
+import dto.UserDTO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import service.RoleService;
 import util.di.DIContainer;
-import service.UseService;
+import service.UserService;
 
 /**
  *
@@ -24,12 +24,12 @@ import service.UseService;
 @WebServlet(name = "UpdateInfor", urlPatterns = {"/updateinfor"})
 public class UpdateInfor extends HttpServlet {
 
-    private UseService userService;
+    private UserService userService;
 
     @Override
     public void init() throws ServletException {
         try {
-            userService = DIContainer.get(UseService.class);
+            userService = DIContainer.get(UserService.class);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -54,7 +54,7 @@ public class UpdateInfor extends HttpServlet {
             int locationId = Integer.parseInt(request.getParameter("locationId"));
 
             // Tạo đối tượng user mới
-            UseDTO user = new UseDTO();
+            UserDTO user = new UserDTO();
             user.setUserId(userId);
             user.setFullName(fullName);
             user.setEmail(email);
