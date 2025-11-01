@@ -107,7 +107,10 @@ public class JdbcTemplateUtil {
         StringBuilder condition = new StringBuilder(" WHERE 1=1 ");
 
         if (locationId != null) {
-            condition.append(" AND l.locationId = ").append(locationId);
+            condition.append(" AND")
+                    .append(" EXISTS (SELECT 1 FROM dbo.Vehicles v WHERE v.carId = c.carId AND v.locationId = ")
+                    .append(locationId)
+                    .append(")");
         }
 
         if (name != null && !name.trim().isEmpty()) {
@@ -117,7 +120,7 @@ public class JdbcTemplateUtil {
                     .append("%')");
         }
 
-        if (categoryId != null ) {
+        if (categoryId != null) {
             condition.append(" AND c.categoryId = ").append(categoryId);
         }
 
@@ -127,32 +130,5 @@ public class JdbcTemplateUtil {
 
         return condition.toString();
     }
-
-     //format dieu kien query search car
-    public static String formatConditionSearchCar(Integer locationId, String name, Integer categoryId, Double price) {
-        StringBuilder condition = new StringBuilder(" WHERE 1=1 ");
-
-        if (locationId != null) {
-            condition.append(" AND l.locationId = ").append(locationId);
-        }
-
-        if (name != null && !name.trim().isEmpty()) {
-            // thêm dấu nháy đơn vì là chuỗi
-            condition.append(" AND LOWER(c.name) LIKE LOWER('%")
-                    .append(name.trim())
-                    .append("%')");
-        }
-
-        if (categoryId != null ) {
-            condition.append(" AND c.categoryId = ").append(categoryId);
-        }
-
-        if (price != null && price > 0) {
-            condition.append(" AND cp.dailyPrice <= ").append(price);
-        }
-
-        return condition.toString();
-    }
-
 
 }

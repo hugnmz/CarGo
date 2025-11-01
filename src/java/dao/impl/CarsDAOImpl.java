@@ -161,8 +161,6 @@ public class CarsDAOImpl implements CarsDAO {
                 + "cp.priceId as cp_priceId, cp.dailyPrice as cp_dailyPrice, cp.depositAmount as cp_depositAmount, "
                 + "cp.startDate as cp_startDate, cp.endDate as cp_endDate, cp.createAt as cp_createAt "
                 + "FROM dbo.Cars c "
-                + "join Vehicles v on v.carId = c.carId "
-                + "join Locations l on l.locationId = v.locationId "
                 + "LEFT JOIN dbo.Categories cat ON c.categoryId = cat.categoryId "
                 + "LEFT JOIN dbo.Fuels f ON c.fuelId = f.fuelId "
                 + "LEFT JOIN dbo.Seatings s ON c.seatingId = s.seatingId "
