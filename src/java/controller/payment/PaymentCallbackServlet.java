@@ -1,21 +1,31 @@
 package controller.payment;
 
-import dao.impl.PaymentsDAOImpl;
-import dao.impl.ContractsDAOImpl;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.*;
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.json.JSONObject;
+import service.PaymentService;
+import util.di.DIContainer;
 
 @WebServlet("/paymentCallback")
 public class PaymentCallbackServlet extends HttpServlet {
 
-    private final PaymentsDAOImpl paymentsDAO = new PaymentsDAOImpl();
-    private final ContractsDAOImpl contractsDAO = new ContractsDAOImpl();
+    private PaymentService paymentService;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        try {
+            paymentService = DIContainer.get(PaymentService.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Dependency injection error", e);
+        }
+    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -49,7 +59,6 @@ public class PaymentCallbackServlet extends HttpServlet {
                 resp.getWriter().write(responseJson.toString());
                 return;
             }
-
             JSONObject data = json.getJSONObject("data");
             BigDecimal amount = new BigDecimal(String.valueOf(data.opt("amount")));
             String description = data.optString("description", "").toLowerCase();
@@ -68,17 +77,17 @@ public class PaymentCallbackServlet extends HttpServlet {
             }
 
             // Kiểm tra pending payment
-            var pendingPayment = paymentsDAO.findPendingPayment(contractId, amount);
-            System.out.println("Pending payment found: " + (pendingPayment != null));
+            Optional<dto.PaymentDTO> pendingPayment = paymentService.findPendingPayment(contractId, amount);
+            System.out.println("Pending payment found: " + pendingPayment.isPresent());
 
-            if (pendingPayment != null && !paymentsDAO.isPaymentCompleted(pendingPayment.getPaymentId())) {
-                boolean updatedPayment = paymentsDAO.completePaymentById(pendingPayment.getPaymentId());
+            if (pendingPayment.isPresent() && !paymentService.isPaymentCompleted(pendingPayment.get().getPaymentId())) {
+                boolean updatedPayment = paymentService.completePaymentById(pendingPayment.get().getPaymentId());
 
                 System.out.println("[CALLBACK] UpdatedPayment=" + updatedPayment);
 
                 System.out.println("Payment updated: " + updatedPayment);
 
-                String statusNow = paymentsDAO.getPaymentStatus(contractId);
+                String statusNow = paymentService.getPaymentStatus(contractId);
                 System.out.println("[CALLBACK] Recheck DB status after update: " + statusNow);
 
                 responseJson.put("status", "ok");

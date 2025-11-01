@@ -1,28 +1,33 @@
 package controller.payment;
 
-import dao.impl.PaymentsDAOImpl;
-import dao.impl.ContractsDAOImpl;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.json.JSONObject;
+import service.PaymentService;
+import util.di.DIContainer;
 
 @WebServlet("/checkPayment")
 public class CheckPaymentServlet extends HttpServlet {
 
-    private final PaymentsDAOImpl paymentsDAO = new PaymentsDAOImpl();
+    private PaymentService paymentService;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        try {
+            paymentService = DIContainer.get(PaymentService.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Dependency injection error", e);
+        }
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-
         response.setContentType("application/json;charset=UTF-8");
-// no-cache
+        // no-cache
         response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
         response.setHeader("Pragma", "no-cache");
         response.setDateHeader("Expires", 0);
@@ -31,9 +36,8 @@ public class CheckPaymentServlet extends HttpServlet {
         try {
             int contractId = Integer.parseInt(request.getParameter("contractId"));
 
-            // 🔍 Kiểm tra có payment COMPLETED chưa
-            String sql = "SELECT TOP 1 status FROM Payments WHERE contractId = ? ORDER BY paymentDate DESC";
-            String status = paymentsDAO.getPaymentStatus(contractId);
+            //Kiểm tra có payment COMPLETED chưa
+            String status = paymentService.getPaymentStatus(contractId);
 
             if ("COMPLETED".equalsIgnoreCase(status)) {
                 result.put("status", "SUCCESS");

@@ -1,12 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package mapper;
 
 import dto.PaymentDTO;
 import model.Payments;
 import util.di.annotation.Component;
+
 @Component
 public class PaymentsMapper {
 
@@ -16,7 +13,7 @@ public class PaymentsMapper {
      * @param payment Payments object
      * @return PaymentDTO object
      */
-    public static PaymentDTO toDTO(Payments payment) {
+    public PaymentDTO toDTO(Payments payment) {
         if (payment == null) {
             return null;
         }
@@ -36,14 +33,13 @@ public class PaymentsMapper {
 
         return dto;
     }
-
-    /**
+/**
      * Chuyển PaymentDTO (DTO) sang Payments (model)
      *
      * @param dto PaymentDTO object
      * @return Payments object
      */
-    public static Payments toModel(PaymentDTO dto) {
+    public Payments toModel(PaymentDTO dto) {
         if (dto == null) {
             return null;
         }
