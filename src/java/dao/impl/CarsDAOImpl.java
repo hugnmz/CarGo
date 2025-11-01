@@ -30,7 +30,6 @@ public class CarsDAOImpl implements CarsDAO {
         return JdbcTemplateUtil.query(sql, Cars.class);
     }
 
-
     @Override
     public Optional<Cars> getCarById(Integer carId) {
 
@@ -154,12 +153,21 @@ public class CarsDAOImpl implements CarsDAO {
     @Override
     public List<Cars> searchCars(Integer locationId, String name, Integer categoryId, Double price) {
         String condition = JdbcTemplateUtil.formatConditionSearchCar(locationId, name, categoryId, price);
-        String sql = "select * from Cars c "
+        String sql = "SELECT "
+                + "c.carId, c.name, c.year, c.description, c.image, c.categoryId, c.fuelId, c.seatingId, "
+                + "cat.categoryId, cat.categoryName, "
+                + "f.fuelId, f.fuelType, "
+                + "s.seatingId, s.seatingType, "
+                + "cp.priceId as cp_priceId, cp.dailyPrice as cp_dailyPrice, cp.depositAmount as cp_depositAmount, "
+                + "cp.startDate as cp_startDate, cp.endDate as cp_endDate, cp.createAt as cp_createAt "
+                + "FROM dbo.Cars c "
                 + "join Vehicles v on v.carId = c.carId "
                 + "join Locations l on l.locationId = v.locationId "
-                + "join CarPrices cp on cp.carId = c.carId "
-                + "join Fuels f on f.fuelId = c.fuelId "
-                + "join Seatings s on s.seatingId = c.seatingId " + condition;
+                + "LEFT JOIN dbo.Categories cat ON c.categoryId = cat.categoryId "
+                + "LEFT JOIN dbo.Fuels f ON c.fuelId = f.fuelId "
+                + "LEFT JOIN dbo.Seatings s ON c.seatingId = s.seatingId "
+                + "LEFT JOIN dbo.CarPrices cp ON c.carId = cp.carId AND cp.endDate IS NULL" + condition;
+
         return JdbcTemplateUtil.query(sql, Cars.class);
     }
 
