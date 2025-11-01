@@ -26,6 +26,7 @@
         action="${pageContext.request.contextPath}/LoginAdmin"
         method="post"
       >
+        <input type="hidden" name="_back" value="/admin/admin_login.jsp" />
         <div class="mb-3">
           <input
             type="text"

@@ -87,6 +87,7 @@ contentType="text/html; charset=UTF-8" language="java" %>
           method="post"
           action="${pageContext.request.contextPath}/ViewCartDetail"
         >
+          <input type="hidden" name="_back" value="/customer/cart.jsp" />
           <input type="hidden" name="carId" value="${carId}">
           <input type="hidden" name="vehicleId" value="${vehicleId}">
           <c:set var="total" value="0" />

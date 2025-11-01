@@ -68,6 +68,8 @@
         action="${pageContext.request.contextPath}/ForgotPasswordServlet"
         method="post"
       >
+        <!-- Hidden field để filter biết trang quay lại -->
+        <input type="hidden" name="_back" value="/auth/forgot-password.jsp" />
         <!-- Username -->
         <div class="mb-3">
           <div class="input-group">

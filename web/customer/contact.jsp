@@ -25,6 +25,7 @@
         <section class="contact-form">
           <h3>Gửi Yêu Cầu Tư Vấn</h3>
           <form action="handleContact" method="post">
+            <input type="hidden" name="_back" value="/customer/contact.jsp" />
             <div class="form-group">
               <label for="fullName">Họ và Tên</label>
               <input

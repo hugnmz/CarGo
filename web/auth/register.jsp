@@ -60,6 +60,8 @@
                 action="${pageContext.request.contextPath}/RegisterServlet"
                 method="post"
                 >
+                <!-- Hidden field để filter biết trang quay lại -->
+                <input type="hidden" name="_back" value="/auth/register.jsp" />
                 <!-- Nhập họ và tên -->
                 <div class="mb-3">
                     <input
@@ -99,7 +101,7 @@
                 <div class="mb-3">
                     <select name="city" class="form-select" required>
                         <option value="" disabled ${city == null ? 'selected' : ''}>Tỉnh/ thành phố (*)</option>
-                        <c:forEach var="location" items="${locations}">
+                        <c:forEach var="location" items="${applicationScope.locations}">
                             <option value="${location.city}" ${city == location.city ? 'selected' : ''}>
                                 ${location.city}
                             </option>

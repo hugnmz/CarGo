@@ -285,4 +285,17 @@ public class CarServiceImpl implements CarService {
         }
     }
 
+     @Override
+    public List<CarDTO> searchCars(Integer locationId, String name, Integer categoryId, Double price) {
+        // lay danh sach tat ca xe
+        List<Cars> cars = carsDAO.searchCars(locationId, name, categoryId, price);
+        List<CarDTO> carDTOs = new ArrayList<>();
+
+        for (Cars car : cars) {
+            CarDTO dto = carMapper.toDTO(car);
+            carDTOs.add(dto);
+        }
+
+        return carDTOs;
+    }
 }

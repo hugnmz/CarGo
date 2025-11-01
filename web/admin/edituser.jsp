@@ -9,6 +9,7 @@
 <div class="container mt-4">
     <h3 class="text-center text-primary mb-3">Sửa thông tin User</h3>
     <form action="ControllerAdmin" method="post" class="row g-3">
+        <input type="hidden" name="_back" value="/admin/edituser.jsp" />
         <input type="hidden" name="action" value="update">
         <input type="hidden" name="userId" value="${editUser.userId}">
 

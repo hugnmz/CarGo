@@ -23,7 +23,7 @@ public interface CarsDAO {
     List<Cars> getCarByFuel(Integer fuelId);
     List<Cars> getCarBySeating(Integer seatingId);
     List<Cars> getCarByLocation(Integer locationId);
-    List<Cars> searchCars(String keyword);
+    List<Cars> searchCars(Integer locationId, String name, Integer categoryId, Double price);
     List<Cars> getCarWithCurrentPrice(BigDecimal minPrice, BigDecimal maxPrice);
-    public int addCarAndReturnId(Cars car);
+    int addCarAndReturnId(Cars car);
 }

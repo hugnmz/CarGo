@@ -200,6 +200,7 @@
                                 <button type="button" class="view-mode" onclick="enableEdit(${v.vehicleId})">Sửa</button>
 
                                 <form action="vehiclecontroller" method="post" class="edit-mode" style="display:none;" id="form-${v.vehicleId}">
+                                    <input type="hidden" name="_back" value="/manager/manage_detail_car.jsp" />
                                     <input type="hidden" name="action" value="update">
                                     <input type="hidden" name="vehicleId" value="${v.vehicleId}">
                                     <input type="hidden" name="carId" value="${car.carId}">
@@ -242,6 +243,7 @@
         <div class="add-vehicle">
             <h3>Thêm Vehicle mới</h3>
             <form action="vehiclecontroller" method="post">
+                <input type="hidden" name="_back" value="/manager/manage_detail_car.jsp" />
                 <input type="hidden" name="action" value="create">
                 <input type="hidden" name="carId" value="${car.carId}">
 
