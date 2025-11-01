@@ -20,16 +20,7 @@ import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.commons.validator.routines.RegexValidator;
 import util.MessageUtil;
 
-@WebFilter(urlPatterns = {
-    "/RegisterServlet",
-    "/Cart",
-    "/LoginServlet",
-    "/ContractServlet",
-    "/CustomerServlet",
-    "/checkout",
-    "/ResetPasswordServlet",
-    "/ForgotPasswordServlet"
-})
+@WebFilter("/*")
 public class ValidationFilter implements Filter {
 
     private final EmailValidator emailValidator = EmailValidator.getInstance();
@@ -91,8 +82,13 @@ public class ValidationFilter implements Filter {
                 }
             }
 
+            String backPage = request.getParameter("_back");
+            if (backPage == null || backPage.isEmpty()) {
+                backPage = request.getServletPath();
+            }
+
             // Forward ve servlet (servlet phai co doGet())
-            request.getRequestDispatcher(getForwardPage(request.getServletPath())).forward(sr, sr1);
+            request.getRequestDispatcher(backPage).forward(sr, sr1);
             return;
         }
 
@@ -130,25 +126,6 @@ public class ValidationFilter implements Filter {
         return null;
     }
 
-    private String getForwardPage(String servletPath) {
-        switch (servletPath) {
-            case "/RegisterServlet":
-                return "/auth/register.jsp";
-            case "/Cart":
-                return "/customer/booking-form.jsp";
-            case "/ContractServlet":
-                return "/customer/cart.jsp";
-            case "/CustomerServlet":
-                return "/customer/profile.jsp";
-            case "/LoginServlet":
-                return "/auth/login.jsp";
-            case "/ResetPasswordServlet":
-                return "/auth/reset-password.jsp";
-            case "/ForgotPasswordServlet":
-                return "/auth/forgot-password.jsp";
-            default:
-                return "/error.jsp";
-        }
-    }
+
 
 }

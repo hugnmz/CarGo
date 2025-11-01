@@ -24,13 +24,13 @@ import util.di.DIContainer;
 @WebServlet(name = "HomeAdmin", urlPatterns = {"/HomeAdmin"})
 public class HomeAdmin extends HttpServlet {
 
-    private UseService userService;
+    private UserService userService;
     private RoleService RoleService;
 
     @Override
     public void init() throws ServletException {
         try {
-            userService = DIContainer.get(UseService.class);
+            userService = DIContainer.get(UserService.class);
             RoleService = DIContainer.get(RoleService.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -50,7 +50,7 @@ public class HomeAdmin extends HttpServlet {
         }
 
         // Lấy danh sách người dùng
-        List<UseDTO> list = userService.getAllUser();
+        List<UserDTO> list = userService.getAllUser();
         // Lấy danh sách vai trò
         List<RoleDTO> roleList = RoleService.getAllRole();
         // Lấy danh sách địa điểm (thành phố)
@@ -75,9 +75,5 @@ public class HomeAdmin extends HttpServlet {
         processRequest(request, response);
     }
 
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
 
 }

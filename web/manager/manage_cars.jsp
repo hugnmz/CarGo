@@ -107,6 +107,7 @@
                     </div>
                     <div class="card-body">
                         <form action="controllerinformationcar" method="post" class="row g-3">
+                            <input type="hidden" name="_back" value="/manager/manage_cars.jsp" />
                             <input type="hidden" name="action" value="create">
                             <!-- Tên xe -->
                             <div class="col-md-6">

@@ -83,6 +83,7 @@
                 </div>
                 <div class="card-body bg-white">
                     <form action="controllerinformationcar" method="post">
+                        <input type="hidden" name="_back" value="/manager/editcar.jsp" />
                         <input type="hidden" name="action" value="update">
                         <input type="hidden" name="carId" value="${car.carId}">
 

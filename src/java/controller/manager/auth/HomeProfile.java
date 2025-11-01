@@ -5,7 +5,8 @@
 package controller.manager.auth;
 
 import dto.LocationDTO;
-import dto.UseDTO;
+import dto.UserDTO;
+import dto.UserDTO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -15,10 +16,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
-import model.User;
+import model.Users;
 import service.RoleService;
 import util.di.DIContainer;
-import service.UseService;
+import service.UserService;
 
 /**
  *
@@ -27,13 +28,13 @@ import service.UseService;
 @WebServlet(name = "HomeProfile", urlPatterns = {"/profile"})
 public class HomeProfile extends HttpServlet {
 
-    private UseService userService;
+    private UserService userService;
     private RoleService RoleService;
 
     @Override
     public void init() throws ServletException {
         try {
-            userService = DIContainer.get(UseService.class);
+            userService = DIContainer.get(UserService.class);
             RoleService = DIContainer.get(RoleService.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -51,7 +52,7 @@ public class HomeProfile extends HttpServlet {
         Integer userId = (Integer) session.getAttribute("userId");
 
         // 🔹 Lấy thông tin người dùng từ database qua service
-        UseDTO user = userService.getUserById(userId);
+        UserDTO user = userService.getUserById(userId);
         
         // 🔹 Lấy danh sách địa điểm (thành phố)
         List<LocationDTO> locationList = userService.getAllLocation();

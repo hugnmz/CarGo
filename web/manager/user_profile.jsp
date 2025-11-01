@@ -193,6 +193,7 @@
                     <h5><i class="fa-solid fa-pen-to-square"></i> Chỉnh sửa thông tin cá nhân</h5>
 
                     <form action="${pageContext.request.contextPath}/updateinfor" method="post">
+                        <input type="hidden" name="_back" value="/manager/user_profile.jsp" />
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">Họ và tên</label>
@@ -239,6 +240,7 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <form action="${pageContext.request.contextPath}/changepass" method="post">
+                            <input type="hidden" name="_back" value="/manager/user_profile.jsp" />
                             <div class="modal-header">
                                 <h5 class="modal-title" id="changePasswordModalLabel">
                                     <i class="fa-solid fa-key"></i> Đổi mật khẩu

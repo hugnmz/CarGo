@@ -284,7 +284,7 @@ public class CarServiceImpl implements CarService {
         }
     }
 
-    @Override
+     @Override
     public List<CarDTO> searchCars(Integer locationId, String name, Integer categoryId, Double price) {
         // lay danh sach tat ca xe
         List<Cars> cars = carsDAO.searchCars(locationId, name, categoryId, price);
@@ -297,5 +297,4 @@ public class CarServiceImpl implements CarService {
 
         return carDTOs;
     }
-
 }

@@ -55,6 +55,8 @@
         action="${pageContext.request.contextPath}/LoginServlet"
         method="post"
       >
+        <!-- Hidden field để filter biết trang quay lại -->
+        <input type="hidden" name="_back" value="/auth/login.jsp" />
         <!-- Username -->
         <div class="mb-3">
           <input

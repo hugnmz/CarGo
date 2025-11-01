@@ -30,12 +30,6 @@ public class CarsDAOImpl implements CarsDAO {
         return JdbcTemplateUtil.query(sql, Cars.class);
     }
 
-    public static void main(String[] args) {
-        CarsDAOImpl d = new CarsDAOImpl();
-        System.out.println(JdbcTemplateUtil.formatConditionSearchCar(0, null, 1, 1000000.0));
-        
-
-    }
 
     @Override
     public Optional<Cars> getCarById(Integer carId) {
@@ -148,6 +142,16 @@ public class CarsDAOImpl implements CarsDAO {
     }
 
     @Override
+    public List<Cars> getCarWithCurrentPrice(BigDecimal minPrice, BigDecimal maxPrice) {
+        String sql = "SELECT DISTINCT c.* FROM dbo.Cars c "
+                + "INNER JOIN dbo.CarPrices cp ON c.carId = cp.carId "
+                + "WHERE cp.endDate IS NULL "
+                + "AND cp.dailyPrice >= ? AND cp.dailyPrice <= ?";
+
+        return JdbcTemplateUtil.query(sql, Cars.class, minPrice, maxPrice);
+    }
+
+    @Override
     public List<Cars> searchCars(Integer locationId, String name, Integer categoryId, Double price) {
         String condition = JdbcTemplateUtil.formatConditionSearchCar(locationId, name, categoryId, price);
         String sql = "select * from Cars c "
@@ -159,13 +163,4 @@ public class CarsDAOImpl implements CarsDAO {
         return JdbcTemplateUtil.query(sql, Cars.class);
     }
 
-    @Override
-    public List<Cars> getCarWithCurrentPrice(BigDecimal minPrice, BigDecimal maxPrice) {
-        String sql = "SELECT DISTINCT c.* FROM dbo.Cars c "
-                + "INNER JOIN dbo.CarPrices cp ON c.carId = cp.carId "
-                + "WHERE cp.endDate IS NULL "
-                + "AND cp.dailyPrice >= ? AND cp.dailyPrice <= ?";
-
-        return JdbcTemplateUtil.query(sql, Cars.class, minPrice, maxPrice);
-    }
 }

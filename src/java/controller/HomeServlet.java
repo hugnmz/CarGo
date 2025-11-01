@@ -42,10 +42,10 @@ public class HomeServlet extends HttpServlet {
 
             //lay danh sach dia diem
             List<LocationDTO> allLocations = carService.getAllLocation();
-            
+
             //lay danh sach loai xe
             List<CategoryDTO> allCategories = carService.getAllCategories();
-            
+
             // truyen danh sach xe xuong jsp
             request.setAttribute("allCars", allCars);
             request.setAttribute("allLocations", allLocations);

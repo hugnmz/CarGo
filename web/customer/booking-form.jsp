@@ -43,6 +43,7 @@
         </div>
 
         <form action="${pageContext.request.contextPath}/Cart" method="post">
+            <input type="hidden" name="_back" value="/customer/booking-form.jsp" />
             <input type="hidden" name="vehicleId" value="${param.vehicleId}" />
             <input type="hidden" name="carId" value="${param.carId}" />
 

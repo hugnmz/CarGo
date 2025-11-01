@@ -68,6 +68,9 @@
         action="${pageContext.request.contextPath}/ResetPasswordServlet"
         method="post"
       >
+        <!-- Hidden field để filter biết trang quay lại -->
+        <input type="hidden" name="_back" value="/auth/reset-password.jsp" />
+
         <!-- Username -->
         <div class="mb-3">
           <div class="input-group">

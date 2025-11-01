@@ -210,6 +210,7 @@
 
 
                                     <form action="${pageContext.request.contextPath}/CustomerServlet" method="POST" id="profileForm">
+                                        <input type="hidden" name="_back" value="/customer/profile.jsp" />
                                         <input type="hidden" name="isVerified" value="${not empty c.isVerified ? c.isVerified : 'true'}">
 
                                         <div class="profile-details">
@@ -253,7 +254,7 @@
                                                         <label for="city"><i class="fa fa-map-marker-alt text-muted"></i> Thành phố</label>
                                                         <select class="form-control" id="city" name="city" required>
                                                             <option value="">-- Chọn thành phố --</option>
-                                                            <c:forEach var="location" items="${locations}">
+                                                            <c:forEach var="location" items="${applicationScope.locations}">
                                                                 <option value="${location.city}" 
                                                                         ${c.city == location.city ? 'selected' : ''}>
                                                                     ${location.city}
@@ -439,6 +440,7 @@
                                     <div class="settings-section">
                                         <h6>Bảo mật</h6>
                                         <form method="POST" action="${pageContext.request.contextPath}/ChangePasswordServlet">
+                                            <input type="hidden" name="_back" value="/customer/profile.jsp" />
                                             <div class="setting-item">
                                                 <div class="row">
                                                     <div class="col-md-4">

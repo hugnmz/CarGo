@@ -26,6 +26,7 @@ prefix="c" uri="jakarta.tags.core" %>
     <p>Nhập mã 6 số đã gửi đến email của bạn.</p>
 
   <form action="${pageContext.request.contextPath}/VerifyServlet" method="post">
+      <input type="hidden" name="_back" value="/auth/verify.jsp" />
       <input
         type="text"
         name="code"

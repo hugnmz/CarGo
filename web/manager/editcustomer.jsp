@@ -57,6 +57,7 @@
             <h2>Chỉnh sửa thông tin khách hàng</h2>
 
             <form action="controllerinformationcustomer" method="post">
+                <input type="hidden" name="_back" value="/manager/editcustomer.jsp" />
                 <input type="hidden" name="action" value="update">
                 <input type="hidden" name="customerId" value="${customer.customerId}">
 
