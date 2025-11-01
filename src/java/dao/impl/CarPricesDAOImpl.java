@@ -82,9 +82,9 @@ public class CarPricesDAOImpl implements CarPricesDAO {
     }
 
     @Override
-    public boolean endCurrentPrice(Integer carId, LocalDate endDate) {
-        String sql = "UPDATE dbo.CarPrices SET endDate = ? WHERE carId = ? AND endDate IS NULL";
-        int result = JdbcTemplateUtil.update(sql, endDate, carId);
+    public boolean endCurrentPrice(Integer carId) {
+        String sql = "UPDATE dbo.CarPrices SET endDate = GETDATE() WHERE carId = ? AND endDate IS NULL";
+        int result = JdbcTemplateUtil.update(sql, carId);
         return result > 0;
     }
 

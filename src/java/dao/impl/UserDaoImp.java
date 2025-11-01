@@ -50,10 +50,10 @@ public class UserDaoImp implements UsersDAO {
         String sql = """
         INSERT INTO Users (
             username, password_hash, password_salt,
-            fullName, phone, email, dateOfBirth,
+            fullName, phone, email,
             locationId, roleId, createAt
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """;
 
         int id = JdbcTemplateUtil.insertAndReturnKey(
@@ -64,7 +64,6 @@ public class UserDaoImp implements UsersDAO {
                 user.getFullName(),
                 user.getPhone(),
                 user.getEmail(),
-                user.getDateOfBirth() != null ? java.sql.Date.valueOf(user.getDateOfBirth()) : null,
                 user.getLocationId(),
                 user.getRoleId(), // ✅ thêm dòng này
                 user.getCreateAt() != null ? Timestamp.valueOf(user.getCreateAt()) : new Timestamp(System.currentTimeMillis())
@@ -81,7 +80,7 @@ public class UserDaoImp implements UsersDAO {
     public boolean updateUser(Users user) {
         String sql = """
             UPDATE Users SET
-                fullName = ?, phone = ?, email = ?, dateOfBirth = ?, locationId = ?
+                fullName = ?, phone = ?, email = ?, locationId = ?
             WHERE userId = ?
         """;
 
@@ -90,7 +89,6 @@ public class UserDaoImp implements UsersDAO {
                 user.getFullName(),
                 user.getPhone(),
                 user.getEmail(),
-                user.getDateOfBirth() != null ? java.sql.Date.valueOf(user.getDateOfBirth()) : null,
                 user.getLocationId(),
                 user.getUserId()
         );

@@ -93,7 +93,7 @@
                             <h5>Quản lý khách hàng</h5>
                             <p class="text-muted">Xem, thêm, cập nhật hoặc xóa thông tin khách hàng</p>
                         </div>
-                        <a href="manage_customers.jsp" class="btn btn-outline-primary">
+                        <a href="managecus" class="btn btn-outline-primary">
                             <i class="fa-solid fa-users"></i> Truy cập
                         </a>
                     </div>

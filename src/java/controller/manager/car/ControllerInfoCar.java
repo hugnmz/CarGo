@@ -143,11 +143,11 @@ public class ControllerInfoCar extends HttpServlet {
 
             // Lấy các số thực, tránh null hoặc rỗng
             String priceStr = request.getParameter("price");
-            carDTO.setDailyPrice(priceStr != null && !priceStr.isEmpty() 
+            carDTO.setDailyPrice(priceStr != null && !priceStr.isEmpty()
                     ? Double.parseDouble(priceStr) : 0);
 
             String depositStr = request.getParameter("deposit");
-            carDTO.setDepositAmount(depositStr != null && !depositStr.isEmpty() 
+            carDTO.setDepositAmount(depositStr != null && !depositStr.isEmpty()
                     ? Double.parseDouble(depositStr) : 0);
 
             boolean success = carService.updateCar(carDTO);
@@ -236,7 +236,7 @@ public class ControllerInfoCar extends HttpServlet {
             throws ServletException, IOException {
         processRequest(request, response);
     }
-    
+
     private void showDetailCarForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
@@ -245,6 +245,7 @@ public class ControllerInfoCar extends HttpServlet {
                 int carId = Integer.parseInt(carIdStr);
 
                 Optional<CarDTO> carDTO = carService.getCarById(carId);
+
                 if (carDTO.isPresent()) {
                     // Gắn đối tượng car vào request để JSP đọc
                     request.setAttribute("car", carDTO.get());
@@ -257,16 +258,20 @@ public class ControllerInfoCar extends HttpServlet {
                     // Lấy danh sách các vehicle thuộc car này
                     List<VehicleDTO> vehicles = carService.getVehicalByCarId(carId);
                     List<LocationDTO> locations = carService.getAllLocation();
-                    
+
+                    // Lấy danh sách giá xe theo ngày
+                    List<model.CarPrices> carPrices = carService.getPricesByCarId(carId);
 
                     request.setAttribute("categories", categories);
                     request.setAttribute("fuels", fuels);
                     request.setAttribute("seatings", seatings);
                     request.setAttribute("vehicles", vehicles);
                     request.setAttribute("locations", locations);
+                    request.setAttribute("carPrices", carPrices);
 
                     // Forward sang JSP
                     request.getRequestDispatcher("manager/manage_detail_car.jsp").forward(request, response);
+
                 } else {
                     request.setAttribute("error", "Không tìm thấy xe có ID: " + carId);
                     request.getRequestDispatcher("managecar").forward(request, response);
@@ -280,5 +285,4 @@ public class ControllerInfoCar extends HttpServlet {
             request.getRequestDispatcher("managecar").forward(request, response);
         }
     }
-
 }

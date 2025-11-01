@@ -37,4 +37,6 @@ public interface CarService {
     
     public List<VehicleDTO> getVehicalByCarId(int carId);
     
+    public List<model.CarPrices> getPricesByCarId(int carId);
+    
 }

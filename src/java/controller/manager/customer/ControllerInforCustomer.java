@@ -106,8 +106,8 @@ public class ControllerInforCustomer extends HttpServlet {
 
     private void editCustomer(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        try {           
+
+        try {
             String idStr = request.getParameter("customerId");
             if (idStr == null) {
                 throw new IllegalArgumentException("Không có customerId trong request!");
@@ -129,7 +129,7 @@ public class ControllerInforCustomer extends HttpServlet {
             }
 
             Boolean isVerified = "1".equals(isVerify);
-            
+
             CustomerDTO customerDTO = new CustomerDTO();
             customerDTO.setCustomerId(customerId);
             customerDTO.setFullName(fullName);
@@ -153,6 +153,29 @@ public class ControllerInforCustomer extends HttpServlet {
         request.getRequestDispatcher("managecus").forward(request, response);
     }
 
+    private void deleteCustomer(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            String idStr = request.getParameter("customerId");
+            if (idStr == null || idStr.isEmpty()) {
+                request.setAttribute("error", "Không tìm thấy ID khách hàng!");
+            } else {
+                Integer customerId = Integer.parseInt(idStr);
+                boolean deleted = customerService.deleteCustomer(customerId);
+                if (deleted) {
+                    request.setAttribute("message", "Xóa khách hàng thành công!");
+                } else {
+                    request.setAttribute("error", "Xóa thất bại! Có thể khách hàng không tồn tại hoặc đang có hợp đồng.");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+        }
+        // Quay lại trang danh sách
+        request.getRequestDispatcher("managecus").forward(request, response);
+    }
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
@@ -163,6 +186,8 @@ public class ControllerInforCustomer extends HttpServlet {
             showEditForm(request, response);
         } else if ("update".equals(action)) {
             editCustomer(request, response);
+        } else if ("delete".equals(action)) {
+            deleteCustomer(request, response);
         } else {
             response.sendRedirect("managecus");
         }

@@ -227,6 +227,13 @@ public class CustomerServiceImpl implements CustomerService {
         // Gọi DAO để update
         boolean success = customersDAO.updateCustomer(customer);
         if (!success) {
+            // Kiểm tra tuổi trước khi ném lỗi
+            if (customerDTO.getDateOfBirth() != null) {
+                int age = java.time.Period.between(customerDTO.getDateOfBirth(), java.time.LocalDate.now()).getYears();
+                if (age < 18) {
+                    throw new IllegalArgumentException("Tuổi phải từ 18 trở lên!");
+                }
+            }
             throw new RuntimeException("Không thể cập nhật thông tin khách hàng (ID = " + customerDTO.getCustomerId() + ")");
         }
 

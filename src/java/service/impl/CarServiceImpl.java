@@ -9,7 +9,6 @@ import dto.LocationDTO;
 import dto.SeatingDTO;
 import dto.VehicleDTO;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -146,7 +145,7 @@ public class CarServiceImpl implements CarService {
                 if (currentPrice.getDailyPrice().compareTo(newDailyPrice) != 0
                         || currentPrice.getDepositAmount().compareTo(newDeposit) != 0) {
                     // Kết thúc giá hiện tại
-                    carPricesDAO.endCurrentPrice(carDTO.getCarId(), java.time.LocalDate.now());
+                    carPricesDAO.endCurrentPrice(carDTO.getCarId());
 
                     // Thêm giá mới
                     model.CarPrices newPrice = new model.CarPrices();
@@ -297,6 +296,16 @@ public class CarServiceImpl implements CarService {
         } catch (Exception e) {
             e.printStackTrace();
             // Trả về danh sách rỗng nếu lỗi
+            return List.of();
+        }
+    }
+
+    @Override
+    public List<CarPrices> getPricesByCarId(int carId) {
+        try {
+            return carPricesDAO.getPricesByCar(carId);
+        } catch (Exception e) {
+            e.printStackTrace();
             return List.of();
         }
     }

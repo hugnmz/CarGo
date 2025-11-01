@@ -144,11 +144,11 @@
                 <p><strong>Số chỗ ngồi:</strong> ${car.seatingType}</p>
                 <p><strong>Giá thuê/ngày:</strong> 
                     <span class="price">
-                        <fmt:formatNumber value="${car.dailyPrice}" type="currency" currencySymbol="₫"/>
+                        <fmt:formatNumber value="${car.dailyPrice}" pattern="#,##0.00" />₫
                     </span>
                 </p>
                 <p><strong>Tiền đặt cọc:</strong> 
-                    <fmt:formatNumber value="${car.depositAmount}" type="currency" currencySymbol="₫"/>
+                    <fmt:formatNumber value="${car.depositAmount}" pattern="#,##0.00" />₫
                 </p>
                 <p><strong>Mô tả:</strong> ${car.description}</p>
             </div>
@@ -165,6 +165,49 @@
                  >${error}</div>
             </br>
         </c:if>
+        
+        <!-- Bảng giá xe theo ngày -->
+        <div class="vehicle-list">
+            <h3>Bảng giá xe theo ngày</h3>
+            
+            <c:if test="${empty carPrices}">
+                <p><em>Chưa có bảng giá nào cho xe này.</em></p>
+            </c:if>
+            
+            <c:if test="${not empty carPrices}">
+                <table>
+                    <tr>
+                        <th>Ngày bắt đầu</th>
+                        <th>Ngày kết thúc</th>
+                        <th>Giá thuê/ngày</th>
+                        <th>Tiền đặt cọc</th>
+                    </tr>
+                    <c:forEach var="price" items="${carPrices}">
+                        <tr>
+                            <td>
+                                ${price.startDate}
+                            </td>
+                            <td>
+                                <c:choose>
+                                    <c:when test="${empty price.endDate}">
+                                        <span style="color: #28a745; font-weight: bold;">Đang áp dụng</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        ${price.endDate}
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td class="price">
+                                <fmt:formatNumber value="${price.dailyPrice}" pattern="#,##0.00" />₫
+                            </td>
+                            <td>
+                                <fmt:formatNumber value="${price.depositAmount}" pattern="#,##0.00" />₫
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </table>
+            </c:if>
+        </div>
             
         <div class="vehicle-list">
             <h3>Danh sách xe (Vehicles)</h3>
