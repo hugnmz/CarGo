@@ -68,7 +68,7 @@
                         class="form-control"
                         placeholder="Nhập họ và tên *"
                         value="${fullname != null ? fullname : ''}"
-                        required
+                        
                         />
                 </div>
 
@@ -80,7 +80,7 @@
                         class="form-control"
                         placeholder="Nhập số điện thoại *"
                         value="${phone != null ? phone : ''}"
-                        required
+                        
                         />
                 </div>
 
@@ -115,7 +115,7 @@
                         class="form-control"
                         placeholder="Tên đăng nhập *"
                         value="${username != null ? username : ''}"
-                        required
+                        
                         />
                 </div>
                 <!-- Nhập mật khẩu -->
@@ -125,7 +125,7 @@
                         name="password"
                         class="form-control"
                         placeholder="Nhập mật khẩu *"
-                        required
+                        
                         />
                 </div>
 
@@ -136,7 +136,7 @@
                         name="confirmPassword"
                         class="form-control"
                         placeholder="Nhập lại mật khẩu *"
-                        required
+                        
                         />
                 </div>
 

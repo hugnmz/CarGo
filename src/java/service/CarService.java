@@ -14,7 +14,6 @@ public interface CarService {
 
     List<CarDTO> getAllCars();
     
-
     Optional<CarDTO> getCarById(Integer carId);
     
     boolean addCar(CarDTO carDTO);

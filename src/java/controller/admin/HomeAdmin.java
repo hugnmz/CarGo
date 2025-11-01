@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import dto.*;
+import jakarta.servlet.http.HttpSession;
 import service.*;
 import util.di.DIContainer;
 
@@ -23,13 +24,13 @@ import util.di.DIContainer;
 @WebServlet(name = "HomeAdmin", urlPatterns = {"/HomeAdmin"})
 public class HomeAdmin extends HttpServlet {
 
-    private UserService userService;
+    private UseService userService;
     private RoleService RoleService;
 
     @Override
     public void init() throws ServletException {
         try {
-            userService = DIContainer.get(UserService.class);
+            userService = DIContainer.get(UseService.class);
             RoleService = DIContainer.get(RoleService.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -38,18 +39,28 @@ public class HomeAdmin extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // 🔹 Lấy danh sách người dùng
-        List<UserDTO> list = userService.getAllUser();
-        // 🔹 Lấy danh sách vai trò
+
+        HttpSession session = request.getSession(false);
+
+        //Kiểm tra quyền truy cập
+        if (session == null || !"ADMIN".equals(session.getAttribute("roleName"))) {
+            request.setAttribute("errors", "Bạn không có quyền truy cập trang này!");
+            request.getRequestDispatcher("auth/login.jsp").forward(request, response);
+            return;
+        }
+
+        // Lấy danh sách người dùng
+        List<UseDTO> list = userService.getAllUser();
+        // Lấy danh sách vai trò
         List<RoleDTO> roleList = RoleService.getAllRole();
-        // 🔹 Lấy danh sách địa điểm (thành phố)
+        // Lấy danh sách địa điểm (thành phố)
         List<LocationDTO> locationList = userService.getAllLocation();
 
         request.setAttribute("users", list);
         request.setAttribute("roles", roleList);
         request.setAttribute("locations", locationList);
-        request.getRequestDispatcher("/admin/adminhome.jsp").forward(request, response);
-        
+        request.getRequestDispatcher("admin/adminhome.jsp").forward(request, response);
+
     }
 
     @Override

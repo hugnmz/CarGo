@@ -95,8 +95,7 @@ public class CarServiceImpl implements CarService {
             Cars cars = carMapper.toModel(carDTO);
             return carsDAO.addCar(cars);
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new RuntimeException("error.system", e);
         }
     }
 
@@ -113,8 +112,7 @@ public class CarServiceImpl implements CarService {
 
             return carPricesDAO.addCarPrice(carPrice);
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new RuntimeException("error.system", e);
         }
     }
 
@@ -146,7 +144,7 @@ public class CarServiceImpl implements CarService {
                 if (currentPrice.getDailyPrice().compareTo(newDailyPrice) != 0
                         || currentPrice.getDepositAmount().compareTo(newDeposit) != 0) {
                     // Kết thúc giá hiện tại
-                    carPricesDAO.endCurrentPrice(carDTO.getCarId(), java.time.LocalDate.now());
+                    carPricesDAO.endCurrentPrice(carDTO.getCarId());
 
                     // Thêm giá mới
                     model.CarPrices newPrice = new model.CarPrices();
@@ -159,8 +157,7 @@ public class CarServiceImpl implements CarService {
                     carPricesDAO.addCarPrice(newPrice);
                 }
             } else {
-                // Nếu chưa có giá nào, tạo luôn
-                model.CarPrices newPrice = new model.CarPrices();
+                CarPrices newPrice = new CarPrices();
                 newPrice.setCarId(carDTO.getCarId());
                 newPrice.setDailyPrice(newDailyPrice);
                 newPrice.setDepositAmount(newDeposit);
@@ -172,8 +169,7 @@ public class CarServiceImpl implements CarService {
 
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new RuntimeException("error.system", e);
         }
     }
 
@@ -187,8 +183,7 @@ public class CarServiceImpl implements CarService {
             Cars cars = carMapper.toModel(carDTO);
             return carsDAO.updateCar(cars);
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new RuntimeException("error.system", e);
         }
     }
      */
@@ -202,13 +197,11 @@ public class CarServiceImpl implements CarService {
             // Xóa toàn bộ giá xe
             boolean deletedPrices = carPricesDAO.deleteCarPricesByCarId(carId);
             if (!deletedPrices) {
-                System.out.println("⚠ Không có giá nào để xóa hoặc lỗi khi xóa giá xe.");
             }
 
             // Xóa các vehical liên quan
             boolean deletedVehicle = vehiclesDAO.deleteVehiclesByCarId(carId);
             if (!deletedVehicle) {
-                System.out.println("⚠ Không có vehicle nào để xóa hoặc lỗi khi xóa vehicle.");
             }
 
             // Xóa hết các xe
@@ -229,8 +222,7 @@ public class CarServiceImpl implements CarService {
                     .map(categoryMapper::toDTO)
                     .toList();
         } catch (Exception e) {
-            e.printStackTrace();
-            return List.of();
+            throw new RuntimeException("error.system", e);
         }
     }
 
@@ -244,9 +236,7 @@ public class CarServiceImpl implements CarService {
                     .map(fuelMapper::toDTO)
                     .toList();
         } catch (Exception e) {
-            e.printStackTrace();
-            // Trả về danh sách rỗng nếu lỗi
-            return List.of();
+            throw new RuntimeException("error.system", e);
         }
     }
 
@@ -260,9 +250,7 @@ public class CarServiceImpl implements CarService {
                     .map(seatingMapper::toDTO)
                     .toList();
         } catch (Exception e) {
-            e.printStackTrace();
-            // Trả về danh sách rỗng nếu lỗi
-            return List.of();
+            throw new RuntimeException("error.system", e);
         }
     }
 
@@ -284,9 +272,7 @@ public class CarServiceImpl implements CarService {
                     .toList();
 
         } catch (Exception e) {
-            e.printStackTrace();
-            // Trả về danh sách rỗng nếu lỗi
-            return List.of();
+            throw new RuntimeException("error.system", e);
         }
     }
 
@@ -295,9 +281,7 @@ public class CarServiceImpl implements CarService {
             var vehicals = vehiclesDAO.getVehiclesByCar(carId);
             return vehicals.stream().map(vehicleMapper::toDTO).toList();
         } catch (Exception e) {
-            e.printStackTrace();
-            // Trả về danh sách rỗng nếu lỗi
-            return List.of();
+            throw new RuntimeException("error.system", e);
         }
     }
 

@@ -100,8 +100,7 @@ public class MapResultSet {
             return instance;
         } catch (Exception e) {
             // log loi neu co
-            e.printStackTrace();
-            throw new RuntimeException("Mapping error: " + e.getMessage(), e);
+            throw new RuntimeException("error.system", e);
         }
 
     }

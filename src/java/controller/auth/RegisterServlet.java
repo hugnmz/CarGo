@@ -39,6 +39,7 @@ public class RegisterServlet extends HttpServlet {
         }
     }
 
+      
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -50,9 +51,7 @@ public class RegisterServlet extends HttpServlet {
             // chuyen huong den trang dang ky
             request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
-            // neu co loi thi chuyen huong den trang dang ky khong co locations
-            response.sendRedirect(request.getContextPath() + "/auth/register.jsp");
+            throw new RuntimeException("error.system.register", e);
         }
     }
 
@@ -73,57 +72,6 @@ public class RegisterServlet extends HttpServlet {
         List<String> errors = new ArrayList<>();
 
         try {
-            // kiem tra cac truong bat buoc
-            if (fullname == null || fullname.trim().isEmpty()) {
-                errors.add(MessageUtil.getError("error.fullname.required"));
-            }
-
-            if (phone == null || phone.trim().isEmpty()) {
-                errors.add(MessageUtil.getError("error.phone.required"));
-            }
-
-            if (email == null || email.trim().isEmpty()) {
-                errors.add(MessageUtil.getError("error.email.required"));
-            }
-
-            if (username == null || username.trim().isEmpty()) {
-                errors.add(MessageUtil.getError("error.username.required"));
-            }
-
-            if (password == null || password.trim().isEmpty()) {
-                errors.add(MessageUtil.getError("error.password.required"));
-            }
-
-            if (confirmPassword == null || confirmPassword.trim().isEmpty()) {
-                errors.add(MessageUtil.getError("error.confirm.password.required"));
-            }
-
-            if (city == null || city.trim().isEmpty()) {
-                errors.add(MessageUtil.getError("error.city.required"));
-            }
-
-            // kiem tra mat khau khop
-            if (password != null && confirmPassword != null && !confirmPassword.equals(password)) {
-                errors.add(MessageUtil.getError("error.password.mismatch"));
-            }
-
-            // kiem tra dinh dang email
-            if (email != null && !email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-                errors.add(MessageUtil.getError("error.email.invalid"));
-            }
-
-            // kiem tra dinh dang so dien thoai
-            if (phone != null && !phone.matches("^[0-9]{10,11}$")) {
-                errors.add(MessageUtil.getError("error.phone.invalid"));
-            }
-
-            // neu co loi validation thi hien thi tat ca loi
-            if (!errors.isEmpty()) {
-                request.setAttribute("errors", errors);
-                setFormData(request, fullname, phone, email, city, username);
-                request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
-                return;
-            }
 
             // kiem tra trung lap email
             if (customerService.isEmailExists(email)) {
@@ -197,12 +145,7 @@ public class RegisterServlet extends HttpServlet {
             }
         } catch (Exception e) {
             // log loi ra console
-            e.printStackTrace();
-            // them loi he thong vao danh sach
-            errors.add(MessageUtil.getError("error.system.register"));
-            request.setAttribute("errors", errors);
-            setFormData(request, fullname, phone, email, city, username);
-            request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
+            throw new RuntimeException("error.system.register", e);
         }
     }
 

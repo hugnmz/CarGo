@@ -7,6 +7,7 @@ package service.impl;
 import dao.CustomersDAO;
 import dao.LocationsDAO;
 import dto.CustomerDTO;
+import dto.LocationDTO;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -359,7 +360,6 @@ public class CustomerServiceImpl implements CustomerService {
         try {
             Optional<Customers> oc = customersDAO.getCustomerByUserName(username);
             if (oc.isEmpty()) {
-                System.out.println("[DEBUG] User not found: " + username);
                 return false;
             }
 
@@ -403,4 +403,114 @@ public class CustomerServiceImpl implements CustomerService {
         return Optional.of(code);
     }
 
+    @Override
+    public Optional<CustomerDTO> getCustomerByUsernameAndEmail(String username, String email) {
+        try {
+            Optional<Customers> oc = customersDAO.getCustomerByUsernameAndEmail(username, email);
+            if (!oc.isPresent()) {
+                return Optional.empty();
+            }
+            return Optional.of(customerMapper.toDTO(oc.get()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<String> generateAndStoreResetCode(String username) {
+        try {
+            Optional<Customers> oc = customersDAO.getCustomerByUserName(username);
+            if (!oc.isPresent()) {
+                return Optional.empty();
+            }
+
+            Customers customer = oc.get();
+            String code = VerificationUtil.generateNumbericCode(); // 6 digits
+            LocalDateTime expireAt = LocalDateTime.now().plusMinutes(15); // 15 minutes
+
+            customer.setVerifyCode(code);
+            customer.setVerifyCodeExpire(expireAt);
+
+            if (customersDAO.updateCustomer(customer)) {
+                return Optional.of(code);
+            }
+            return Optional.empty();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public boolean resetPasswordWithCode(String username, String code, String newPassword) {
+        try {
+            Optional<Customers> oc = customersDAO.getCustomerByUserName(username);
+            if (!oc.isPresent()) {
+                return false;
+            }
+
+            Customers customer = oc.get();
+
+            // Verify code
+            if (customer.getVerifyCode() == null
+                    || !customer.getVerifyCode().equals(code)
+                    || customer.getVerifyCodeExpire() == null
+                    || customer.getVerifyCodeExpire().isBefore(LocalDateTime.now())) {
+                return false;
+            }
+
+            // Hash new password
+            byte[] newSalt = PasswordUtil.generateSalt();
+            byte[][] newHash = PasswordUtil.hashPassword(newPassword, newSalt);
+            byte[] newPasswordHash = newHash[0];
+            byte[] newPasswordSalt = newHash[1];
+
+            // Update password
+            boolean success = customersDAO.changePassword(customer.getCustomerId(),
+                    newPasswordHash, newPasswordSalt);
+
+            if (success) {
+                // Clear reset code
+                customer.setVerifyCode(null);
+                customer.setVerifyCodeExpire(null);
+                customersDAO.updateCustomer(customer);
+            }
+
+            return success;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public List<LocationDTO> getAllLocation() {
+        try {
+            // Lấy toàn bộ danh sách Location từ Database
+            var locations = locationsDAO.getAllLocations();
+
+            // Chuyển sang DTO
+            return locations.stream()
+                    .map(loc -> {
+                        LocationDTO dto = new LocationDTO();
+                        dto.setLocationId(loc.getLocationId());
+                        dto.setCity(loc.getCity());
+                        dto.setAddress(loc.getAddress());
+                        return dto;
+                    })
+                    .toList();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Trả về danh sách rỗng nếu lỗi
+            return List.of();
+        }
+
+    }
+
+    @Override
+    public int countCustomer() {
+        return customersDAO.countCustomer();
+    }
 }

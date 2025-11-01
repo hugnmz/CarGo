@@ -108,7 +108,9 @@
 
       <!-- Liên kết -->
       <div class="d-flex justify-content-between mt-3">
-        <a href="#">Quên mật khẩu?</a>
+        <a href="${pageContext.request.contextPath}/ForgotPasswordServlet"
+          >Quên mật khẩu?</a
+        >
         <a href="${pageContext.request.contextPath}/RegisterServlet"
           >Đăng ký tài khoản</a
         >

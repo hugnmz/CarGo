@@ -35,10 +35,9 @@ public class CarsDAOImpl implements CarsDAO {
         CarsDAOImpl d = new CarsDAOImpl();
         List<Cars> list = d.getAllCars();
         for (Cars cars : list) {
-            System.out.println(cars.toString());
+            
         }
         
-        System.out.println(d.getCarById(1).toString());
 
     }
 

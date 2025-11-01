@@ -98,8 +98,7 @@ public class ContractServiceImpl implements ContractService {
         try {
             return contractsDAO.updateContractStatus(contractId, status);
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new RuntimeException("error.system", e);
         }
     }
 
@@ -125,7 +124,7 @@ public class ContractServiceImpl implements ContractService {
                 contractDTOs.add(dto);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("error.system", e);
         }
         return contractDTOs;
     }
@@ -143,7 +142,7 @@ public class ContractServiceImpl implements ContractService {
                 contractDTOs.add(dto);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("error.system", e);
         }
         return contractDTOs;
     }
@@ -160,8 +159,7 @@ public class ContractServiceImpl implements ContractService {
             }
             return contractsDAO.addContract(contract);
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new RuntimeException("error.system", e);
         }
     }
 
@@ -197,7 +195,7 @@ public class ContractServiceImpl implements ContractService {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("error.system", e);
         }
 
         return createdContracts;
@@ -210,7 +208,7 @@ public class ContractServiceImpl implements ContractService {
                 return customer.get().getFullName();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("error.system", e);
         }
         return "Khách hàng";
     }
@@ -237,7 +235,7 @@ public class ContractServiceImpl implements ContractService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("error.system", e);
         }
 
         return selectedOrders;
@@ -284,7 +282,7 @@ public class ContractServiceImpl implements ContractService {
             }
 
             // Lấy contract ID vừa tạo - KHÔNG DÙNG STREAM
-            List<model.Contracts> customerContracts = contractsDAO.getContractByCustomer(customerId);
+            List<Contracts> customerContracts = contractsDAO.getContractByCustomer(customerId);
             model.Contracts savedContract = null;
             for (model.Contracts c : customerContracts) {
                 if (c.getStartDate().equals(start) && c.getEndDate().equals(end)) {
@@ -330,8 +328,7 @@ public class ContractServiceImpl implements ContractService {
             return contractDTO;
 
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException("error.system", e);
         }
     }
 

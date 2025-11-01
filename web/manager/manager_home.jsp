@@ -14,8 +14,8 @@
         return;
     }
     if (!"MANAGER".equalsIgnoreCase(role)) {
-        request.setAttribute("error", "Bạn không có quyền truy cập trang này!");
-        request.getRequestDispatcher("error.jsp").forward(request, response);
+        request.setAttribute("errors", "Bạn không có quyền truy cập trang này!");
+        request.getRequestDispatcher("auth/login.jsp").forward(request, response);
         return;
     }
 %>
@@ -70,7 +70,7 @@
         <h4 class="text-center text-white mb-4"><i class="fa-solid fa-car"></i> Car Rental</h4>
         <a href="homemange"><i class="fa-solid fa-house"></i> Trang chủ</a>
         <a href="profile"><i class="fa-solid fa-user-gear"></i> Thông tin cá nhân</a>
-        <a href="manage_customers.jsp"><i class="fa-solid fa-users"></i> Quản lý khách hàng</a>
+        <a href="managecus"><i class="fa-solid fa-users"></i> Quản lý khách hàng</a>
         <a href="managecar"><i class="fa-solid fa-car-side"></i> Quản lý xe</a>
         <a href="#"><i class="fa-solid fa-file-contract"></i> Hợp đồng</a>
         <a href="${pageContext.request.contextPath}/LogoutServlet">
@@ -93,7 +93,7 @@
                             <h5>Quản lý khách hàng</h5>
                             <p class="text-muted">Xem, thêm, cập nhật hoặc xóa thông tin khách hàng</p>
                         </div>
-                        <a href="manage_customers.jsp" class="btn btn-outline-primary">
+                        <a href="managecus" class="btn btn-outline-primary">
                             <i class="fa-solid fa-users"></i> Truy cập
                         </a>
                     </div>

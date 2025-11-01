@@ -52,8 +52,7 @@ public final class DIContainer {
                 }
             }
         } catch (Exception e) {
-            System.err.println("[DI] Lỗi autoScan: " + e.getMessage());
-            e.printStackTrace();
+            throw new RuntimeException("[DI] Lỗi autoScan: " + e.getMessage(), e);
         }
     }
 
@@ -65,9 +64,6 @@ public final class DIContainer {
                 for (Class<?> itf : itfs) {
                     // neu interface da co implementation khac thi canh bao, giu lai ban dau tien
                     if (IMPLEMENTATIONS.containsKey(itf)) {
-                        System.err.println("[DI] Cảnh báo: interface " + itf.getName()
-                                + " có nhiều implementation (" + IMPLEMENTATIONS.get(itf).getName()
-                                + " và " + impl.getName() + "). Giữ lại implementation đầu tiên.");
                         continue;
                     }
                     IMPLEMENTATIONS.put(itf, impl);
@@ -76,7 +72,7 @@ public final class DIContainer {
             // dong thoi luu chinh impl de co the get(ImplClass.class)
             IMPLEMENTATIONS.putIfAbsent(impl, impl);
         } catch (Exception e) {
-            System.err.println("[DI] Lỗi registerClass " + impl.getName() + ": " + e.getMessage());
+            throw new RuntimeException("[DI] Lỗi registerClass " + impl.getName() + ": " + e.getMessage(), e);
         }
     }
 
@@ -248,7 +244,7 @@ public final class DIContainer {
                 }
             }
         } catch (Exception e) {
-            System.err.println("[DI] Lỗi scan packages: " + e.getMessage());
+            throw new RuntimeException("[DI] Lỗi scan packages: " + e.getMessage(), e);
         }
         return result;
     }

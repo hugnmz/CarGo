@@ -28,7 +28,7 @@ public class RolesDaoImpl implements RolesDao{
         RolesDaoImpl r = new RolesDaoImpl();
         List<Roles> list = r.getAllRoles();
         for (Roles roles : list) {
-            System.out.println(roles.toString());
+            
         }
     }
 

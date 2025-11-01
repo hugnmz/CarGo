@@ -13,12 +13,26 @@ public class CustomerDTO {
     private LocalDate dateOfBirth;   // Ngày sinh
     private LocalDateTime createAt;  // Ngày tạo
     private String city;             // Thành phố
-    private String address;          // Dia chi
     private Boolean isVerified;
     private Integer locationId;
 
+    
+    
     // Constructors
     public CustomerDTO() {
+    }
+
+    public CustomerDTO(Integer customerId, String username, String fullName, String phone, String email, LocalDate dateOfBirth, LocalDateTime createAt, String city, Boolean isVerified, Integer locationId) {
+        this.customerId = customerId;
+        this.username = username;
+        this.fullName = fullName;
+        this.phone = phone;
+        this.email = email;
+        this.dateOfBirth = dateOfBirth;
+        this.createAt = createAt;
+        this.city = city;
+        this.isVerified = isVerified;
+        this.locationId = locationId;
     }
 
     // Getters and Setters
@@ -84,14 +98,6 @@ public class CustomerDTO {
 
     public void setCity(String city) {
         this.city = city;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 
     public Boolean getIsVerified() {

@@ -132,8 +132,7 @@ public class ContractServlet extends HttpServlet {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/staff?error=contract_creation_error");
+            throw new RuntimeException("error.system", e);
         }
     }
 
@@ -153,8 +152,7 @@ public class ContractServlet extends HttpServlet {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/staff?error=status_update_error");
+            throw new RuntimeException("error.system", e);
         }
     }
 
@@ -198,8 +196,7 @@ public class ContractServlet extends HttpServlet {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/customer/error.jsp");
+            throw new RuntimeException("error.system", e);
         }
     }
 

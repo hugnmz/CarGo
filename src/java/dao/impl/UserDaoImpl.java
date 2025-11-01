@@ -9,7 +9,7 @@ import util.JdbcTemplateUtil;
 import util.di.annotation.Repository;
 
 @Repository
-public class UserDaoImp implements UsersDAO {
+public class UserDaoImpl implements UsersDAO {
 
     @Override
     public List<Users> getAllUsers() {

@@ -2,7 +2,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 package controller.manager;
 
 import java.io.IOException;
@@ -12,48 +11,66 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import service.CustomerService;
-import service.UserService;
+import jakarta.servlet.http.HttpSession;
 import service.VehicleService;
 import util.di.DIContainer;
+import service.CustomerService;
+import service.UserService;
 
 /**
  *
  * @author DELL
  */
-@WebServlet(name="HomeManage", urlPatterns={"/homemange"})
+@WebServlet(name = "HomeManage", urlPatterns = {"/homemange"})
 public class HomeManage extends HttpServlet {
-   
-    
+
     private VehicleService vehiclesService;
     private CustomerService customerService;
-    
+
     @Override
     public void init() throws ServletException {
         try {
             vehiclesService = DIContainer.get(VehicleService.class);
+            customerService = DIContainer.get(CustomerService.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-    
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
+
+        // Kiểm tra đăng nhập
+//        HttpSession session = request.getSession(false);
+//        if (session == null || session.getAttribute("roleName") == null) {
+//            response.sendRedirect("LoginServlet");
+//            return;
+//        }
+//
+//        // Kiểm tra quyền truy cập
+//        String role = (String) session.getAttribute("roleName");
+//        if (!"MANAGER".equalsIgnoreCase(role)) {
+//            request.setAttribute("errors", "Bạn không có quyền truy cập trang quản lý!");
+//            request.getRequestDispatcher("auth/login.jsp").forward(request, response);
+//            return;
+//        }
+
         int totalVehicles = vehiclesService.countVehical();
-//        int totalCustomers = customerService.getTotalCustomers();
+        int totalCustomers = customerService.countCustomer();
 //        int totalContracts = contractService.getTotalActiveContracts();
 
         request.setAttribute("totalCars", totalVehicles);
-//        request.setAttribute("totalCustomers", totalCustomers);
+        request.setAttribute("totalCustomers", totalCustomers);
 //        request.setAttribute("totalContracts", totalContracts);
 
-        request.getRequestDispatcher("/manager/manager_home.jsp").forward(request, response);
-        
-    } 
+        request.getRequestDispatcher("manager/manager_home.jsp").forward(request, response);
+
+    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
+    /**
      * Handles the HTTP <code>GET</code> method.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -61,12 +78,13 @@ public class HomeManage extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         processRequest(request, response);
-    } 
+    }
 
-    /** 
+    /**
      * Handles the HTTP <code>POST</code> method.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -74,12 +92,13 @@ public class HomeManage extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    /** 
+    /**
      * Returns a short description of the servlet.
+     *
      * @return a String containing servlet description
      */
     @Override

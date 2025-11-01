@@ -38,16 +38,10 @@ public class CartServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // method doGet khong su dung trong servlet nay
+        // Forward den booking form (duoc goi khi filter co loi validation)
+        request.getRequestDispatcher("/customer/booking-form.jsp").forward(request, response);
     }
 
-    /**
-     * method xu ly them san pham vao gio hang
-     * - kiem tra dang nhap
-     * - lay va validate tham so tu form
-     * - them san pham vao gio hang
-     * - chuyen huong voi thong bao ket qua
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -100,15 +94,12 @@ public class CartServlet extends HttpServlet {
             }
 
             // chuyen doi ngay tu string sang localdate
+            // Filter da validate format, nen parse an toan
             LocalDate startDate = null, endDate = null;
-            if (startDateStr != null && endDateStr != null) {
-                try {
-                    startDate = LocalDate.parse(startDateStr);
-                    endDate = LocalDate.parse(endDateStr);
-                } catch (Exception e) {
-                    // neu chuyen doi that bai thi them loi vao danh sach
-                    errors.add(MessageUtil.getError("error.date.format.invalid"));
-                }
+            if (startDateStr != null && !startDateStr.trim().isEmpty() 
+                && endDateStr != null && !endDateStr.trim().isEmpty()) {
+                startDate = LocalDate.parse(startDateStr);
+                endDate = LocalDate.parse(endDateStr);
             }
 
             // kiem tra ngay bat dau phai trong tuong lai
@@ -154,12 +145,7 @@ public class CartServlet extends HttpServlet {
 
         } catch (Exception e) {
             // xu ly loi he thong
-            e.printStackTrace();
-            // tao danh sach loi va hien thi trang booking form
-            List<String> errors = new ArrayList<>();
-            errors.add(MessageUtil.getError("error.system.cart"));
-            request.setAttribute("errors", errors);
-            request.getRequestDispatcher("/customer/booking-form.jsp").forward(request, response);
+            throw new RuntimeException("error.system.cart", e);
         }
     }
 

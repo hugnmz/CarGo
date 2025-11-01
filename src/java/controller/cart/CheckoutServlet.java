@@ -13,7 +13,6 @@ import util.AuthUtil;
 import util.MessageUtil;
 import util.di.DIContainer;
 
-
 @WebServlet(name = "CheckoutServlet", urlPatterns = {"/checkout"})
 public class CheckoutServlet extends HttpServlet {
 
@@ -33,6 +32,14 @@ public class CheckoutServlet extends HttpServlet {
     }
 
     @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doGet(request, response); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+
+        request.getRequestDispatcher("/ViewCartDetail").forward(request, response);
+
+    }
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -40,14 +47,14 @@ public class CheckoutServlet extends HttpServlet {
         if (!AuthUtil.requireLogin(request, response)) {
             return;
         }
-        
+
         // lay customer id tu session
         Integer customerId = AuthUtil.getCustomerId(request);
-        
+
         // lay danh sach id cac don hang duoc chon tu form
         String[] selectedIds = request.getParameterValues("selectedIds");
         Integer[] selectedOrderIds = null;
-        
+
         // kiem tra neu co don hang duoc chon
         if (selectedIds != null && selectedIds.length > 0) {
             // tao mang integer tu mang string
@@ -61,22 +68,22 @@ public class CheckoutServlet extends HttpServlet {
                 }
             }
         }
-        
+
         try {
             // tao hop dong tu gio hang voi cac don hang duoc chon
             List<ContractDTO> createdContracts = contractService.createContractsFromCart(customerId, selectedOrderIds);
-            
+
             if (createdContracts.isEmpty()) {
                 // neu khong co hop dong nao duoc tao thi chuyen ve trang gio hang
                 response.sendRedirect(request.getContextPath() + "/ViewCartDetail");
                 return;
             }
-            
+
             // dat danh sach hop dong da tao vao request de truyen sang jsp
             request.setAttribute("created", createdContracts);
             // chuyen huong den trang hien thi ket qua thanh toan
             request.getRequestDispatcher("/customer/checkout-result.jsp").forward(request, response);
-            
+
         } catch (Exception e) {
             // log loi ra console
             e.printStackTrace();

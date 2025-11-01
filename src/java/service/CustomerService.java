@@ -5,6 +5,7 @@
 package service;
 
 import dto.CustomerDTO;
+import dto.LocationDTO;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +23,7 @@ public interface CustomerService {
 
     //quản lí customer
     Optional<CustomerDTO> getCustomerByUsername(String username);
-    
+
     Optional<CustomerDTO> getCustomerById(Integer customerId);
 
     List<CustomerDTO> getAllCustomers();
@@ -48,4 +49,14 @@ public interface CustomerService {
     boolean verifyAccount(String username, String code);
 
     Optional<String> generateAndStoreVerificationCode(String username);
+
+    Optional<String> generateAndStoreResetCode(String username);  // Method riêng cho reset password
+
+    boolean resetPasswordWithCode(String username, String code, String newPassword);
+
+    Optional<CustomerDTO> getCustomerByUsernameAndEmail(String username, String email);
+
+    List<LocationDTO> getAllLocation();
+
+    int countCustomer();
 }

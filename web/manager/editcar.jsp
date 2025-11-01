@@ -9,7 +9,7 @@
 
     String role = (String) session.getAttribute("roleName");
     if (role == null || !"MANAGER".equalsIgnoreCase(role)) {
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("auth/login.jsp");
         return;
     }
 %>
@@ -21,7 +21,59 @@
         <title>Chỉnh sửa xe</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-        <link href="${pageContext.request.contextPath}/css/manager/editcar.css" rel="stylesheet">
+        <style>
+            body {
+                background-color: #e8f0fe;
+                font-family: "Segoe UI", sans-serif;
+            }
+            .container {
+                max-width: 800px;
+                margin: 50px auto;
+            }
+            .card {
+                border-radius: 12px;
+                box-shadow: 0 0 15px rgba(0,0,0,0.15);
+                border: none;
+            }
+            .card-header {
+                background-color: #007bff;
+                color: white;
+                border-top-left-radius: 12px;
+                border-top-right-radius: 12px;
+            }
+            .form-label {
+                font-weight: 600;
+            }
+            .form-control, .form-select {
+                border-radius: 8px;
+                border: 1px solid #bcd0f7;
+            }
+            .form-control:focus, .form-select:focus {
+                border-color: #007bff;
+                box-shadow: 0 0 5px rgba(0,123,255,0.3);
+            }
+            .btn-primary {
+                background-color: #007bff;
+                border: none;
+            }
+            .btn-primary:hover {
+                background-color: #0069d9;
+            }
+            .btn-secondary {
+                background-color: #6c757d;
+                border: none;
+            }
+            .btn-secondary:hover {
+                background-color: #5a6268;
+            }
+            .car-img-preview {
+                width: 160px;
+                height: 100px;
+                object-fit: cover;
+                border-radius: 8px;
+                border: 1px solid #ddd;
+            }
+        </style>
     </head>
     <body>
         <div class="container">

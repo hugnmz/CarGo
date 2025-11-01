@@ -4,7 +4,7 @@
  */
 package controller.manager.auth;
 
-import dto.UserDTO;
+import dto.UseDTO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -14,9 +14,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import service.RoleService;
-import service.UserService;
 import util.di.DIContainer;
-import util.MessageUtil;
+import service.UseService;
 
 /**
  *
@@ -25,12 +24,12 @@ import util.MessageUtil;
 @WebServlet(name = "UpdateInfor", urlPatterns = {"/updateinfor"})
 public class UpdateInfor extends HttpServlet {
 
-    private UserService userService;
+    private UseService userService;
 
     @Override
     public void init() throws ServletException {
         try {
-            userService = DIContainer.get(UserService.class);
+            userService = DIContainer.get(UseService.class);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -55,7 +54,7 @@ public class UpdateInfor extends HttpServlet {
             int locationId = Integer.parseInt(request.getParameter("locationId"));
 
             // Tạo đối tượng user mới
-            UserDTO user = new UserDTO();
+            UseDTO user = new UseDTO();
             user.setUserId(userId);
             user.setFullName(fullName);
             user.setEmail(email);
@@ -66,11 +65,11 @@ public class UpdateInfor extends HttpServlet {
             userService.updateUser(user);
 
             //Truyền dữ liệu về server
-            request.setAttribute("message", MessageUtil.getError("error.user.update.success"));
+            request.setAttribute("message", "Cập nhật user thành công!");
             request.getRequestDispatcher("profile").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.user.update.error"));
+            request.setAttribute("error", "Lỗi khi cập nhật user: " + e.getMessage());
         }
     }
 

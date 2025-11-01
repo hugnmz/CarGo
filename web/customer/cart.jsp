@@ -58,7 +58,7 @@ contentType="text/html; charset=UTF-8" language="java" %>
                         }
                         dateGroupsMap.get(dateKey).add(obj);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        throw new RuntimeException("error.system.cart", e);
                     }
                 }
             }

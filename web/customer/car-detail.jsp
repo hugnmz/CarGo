@@ -1,14 +1,10 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
-<%@ page import="jakarta.servlet.http.*, jakarta.servlet.*" %>
-<%
-    String username = (String) session.getAttribute("username");
-    String avatar = (String) session.getAttribute("avatar");
-    if (avatar == null || avatar.isEmpty()) {
-        avatar = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
-    }
-%>
+
+<c:set var="c" value="${sessionScope.c}" />
+<c:set var="username" value="${c != null ? c.username : sessionScope.username}" />
+<c:set var="avatar" value="${not empty sessionScope.avatar ? sessionScope.avatar : 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'}" />
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -34,23 +30,26 @@
                         <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/home">Trang chủ</a></li>
                         <li class="nav-item"><a class="nav-link" href="#">Về chúng tôi</a></li>
                         <li class="nav-item"><a class="nav-link" href="#">Liên hệ</a></li>
-                            <% if (username != null && !username.isEmpty()) { %>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                               data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="<%= avatar %>" alt="Avatar" style="width:40px; height:40px; border-radius:50%;">
-                                <span class="ms-1"><%= username %></span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href="${pageContext.request.contextPath}/CustomerServlet">Thông tin cá nhân</a></li>
-                                <li><a class="dropdown-item" href="${pageContext.request.contextPath}/LogoutServlet">Đăng xuất</a></li>
-                            </ul>
-                        </li>
-                        <% } else { %>
-                        <li class="nav-item">
-                            <a class="nav-link" href="${pageContext.request.contextPath}/auth/login.jsp">Đăng nhập</a>
-                        </li>
-                        <% } %>
+                        <c:choose>
+                            <c:when test="${not empty username}">
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                       data-bs-toggle="dropdown" aria-expanded="false">
+                                        <img src="${avatar}" alt="Avatar" style="width:40px; height:40px; border-radius:50%;">
+                                        <span class="ms-1">${username}</span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/CustomerServlet">Thông tin cá nhân</a></li>
+                                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/LogoutServlet">Đăng xuất</a></li>
+                                    </ul>
+                                </li>
+                            </c:when>
+                            <c:otherwise>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="${pageContext.request.contextPath}/auth/login.jsp">Đăng nhập</a>
+                                </li>
+                            </c:otherwise>
+                        </c:choose>
                     </ul>
                 </div>
             </div>

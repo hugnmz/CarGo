@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -61,8 +62,8 @@ public class CustomerServlet extends HttpServlet {
         }
 
         // lay customer id tu session
-        Integer customerId = (Integer) session.getAttribute("customerId");
-        if (customerId == null) {
+        CustomerDTO customerDTO = (CustomerDTO) session.getAttribute("c");
+        if (customerDTO.getCustomerId() == null) {
             // neu khong co customer id thi chuyen den trang dang nhap
             response.sendRedirect(request.getContextPath() + "/auth/login.jsp");
             return;
@@ -70,22 +71,16 @@ public class CustomerServlet extends HttpServlet {
 
         try {
             // lay thong tin khach hang tu database bang customer id
-            Optional<CustomerDTO> customerOpt = customerService.getCustomerById(customerId);
+            Optional<CustomerDTO> customerOpt = customerService.getCustomerById(customerDTO.getCustomerId());
 
-            if (customerOpt.isPresent()) {
-                // neu tim thay khach hang thi lay thong tin
-                CustomerDTO customer = customerOpt.get();
-                // dat thong tin khach hang vao request de truyen sang jsp
-                request.setAttribute("customer", customer);
-                // khong luu customer object vao session de tiet kiem bo nho
-            }
+            CustomerDTO customer = customerOpt.get();
 
             //lay danh sach locations
             List<LocationDTO> locations = locationService.getAllLocations();
             request.setAttribute("locations", locations);
 
             // lay danh sach hop dong cua khach hang tu database
-            List<ContractDTO> listContract = contractService.getContractsByCustomer(customerId);
+            List<ContractDTO> listContract = contractService.getContractsByCustomer(customer.getCustomerId());
             // dat danh sach hop dong vao request de truyen sang jsp
             request.setAttribute("listContract", listContract);
 
@@ -94,9 +89,6 @@ public class CustomerServlet extends HttpServlet {
             request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
 
         } catch (Exception e) {
-            // log loi chi tiet ra console
-            System.err.println("Error in CustomerServlet: " + e.getMessage());
-            e.printStackTrace();
 
             // dat thong bao loi cho nguoi dung
             request.setAttribute("error", "Có lỗi xảy ra khi tải thông tin. Vui lòng thử lại sau.");
@@ -141,30 +133,26 @@ public class CustomerServlet extends HttpServlet {
             customerDTO.setPhone(phone);
             customerDTO.setCity(city);
 
-            // kiem tra va set trang thai xac thuc neu co
-            if (isVerifiedStr != null && !isVerifiedStr.isEmpty()) {
-                customerDTO.setIsVerified(Boolean.valueOf(isVerifiedStr));
-            }
-
             // kiem tra va set ngay sinh neu co
             if (dateOfBirthStr != null && !dateOfBirthStr.isEmpty()) {
-                customerDTO.setDateOfBirth(java.time.LocalDate.parse(dateOfBirthStr));
+                customerDTO.setDateOfBirth(LocalDate.parse(dateOfBirthStr));
             }
 
             // goi service de cap nhat thong tin khach hang
             boolean success = customerService.updateCustomer(customerDTO);
 
             if (success) {
-                // neu cap nhat thanh cong thi cap nhat lai session
-                HttpSession session = request.getSession();
-                session.setAttribute("fullName", fullName);
-                session.setAttribute("email", email);
-                session.setAttribute("phone", phone);
-                session.setAttribute("city", city);
-                // cap nhat ngay sinh neu co
-                if (dateOfBirthStr != null) {
-                    session.setAttribute("dateOfBirth", dateOfBirthStr);
+                HttpSession session = request.getSession(false);
+                CustomerDTO oldCustomer = (CustomerDTO) session.getAttribute("c");
+                
+                // lay customer updated tu database
+                Optional<CustomerDTO> updatedOpt = customerService.getCustomerById(oldCustomer.getCustomerId());
+                
+                if (updatedOpt.isPresent()) {
+                    // cap nhat lai customer object trong session
+                    session.setAttribute("c", updatedOpt.get());
                 }
+
                 // chuyen huong den trang profile voi thong bao thanh cong
                 response.sendRedirect(request.getContextPath() + "/CustomerServlet?success=1");
             } else {

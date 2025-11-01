@@ -20,7 +20,7 @@ public class LogoutAdmin extends HttpServlet {
             session.invalidate(); // huỷ session
         }
         // Redirect về trang login admin
-        response.sendRedirect("LoginAdmin");
+        response.sendRedirect(request.getContextPath() + "/home?logout=success");
     }
 
     @Override
@@ -28,10 +28,5 @@ public class LogoutAdmin extends HttpServlet {
             throws ServletException, IOException {
         // Gọi doGet để logout cũng được
         doGet(request, response);
-    }
-
-    @Override
-    public String getServletInfo() {
-        return "Logout admin servlet";
     }
 }

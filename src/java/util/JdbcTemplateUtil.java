@@ -26,8 +26,7 @@ public class JdbcTemplateUtil {
 
         } catch (Exception e) {
             // log loi neu co
-            e.printStackTrace();
-            return 0;
+            throw new RuntimeException("error.system", e);
         }
     }
 
@@ -50,7 +49,7 @@ public class JdbcTemplateUtil {
             }
         } catch (Exception e) {
             // log loi neu co
-            e.printStackTrace();
+            throw new RuntimeException("error.system", e);
         }
 
         return result;
@@ -81,8 +80,7 @@ public class JdbcTemplateUtil {
             }
         } catch (Exception e) {
             // log loi neu co
-            e.printStackTrace();
-            return 0;
+            throw new RuntimeException("error.system", e);
         }
     }
 
@@ -99,8 +97,7 @@ public class JdbcTemplateUtil {
             }
         } catch (Exception e) {
             // log loi neu co
-            e.printStackTrace();
-            return 0;
+            throw new RuntimeException("error.system", e);
         }
     }
   

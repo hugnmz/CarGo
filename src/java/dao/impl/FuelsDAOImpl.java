@@ -20,7 +20,7 @@ public class FuelsDAOImpl implements FuelsDAO {
         FuelsDAOImpl d = new FuelsDAOImpl();
         List<Fuels> list = d.getAllFuels();
         for (Fuels fuels : list) {
-            System.out.println(fuels.toString());
+            
         }
     }
 

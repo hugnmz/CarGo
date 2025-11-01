@@ -15,7 +15,6 @@ import service.UserService;
 import util.MessageUtil;
 import util.di.DIContainer;
 
-
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
 
@@ -54,162 +53,80 @@ public class LoginServlet extends HttpServlet {
         request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
     }
 
-    /**
-     * method xu ly dang nhap
-     * - lay tham so tu form dang nhap
-     * - validate thong tin dang nhap
-     * - dang nhap voi vai tro customer hoac user
-     * - tao session va chuyen huong den trang phu hop
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // lay tham so tu form dang nhap
+        // Lay tham so tu form
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String rememberMe = request.getParameter("rememberMe");
 
-        // tao danh sach de luu cac loi validation
-        List<String> errors = new ArrayList<>();
-
-        // kiem tra username co rong khong
-        if (username == null || username.trim().isEmpty()) {
-            errors.add(MessageUtil.getError("error.username.required"));
-        }
-        // kiem tra password co rong khong
-        if (password == null || password.trim().isEmpty()) {
-            errors.add(MessageUtil.getError("error.password.required"));
-        }
-
-        // neu co loi validation thi hien thi lai trang dang nhap
-        if (!errors.isEmpty()) {
-            request.setAttribute("errors", errors);
-            request.setAttribute("username", username);
-            request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
+        // Check du lieu dau vao
+        if (username == null || username.trim().isEmpty()
+                || password == null || password.trim().isEmpty()) {
+            request.setAttribute("errors", "Vui lòng nhập đầy đủ thông tin");
+            request.getRequestDispatcher("auth/login.jsp").forward(request, response);
             return;
         }
 
         try {
-            // dang nhap voi vai tro customer truoc
+            //1. Đăng nhập với vai trò Customer
             Optional<CustomerDTO> customerOpt = customerService.loginCustomer(username, password);
             if (customerOpt.isPresent()) {
                 CustomerDTO customer = customerOpt.get();
-
-                // huy session cu neu co va luu lai redirect url
-                HttpSession old = request.getSession(false);
-                String redirectURL = null;
-                if (old != null) {
-                    redirectURL = (String) old.getAttribute("redirectAfterLogin");
-                    old.invalidate();
-                }
-
-                // tao session moi cho customer
                 HttpSession session = request.getSession(true);
                 setCustomerSession(session, customer);
-                if (redirectURL != null) {
-                    session.setAttribute("redirectAfterLogin", redirectURL);
-                }
-                session.removeAttribute("redirectURL");
-
-                // xu ly remember me neu duoc chon
-                handleRememberMe(response, username, request.getContextPath(), rememberMe);
-
-                // neu co redirect after login hop le thi chuyen den do, neu khong thi ve trang chu
-                String currURL = (String) session.getAttribute("redirectAfterLogin");
-                String targetPath = (isSafeInternalPath(currURL) ? currURL : "/home?login=success");
-                response.sendRedirect(request.getContextPath() + targetPath);
+                redirectByRole(response, request, "CUSTOMER");
                 return;
             }
 
-            // neu khong phai customer thi thu dang nhap voi vai tro staff/manager
+            //2. Đăng nhập với vai trò Staff / Manager
             Optional<UserDTO> userOpt = userService.loginUser(username, password);
             if (userOpt.isPresent()) {
                 UserDTO user = userOpt.get();
 
-                // huy session cu neu co va luu lai redirect url
-                HttpSession old = request.getSession(false);
-                String redirectURL = null;
-                if (old != null) {
-                    redirectURL = (String) old.getAttribute("redirectAfterLogin");
-                    old.invalidate();
-                }
-
-                // tao session moi cho user
                 HttpSession session = request.getSession(true);
                 setUserSession(session, user);
-                if (redirectURL != null) {
-                    session.setAttribute("redirectAfterLogin", redirectURL);
-                }
-                session.removeAttribute("redirectURL");
-
-                // xu ly remember me neu duoc chon
-                handleRememberMe(response, username, request.getContextPath(), rememberMe);
-
-                // uu tien redirect after login neu co va hop le, neu khong thi chuyen huong theo role
-                String currURL = (String) session.getAttribute("redirectAfterLogin");
-                if (isSafeInternalPath(currURL)) {
-                    response.sendRedirect(request.getContextPath() + currURL);
-                } else {
-                    redirectByRole(response, request, user.getRoleName());
-                }
+                redirectByRole(response, request, user.getRoleName());
                 return;
             }
 
-            // neu sai thong tin dang nhap thi them loi vao danh sach
-            errors.add(MessageUtil.getError("error.login.invalid"));
-            request.setAttribute("errors", errors);
-            request.setAttribute("username", username);
-            request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
+            //3. Sai thông tin đăng nhập
+            request.setAttribute("errors", "Sai tên đăng nhập hoặc mật khẩu.");
+            request.getRequestDispatcher("auth/login.jsp").forward(request, response);
 
         } catch (Exception e) {
-            // log loi ra console
             e.printStackTrace();
-            // them loi he thong vao danh sach
-            errors.add(MessageUtil.getError("error.system.login"));
-            request.setAttribute("errors", errors);
-            request.setAttribute("username", username);
-            request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
+            request.setAttribute("errors", "Đã xảy ra lỗi khi đăng nhập.");
+            request.getRequestDispatcher("auth/login.jsp").forward(request, response);
         }
     }
+
     private void setCustomerSession(HttpSession session, CustomerDTO customer) {
         session.setAttribute("userType", "CUSTOMER");
-        session.setAttribute("customerId", customer.getCustomerId());
-        session.setAttribute("username", customer.getUsername());
-        session.setAttribute("fullName", customer.getFullName());
+        session.setAttribute("c", customer);
         session.setAttribute("loginTime", System.currentTimeMillis());
         session.setMaxInactiveInterval(2 * 60 * 60); // tang len 2 gio
     }
 
-
-    private void setUserSession(HttpSession session, UserDTO user) {
+     private void setUserSession(HttpSession session, UserDTO user) {
         session.setAttribute("userType", user.getRoleName());
         session.setAttribute("userId", user.getUserId());
-        session.setAttribute("username", user.getUsername());
+        session.setAttribute("usernameu", user.getUsername());
         session.setAttribute("fullName", user.getFullName());
         session.setAttribute("email", user.getEmail());
         session.setAttribute("roleName", user.getRoleName());
-        session.setAttribute("loginTime", System.currentTimeMillis());   // cho dong nhat
         session.setMaxInactiveInterval(60 * 60);
     }
+    
 
-    private void handleRememberMe(HttpServletResponse response, String username, String contextPath, String rememberMe) {
-        if ("on".equals(rememberMe)) {
-            Cookie cookie = new Cookie("rememberMeUser", username);
-            cookie.setMaxAge(30 * 24 * 60 * 60); // 30 ngày
-            cookie.setHttpOnly(true);
-            cookie.setPath((contextPath == null || contextPath.isEmpty()) ? "/" : contextPath);
-            response.addCookie(cookie);
-        }
-    }
-
-    private void redirectByRole(HttpServletResponse response, HttpServletRequest request, String role)
-            throws IOException {
+        private void redirectByRole(HttpServletResponse response, HttpServletRequest request, String role)
+            throws IOException, ServletException {
         String path = request.getContextPath();
-        switch (role == null ? "" : role.toUpperCase()) {
+
+        switch (role.toUpperCase()) {
             case "MANAGER":
-                // NOTE: đường "/homemange" trong code gốc có vẻ là typo,
-                // nếu route thực tế của bạn là "/homeManager" thì đổi lại ở đây.
                 response.sendRedirect(path + "/homemange");
                 break;
             case "STAFF":
@@ -218,8 +135,9 @@ public class LoginServlet extends HttpServlet {
             case "CUSTOMER":
                 response.sendRedirect(path + "/home");
                 break;
-            default:
-                response.sendRedirect(path + "/error403.jsp");
+            case "ADMIN":
+                response.sendRedirect(request.getContextPath() + "/HomeAdmin");
+                break;
         }
     }
 

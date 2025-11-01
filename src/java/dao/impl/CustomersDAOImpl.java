@@ -18,6 +18,7 @@ import util.di.annotation.Repository;
  */
 @Repository
 public class CustomersDAOImpl implements CustomersDAO {
+
     @Override
     public List<Customers> getAllCustomers() {
         String sql = "select * from Customers";
@@ -87,7 +88,6 @@ public class CustomersDAOImpl implements CustomersDAO {
         int affected = JdbcTemplateUtil.update(sql, customerId);
         return affected > 0;
     }
-    
 
     @Override
     public boolean changePassword(Integer customerId, byte[] newHash, byte[] newSalt) {
@@ -126,6 +126,21 @@ public class CustomersDAOImpl implements CustomersDAO {
         String sql = "select COUNT(*) FROM Customers WHERE phone = ?";
         int count = JdbcTemplateUtil.count(sql, phone);
         return count > 0;
+    }
+
+    @Override
+    public Optional<Customers> getCustomerByUsernameAndEmail(String username, String email) {
+        String sql = "select c.*, l.city "
+                + "from Customers c left join Locations l on "
+                + "c.locationId = l.locationId where c.username = ? AND c.email = ?";
+        Customers one = JdbcTemplateUtil.queryOne(sql, Customers.class, username, email);
+        return Optional.ofNullable(one);
+    }
+
+     @Override
+    public int countCustomer() {
+        String sql = "SELECT COUNT(*) FROM dbo.Customers";
+        return JdbcTemplateUtil.count(sql);
     }
 
 }

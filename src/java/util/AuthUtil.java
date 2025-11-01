@@ -1,5 +1,6 @@
 package util;
 
+import dto.CustomerDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -13,8 +14,9 @@ public class AuthUtil {
         // lay session hien tai, neu khong co thi null
         HttpSession session = request.getSession(false);
 
-        // kiem tra session va customer id
-        if (session == null || session.getAttribute("customerId") == null) {
+        // kiem tra session va customer object
+        CustomerDTO customer = (session != null) ? (CustomerDTO) session.getAttribute("c") : null;
+        if (session == null || customer == null || customer.getCustomerId() == null) {
             // luu url hien tai de chuyen huong sau khi dang nhap
             String requestURI = request.getRequestURI();
             String contextPath = request.getContextPath();
@@ -37,13 +39,23 @@ public class AuthUtil {
         return true;
     }
 
-    // method lay customer id tu session
+    // method lay customer id tu customer object trong session
     public static Integer getCustomerId(HttpServletRequest request) {
         // lay session hien tai, neu khong co thi null
         HttpSession session = request.getSession(false);
         if (session != null) {
-            // tra ve customer id tu session
-            return (Integer) session.getAttribute("customerId");
+            CustomerDTO customer = (CustomerDTO) session.getAttribute("c");
+            // tra ve customer id tu customer object
+            return (customer != null) ? customer.getCustomerId() : null;
+        }
+        return null;
+    }
+    
+    // method lay customer object tu session
+    public static CustomerDTO getCustomer(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            return (CustomerDTO) session.getAttribute("c");
         }
         return null;
     }

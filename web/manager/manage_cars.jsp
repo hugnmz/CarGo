@@ -9,7 +9,7 @@
 
     String role = (String) session.getAttribute("roleName");
     if (role == null || !"MANAGER".equalsIgnoreCase(role)) {
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("auth/login.jsp");
         return;
     }
 %>
@@ -21,7 +21,51 @@
         <title>Quản lý xe - Manager</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-        <link href="${pageContext.request.contextPath}/css/manager/manage_cars.css" rel="stylesheet">
+        <style>
+            body {
+                background-color: #f8f9fa;
+            }
+            .sidebar {
+                height: 100vh;
+                background-color: #212529;
+                color: white;
+                position: fixed;
+                width: 240px;
+                top: 0;
+                left: 0;
+                padding-top: 20px;
+            }
+            .sidebar a {
+                color: #adb5bd;
+                text-decoration: none;
+                display: block;
+                padding: 10px 20px;
+            }
+            .sidebar a:hover {
+                background-color: #343a40;
+                color: #fff;
+            }
+            .content {
+                margin-left: 250px;
+                padding: 20px;
+            }
+            .table th {
+                background-color: #0d6efd;
+                color: white;
+            }
+            .car-img {
+                width: 100px;
+                height: 60px;
+                object-fit: cover;
+                border-radius: 6px;
+                border: 1px solid #ddd;
+            }
+
+            .sidebar a.active {
+                background-color: #0d6efd;
+                color: #fff !important;
+            }
+        </style>
     </head>
     <body>
         <!-- Sidebar -->
@@ -29,8 +73,8 @@
             <h4 class="text-center text-white mb-4"><i class="fa-solid fa-car"></i> Car Rental</h4>
             <a href="homemange"><i class="fa-solid fa-house"></i> Trang chủ</a>
             <a href="profile"><i class="fa-solid fa-user-gear"></i> Thông tin cá nhân</a>
-            <a href="manage_customers.jsp"><i class="fa-solid fa-users"></i> Quản lý khách hàng</a>
-            <a href="manage_cars.jsp"
+            <a href="managecus"><i class="fa-solid fa-users"></i> Quản lý khách hàng</a>
+            <a href="managecar"
                class="<%= request.getRequestURI().contains("manage_cars.jsp") ? "active" : "" %>">
                 <i class="fa-solid fa-car-side"></i> Quản lý xe
             </a>
@@ -80,10 +124,6 @@
                                 <textarea class="form-control" id="description" name="description" rows="3" placeholder="Nhập mô tả chi tiết về xe..."></textarea>
                             </div>
                             <!-- Ảnh xe -->
-                            <!--                            <div class="col-md-6">
-                                                            <label for="image" class="form-label">Hình ảnh xe</label>
-                                                            <input type="text" class="form-control" id="image" name="image" accept="image/*" required>
-                                                        </div>-->
                             <div class="col-md-6">
                                 <label for="image" class="form-label">Hình ảnh xe (Link)</label>
                                 <input type="text" class="form-control" id="image" name="image" placeholder="Nhập link ảnh trực tuyến" required>

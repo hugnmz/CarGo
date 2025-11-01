@@ -27,14 +27,14 @@ public class EmailUtil {
                 // tai cau hinh tu file
                 props.load(in);
             } else {
-                // neu khong tim thay file thi in loi
-                System.err.println("[EmailUtil] mail.properties not found!");
+                // neu khong tim thay file thi bo qua
             }
         } catch (IOException e) {
             // log loi neu co
-            e.printStackTrace();
+            throw new RuntimeException("error.email.send.failed", e);
         }
     }
+
 
     // method tao session email voi cau hinh smtp
     private static Session buildSession() {
@@ -63,7 +63,7 @@ public class EmailUtil {
         });
     }
 
-    // method gui email don gian
+    // method gui email 
     public static void send(String to, String subject, String htmlBody) throws MessagingException {
         // tao session
         Session session = buildSession();
@@ -83,13 +83,14 @@ public class EmailUtil {
     }
 
     
-    // method gui thong tin tai khoan cho nhan vien
-    public static void sendCredentials(String toEmail, String username, String password, String role) {
-        // lay cau hinh tu mail.properties
+   
+    //Admin gửi thông tin tài khoản cho nhân viên
+    public static void sendCredentials(String toEmail, String fullname,
+            String username, String password, String role) {
+        // Load cấu hình từ mail.properties
         final String fromEmail = props.getProperty("mail.from", props.getProperty("mail.username"));
         final String appPassword = props.getProperty("mail.password");
 
-        // tao properties cho smtp
         Properties mailProps = new Properties();
         mailProps.put("mail.smtp.auth", props.getProperty("mail.smtp.auth", "true"));
         mailProps.put("mail.smtp.starttls.enable", props.getProperty("mail.smtp.starttls.enable", "true"));
@@ -97,12 +98,11 @@ public class EmailUtil {
         mailProps.put("mail.smtp.host", props.getProperty("mail.smtp.host", "smtp.gmail.com"));
         mailProps.put("mail.smtp.port", props.getProperty("mail.smtp.port", "587"));
 
-        // neu co bat debug mode
+        // Nếu có bật debug mode
         if ("true".equalsIgnoreCase(props.getProperty("mail.debug"))) {
             mailProps.put("mail.debug", "true");
         }
 
-        // tao session voi authenticator
         Session session = Session.getInstance(mailProps, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
@@ -111,14 +111,12 @@ public class EmailUtil {
         });
 
         try {
-            // tao message
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(fromEmail, "CarGo Admin"));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
             message.setSubject("CarGo account your information");
 
-            // tao noi dung email html
-            String content = "<h3>Xin chào " + username + ",</h3>"
+            String content = "<h3>Xin chào " + fullname + ",</h3>"
                     + "<p>Tài khoản của bạn đã được tạo trong hệ thống CarGo.</p>"
                     + "<p><b>Tên đăng nhập:</b> " + username + "<br>"
                     + "<b>Mật khẩu:</b> " + password + "<br>"
@@ -128,11 +126,9 @@ public class EmailUtil {
 
             message.setContent(content, "text/html; charset=UTF-8");
 
-            // gui email
             Transport.send(message);
             System.out.println("[EmailUtil] Mail sent to " + toEmail);
         } catch (Exception e) {
-            // log loi neu co
             e.printStackTrace();
             System.out.println("[EmailUtil] Lỗi gửi email: " + e.getMessage());
         }

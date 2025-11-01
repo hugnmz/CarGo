@@ -31,7 +31,7 @@ public interface CarPricesDAO {
     
     boolean deleteCarPricesByCarId(Integer carId);
 
-    boolean endCurrentPrice(Integer carId, LocalDate endDate);
+    boolean endCurrentPrice(Integer carId);
     
     Optional<BigDecimal> getCurrentDailyPrice(Integer carId);
     

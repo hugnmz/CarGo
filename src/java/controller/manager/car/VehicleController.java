@@ -10,7 +10,6 @@ import java.util.Optional;
 import service.VehicleService;
 import service.CarService;
 import util.di.DIContainer;
-import util.MessageUtil;
 
 @WebServlet(name = "VehicleController", urlPatterns = {"/vehiclecontroller"})
 public class VehicleController extends HttpServlet {
@@ -43,31 +42,14 @@ public class VehicleController extends HttpServlet {
             v.setIsActive(isActive);
             v.setLocationId(locationId);
 
-//            boolean added = vehicleService.addVehicle(v);
-//            if (added) {
-//                request.setAttribute("message", "Thêm vehicle thành công!");
-//            } else {
-//                request.setAttribute("error", "Thêm vehicle thất bại!");
-//            }
-//
-//            request.getRequestDispatcher("cardetail?action=detail&carId=" + carId)
-//                    .forward(request, response);
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            request.setAttribute("error", "Lỗi khi thêm vehicle: " + e.getMessage());
-//            request.getRequestDispatcher("cardetail?action=detail&carId="
-//                    + Integer.parseInt(request.getParameter("carId")))
-//                    .forward(request, response);
-//        }
             vehicleService.addVehicle(v);
 
-            request.setAttribute("message", MessageUtil.getError("error.vehicle.add.success"));
+            request.setAttribute("message", "Thêm vehicle thành công!");
 
         } catch (Exception e) {
             e.printStackTrace();
             // Đẩy lỗi chi tiết ra JSP
-            request.setAttribute("error", MessageUtil.getError("error.vehicle.add.failed"));
+            request.setAttribute("error", "Thêm thất bại: " + e.getMessage());
         }
         request.getRequestDispatcher("controllerinformationcar?action=detail&carId="
                 + Integer.parseInt(request.getParameter("carId")))
@@ -91,32 +73,15 @@ public class VehicleController extends HttpServlet {
             v.setLocationId(locationId);
             v.setCarId(carId);
 
-//            boolean updated = vehicleService.updateVehicle(v);
-//            if (updated) {
-//                request.setAttribute("message", "Cập nhật vehicle thành công!");
-//            } else {
-//                request.setAttribute("error", "Cập nhật vehicle thất bại!");
-//            }
-//
-//           request.getRequestDispatcher("cardetail?action=detail&carId=" + carId)
-//                    .forward(request, response);
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            request.setAttribute("error", "Lỗi khi cập nhật vehicle: " + e.getMessage());
-//            request.getRequestDispatcher("cardetail?action=detail&carId=" + 
-//                    Integer.parseInt(request.getParameter("carId")))
-//                    .forward(request, response);
-//        }
             // Gọi service có ném Exception
             vehicleService.updateVehicle(v);
 
-            request.setAttribute("message", MessageUtil.getError("error.vehicle.update.success"));
+            request.setAttribute("message", "Cập nhật vehicle thành công!");
 
         } catch (Exception e) {
             e.printStackTrace();
             // Đẩy lỗi chi tiết ra JSP
-            request.setAttribute("error", MessageUtil.getError("error.vehicle.update.failed"));
+            request.setAttribute("error", "Cập nhật thất bại: " + e.getMessage());
         }
 
         request.getRequestDispatcher("controllerinformationcar?action=detail&carId="
@@ -133,9 +98,9 @@ public class VehicleController extends HttpServlet {
 
             boolean deleted = vehicleService.deleteVehicle(vehicleId);
             if (deleted) {
-                request.setAttribute("message", MessageUtil.getError("error.vehicle.delete.success"));
+                request.setAttribute("message", "Xóa vehicle thành công!");
             } else {
-                request.setAttribute("error", MessageUtil.getError("error.vehicle.delete.failed"));
+                request.setAttribute("error", "Xóa vehicle thất bại!");
             }
 
             request.getRequestDispatcher("controllerinformationcar?action=detail&carId=" + carId)
@@ -143,7 +108,7 @@ public class VehicleController extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.vehicle.delete.error"));
+            request.setAttribute("error", "Lỗi khi xóa vehicle: " + e.getMessage());
             request.getRequestDispatcher("controllerinformationcar?action=detail&carId="
                     + Integer.parseInt(request.getParameter("carId")))
                     .forward(request, response);
@@ -162,7 +127,7 @@ public class VehicleController extends HttpServlet {
         } else if ("delete".equalsIgnoreCase(action)) {
             deleteVehicle(request, response);
         } else {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, MessageUtil.getError("error.action.invalid"));
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Hành động không hợp lệ!");
         }
     }
 }

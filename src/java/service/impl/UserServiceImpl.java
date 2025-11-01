@@ -55,7 +55,6 @@ public class UserServiceImpl implements UserService {
             return Optional.of(dto);
 
         } catch (Exception e) {
-            e.printStackTrace();
             return Optional.empty();
         }
     }
@@ -115,13 +114,11 @@ public class UserServiceImpl implements UserService {
                 throw new RuntimeException("Không thể thêm người dùng vào cơ sở dữ liệu.");
             }
 
-            System.out.println("Thêm user thành công: " + user.getUsername());
+            
 
         } catch (IllegalArgumentException e) {
-            System.err.println("Lỗi dữ liệu đầu vào: " + e.getMessage());
             throw e;
         } catch (Exception e) {
-            System.err.println("Lỗi không xác định: " + e.getMessage());
             throw new RuntimeException("Đã xảy ra lỗi khi thêm người dùng.", e);
         }
     }
@@ -163,13 +160,11 @@ public class UserServiceImpl implements UserService {
                 throw new RuntimeException("Không thể cập nhật thông tin người dùng (ID = " + userDTO.getUserId() + ")");
             }
 
-            System.out.println("Cập nhật user thành công: " + user.getUsername());
+            
 
         } catch (IllegalArgumentException e) {
-            System.err.println("Lỗi dữ liệu: " + e.getMessage());
             throw e;
         } catch (Exception e) {
-            System.err.println("Lỗi không xác định: " + e.getMessage());
             throw new RuntimeException("Đã xảy ra lỗi khi cập nhật người dùng.", e);
         }
     }
@@ -182,7 +177,6 @@ public class UserServiceImpl implements UserService {
                 throw new RuntimeException("Không thể xóa user ID = " + userId);
             }
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException("Lỗi khi xóa user: " + e.getMessage());
         }
     }
@@ -205,7 +199,6 @@ public class UserServiceImpl implements UserService {
                     .toList();
 
         } catch (Exception e) {
-            e.printStackTrace();
             // Trả về danh sách rỗng nếu lỗi
             return List.of();
         }

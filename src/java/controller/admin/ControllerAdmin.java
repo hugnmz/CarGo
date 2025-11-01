@@ -17,10 +17,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import model.Users;
 import service.RoleService;
-import service.UserService;
-import util.MessageUtil;
 import util.di.DIContainer;
 import util.EmailUtil;
+import service.UserService;
 
 /**
  *
@@ -108,38 +107,19 @@ public class ControllerAdmin extends HttpServlet {
                 }
 
                 if (email != null && !email.isEmpty()) {
-                    util.EmailUtil.sendCredentials(email, username, password, roleName);
+                    util.EmailUtil.sendCredentials(email, fullname ,username, password, roleName);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                request.setAttribute("error", MessageUtil.getError("error.user.add.email.error"));
+                request.setAttribute("error", "Thêm user thành công nhưng lỗi gửi email: " + e.getMessage());
             }
-//            try {
-//                String roleName = switch (user.getRoleId()) {
-//                    case 1 ->
-//                        "Admin";
-//                    case 2 ->
-//                        "Staff";
-//                    case 3 ->
-//                        "Customer";
-//                    default ->
-//                        "Người dùng";
-//                };
-//
-//                if (email != null && !email.isEmpty()) {
-//                    util.EmailUtil.sendCredentials(email, username, password, roleName);
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                request.setAttribute("error", "User thêm thành công nhưng lỗi gửi email: " + e.getMessage());
-//            }
 
-            request.setAttribute("message", MessageUtil.getError("error.user.add.success"));
+            request.setAttribute("message", "Thêm user thành công!");
             request.getRequestDispatcher("HomeAdmin").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.user.add.error"));
+            request.setAttribute("error", "Lỗi khi thêm user: " + e.getMessage());
             request.getRequestDispatcher("HomeAdmin").forward(request, response);
         }
     }
@@ -177,11 +157,11 @@ public class ControllerAdmin extends HttpServlet {
             userService.updateUser(user);
 
             //Truyền dữ liệu về server
-            request.setAttribute("message", MessageUtil.getError("error.user.update.success"));
+            request.setAttribute("message", "Cập nhật user thành công!");
             request.getRequestDispatcher("HomeAdmin").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.user.update.error"));
+            request.setAttribute("error", "Lỗi khi cập nhật user: " + e.getMessage());
             request.getRequestDispatcher("HomeAdmin").forward(request, response);
         }
     }
@@ -195,7 +175,7 @@ public class ControllerAdmin extends HttpServlet {
         if (userIdStr != null && !userIdStr.isEmpty()) {
             Integer userId = Integer.parseInt(userIdStr);
             userService.deleteUser(userId);
-            request.setAttribute("message", MessageUtil.getError("error.user.delete.success"));
+            request.setAttribute("message", "Xóa user thành công!");
         }
         //Gửi dữ liệu về home admin
         request.getRequestDispatcher("HomeAdmin").forward(request, response);

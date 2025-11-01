@@ -27,7 +27,6 @@ public class DB {
         // 2) nap driver jdbc sql server (ep nap de chac chan)
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            System.out.println("[DB] SQLServerDriver loaded.");
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("SQLServerDriver NOT found on classpath", e);
         }

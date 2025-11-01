@@ -23,7 +23,7 @@ public class VehiclesDAOImpl implements VehiclesDAO {
         VehiclesDAOImpl v = new VehiclesDAOImpl();
         List<Vehicles> list = v.getAllVehicles();
         for (Vehicles vehicles : list) {
-            System.out.println(vehicles.toString());
+            
         }
     }
 

@@ -14,7 +14,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.*;
 import util.di.DIContainer;
-import util.MessageUtil;
 import dto.CarDTO;
 import dto.CategoryDTO;
 import dto.FuelDTO;
@@ -68,17 +67,17 @@ public class ControllerInfoCar extends HttpServlet {
                 boolean priceAdded = carService.addPriceForCar(carId, price, deposit);
 
                 if (priceAdded) {
-                    request.setAttribute("message", MessageUtil.getError("error.car.add.success"));
+                    request.setAttribute("message", "Thêm xe và giá thành công!");
                 } else {
-                    request.setAttribute("error", MessageUtil.getError("error.car.add.price.failed"));
+                    request.setAttribute("error", "Thêm xe thành công nhưng thêm giá thất bại!");
                 }
             } else {
-                request.setAttribute("error", MessageUtil.getError("error.car.add.id.failed"));
+                request.setAttribute("error", "Không lấy được ID xe sau khi thêm!");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.car.add.error"));
+            request.setAttribute("error", "Lỗi khi thêm xe: " + e.getMessage());
         }
 
         request.getRequestDispatcher("managecar").forward(request, response);
@@ -93,9 +92,9 @@ public class ControllerInfoCar extends HttpServlet {
             Integer id = Integer.parseInt(idStr);
             boolean success = carService.deleteCar(id);
             if (success) {
-                request.setAttribute("message", MessageUtil.getError("error.car.delete.success"));
+                request.setAttribute("message", "Xóa car thành công!");
             } else {
-                request.setAttribute("error", MessageUtil.getError("error.car.delete.failed"));
+                request.setAttribute("error", "Xóa car thất bại!");
             }
         }
         request.getRequestDispatcher("managecar").forward(request, response);
@@ -153,13 +152,13 @@ public class ControllerInfoCar extends HttpServlet {
 
             boolean success = carService.updateCar(carDTO);
             if (success) {
-                request.setAttribute("message", MessageUtil.getError("error.car.update.success"));
+                request.setAttribute("message", "Cập nhật xe thành công!");
             } else {
-                request.setAttribute("error", MessageUtil.getError("error.car.update.failed"));
+                request.setAttribute("error", "Cập nhật xe thất bại!");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.car.update.error"));
+            request.setAttribute("error", "Lỗi khi cập nhật xe: " + e.getMessage());
         }
 
         request.getRequestDispatcher("managecar").forward(request, response);
@@ -190,7 +189,7 @@ public class ControllerInfoCar extends HttpServlet {
                     // Forward sang JSP
                     request.getRequestDispatcher("manager/editcar.jsp").forward(request, response);
                 } else {
-                    request.setAttribute("error", MessageUtil.getError("error.car.not.found"));
+                    request.setAttribute("error", "Không tìm thấy xe có ID: " + carId);
                     request.getRequestDispatcher("managecar").forward(request, response);
                 }
             } else {
@@ -198,7 +197,7 @@ public class ControllerInfoCar extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.car.edit.load.error"));
+            request.setAttribute("error", "Lỗi khi tải form chỉnh sửa: " + e.getMessage());
             request.getRequestDispatcher("managecar").forward(request, response);
         }
     }
@@ -269,7 +268,7 @@ public class ControllerInfoCar extends HttpServlet {
                     // Forward sang JSP
                     request.getRequestDispatcher("manager/manage_detail_car.jsp").forward(request, response);
                 } else {
-                    request.setAttribute("error", MessageUtil.getError("error.car.not.found"));
+                    request.setAttribute("error", "Không tìm thấy xe có ID: " + carId);
                     request.getRequestDispatcher("managecar").forward(request, response);
                 }
             } else {
@@ -277,7 +276,7 @@ public class ControllerInfoCar extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.car.edit.load.error"));
+            request.setAttribute("error", "Lỗi khi tải form chỉnh sửa: " + e.getMessage());
             request.getRequestDispatcher("managecar").forward(request, response);
         }
     }

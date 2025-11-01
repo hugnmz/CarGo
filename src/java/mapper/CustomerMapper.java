@@ -64,7 +64,7 @@ public class CustomerMapper {
         } else if (dto.getCity() != null) {
             Locations location = new Locations();
             location.setCity(dto.getCity());
-            location.setAddress(dto.getAddress());
+
             user.setLocation(location);
         }
         //tra ve user
