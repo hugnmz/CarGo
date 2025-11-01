@@ -9,7 +9,6 @@ import model.Locations;
 // class xu ly cac cau lenh sql
 // trong dao chi can viet cau sql roi nhet tham so placeholder vao trong may ham nay
 // thieu cai nao viet them vao
-
 public class JdbcTemplateUtil {
 
     // thuc hien cau lenh update hay delete va tra ve so hang da bi thay doi
@@ -93,16 +92,41 @@ public class JdbcTemplateUtil {
             }
 
             try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? rs.getInt(1) : 0; 
+                return rs.next() ? rs.getInt(1) : 0;
             }
         } catch (Exception e) {
             // log loi neu co
             throw new RuntimeException("error.system", e);
         }
     }
-  
+
     // sau to viet them
 //    public static <T> T inTransaction(SQLFunction<Connection, T> work) { ... }
+    //format dieu kien query search car
+    public static String formatConditionSearchCar(Integer locationId, String name, Integer categoryId, Double price) {
+        StringBuilder condition = new StringBuilder(" WHERE 1=1 ");
+
+        if (locationId != null) {
+            condition.append(" AND l.locationId = ").append(locationId);
+        }
+
+        if (name != null && !name.trim().isEmpty()) {
+            // thêm dấu nháy đơn vì là chuỗi
+            condition.append(" AND LOWER(c.name) LIKE LOWER('%")
+                    .append(name.trim())
+                    .append("%')");
+        }
+
+        if (categoryId != null ) {
+            condition.append(" AND c.categoryId = ").append(categoryId);
+        }
+
+        if (price != null && price > 0) {
+            condition.append(" AND cp.dailyPrice <= ").append(price);
+        }
+
+        return condition.toString();
+    }
 
     // method chua duoc implement
     public Optional<Locations> queryForObject(String sql, Class<Locations> aClass, Integer id) {

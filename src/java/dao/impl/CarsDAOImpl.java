@@ -27,16 +27,12 @@ public class CarsDAOImpl implements CarsDAO {
                 + "LEFT JOIN dbo.Seatings s ON c.seatingId = s.seatingId "
                 + "LEFT JOIN dbo.CarPrices cp ON c.carId = cp.carId AND cp.endDate IS NULL";
 
-
         return JdbcTemplateUtil.query(sql, Cars.class);
     }
 
     public static void main(String[] args) {
         CarsDAOImpl d = new CarsDAOImpl();
-        List<Cars> list = d.getAllCars();
-        for (Cars cars : list) {
-            
-        }
+        System.out.println(JdbcTemplateUtil.formatConditionSearchCar(0, null, 1, 1000000.0));
         
 
     }
@@ -66,20 +62,20 @@ public class CarsDAOImpl implements CarsDAO {
     @Override
     public boolean addCar(Cars car) {
         String sql = "INSERT INTO dbo.Cars (name, year, description, image, categoryId, fuelId, seatingId) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        
-        int result = JdbcTemplateUtil.update(sql, 
-            car.getName(), 
-            car.getYear(), 
-            car.getDescription(), 
-            car.getImage(), 
-            car.getCategoryId(), 
-            car.getFuelId(), 
-            car.getSeatingId()
+
+        int result = JdbcTemplateUtil.update(sql,
+                car.getName(),
+                car.getYear(),
+                car.getDescription(),
+                car.getImage(),
+                car.getCategoryId(),
+                car.getFuelId(),
+                car.getSeatingId()
         );
-        
+
         return result > 0;
     }
-    
+
     @Override
     public int addCarAndReturnId(Cars car) {
         String sql = "INSERT INTO dbo.Cars (name, year, description, image, categoryId, fuelId, seatingId) "
@@ -152,11 +148,15 @@ public class CarsDAOImpl implements CarsDAO {
     }
 
     @Override
-    public List<Cars> searchCars(String keyword) {
-        String sql = "SELECT * FROM dbo.Cars WHERE name LIKE ? OR description LIKE ?";
-        String searchPattern = "%" + keyword + "%";
-
-        return JdbcTemplateUtil.query(sql, Cars.class, searchPattern, searchPattern);
+    public List<Cars> searchCars(Integer locationId, String name, Integer categoryId, Double price) {
+        String condition = JdbcTemplateUtil.formatConditionSearchCar(locationId, name, categoryId, price);
+        String sql = "select * from Cars c "
+                + "join Vehicles v on v.carId = c.carId "
+                + "join Locations l on l.locationId = v.locationId "
+                + "join CarPrices cp on cp.carId = c.carId "
+                + "join Fuels f on f.fuelId = c.fuelId "
+                + "join Seatings s on s.seatingId = c.seatingId " + condition;
+        return JdbcTemplateUtil.query(sql, Cars.class);
     }
 
     @Override
@@ -168,5 +168,4 @@ public class CarsDAOImpl implements CarsDAO {
 
         return JdbcTemplateUtil.query(sql, Cars.class, minPrice, maxPrice);
     }
-
 }

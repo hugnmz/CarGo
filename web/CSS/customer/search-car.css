@@ -1,0 +1,179 @@
+:root {
+  --primary: #10b981;
+  --primary-dark: #059669;
+  --primary-light: #d1fae5;
+  --dark: #1f2937;
+  --gray: #6b7280;
+  --light-gray: #f3f4f6;
+}
+
+/* Search Box */
+.search-modern {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  margin-top: 50px;
+  position: relative;
+  z-index: 10;
+}
+.search-modern .form-control,
+.search-modern .form-select {
+  border: 2px solid #e5e7eb;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  transition: all 0.3s;
+}
+.search-modern .form-control:focus,
+.search-modern .form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+.search-modern .btn-search {
+  background: var(--primary);
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: 10px;
+  font-weight: 600;
+  border: none;
+  transition: all 0.3s;
+}
+.search-modern .btn-search:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+}
+
+/* Cars page specific styles */
+.car-card {
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  height: 100%;
+}
+
+.car-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.car-card-clickable {
+  cursor: pointer;
+}
+
+.car-image-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.car-image {
+  height: 200px;
+  object-fit: cover;
+  transition: all 0.3s;
+}
+
+.car-card:hover .car-image {
+  transform: scale(1.05);
+}
+
+.special-icon {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.5rem;
+  border-radius: 50%;
+  font-size: 1.2rem;
+}
+
+.car-specs {
+  margin: 1rem 0;
+}
+
+.spec-item {
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.spec-item i {
+  font-size: 1.2rem;
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+.location-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.price-section {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+}
+
+/* Brand logos */
+.brand-logo {
+  padding: 1rem;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.brand-logo:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.brand-logo img {
+  width: 60px;
+  height: 40px;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+}
+
+.brand-logo p {
+  margin: 0;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* Location cards */
+.card-location {
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s;
+  height: 100%;
+}
+
+.card-location:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.card-location .card-img-top {
+  height: 150px;
+  object-fit: cover;
+}
+
+.card-location .card-body {
+  padding: 1.5rem;
+}
+
+.card-location .card-title {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.card-location .btn-outline-success {
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+}
+

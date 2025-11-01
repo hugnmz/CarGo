@@ -13,6 +13,7 @@ public interface CarService {
     
 
     List<CarDTO> getAllCars();
+    List<CarDTO> searchCars(Integer locationId, String name, Integer categoryId, Double price);
     
     Optional<CarDTO> getCarById(Integer carId);
     

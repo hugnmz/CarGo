@@ -11,6 +11,8 @@ import util.MessageUtil;
 import java.io.IOException;
 import java.util.List;
 import dto.CarDTO;
+import dto.CategoryDTO;
+import dto.LocationDTO;
 
 // servlet hien thi trang chu
 @WebServlet("/home")
@@ -18,12 +20,14 @@ public class HomeServlet extends HttpServlet {
 
     private CarService carService;
 
+
     @Override
     public void init() throws ServletException {
         super.init();
         // khoi tao carservice tu di container
         try {
             carService = DIContainer.get(CarService.class);
+
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize CarService", e);
         }
@@ -35,13 +39,21 @@ public class HomeServlet extends HttpServlet {
         try {
             // lay danh sach tat ca xe
             List<CarDTO> allCars = carService.getAllCars();
+
+            //lay danh sach dia diem
+            List<LocationDTO> allLocations = carService.getAllLocation();
+            
+            //lay danh sach loai xe
+            List<CategoryDTO> allCategories = carService.getAllCategories();
             
             // truyen danh sach xe xuong jsp
             request.setAttribute("allCars", allCars);
-            
+            request.setAttribute("allLocations", allLocations);
+            request.setAttribute("allCategories", allCategories);
+
             // forward den trang home.jsp
             request.getRequestDispatcher("/customer/home.jsp").forward(request, response);
-            
+
         } catch (Exception e) {
             // xu ly loi he thong
             e.printStackTrace();
@@ -57,4 +69,3 @@ public class HomeServlet extends HttpServlet {
         doGet(request, response);
     }
 }
-

@@ -17,7 +17,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-        <link href="${pageContext.request.contextPath}/css/customer/home.css" rel="stylesheet">
+        <link href="${pageContext.request.contextPath}/CSS/customer/home.css" rel="stylesheet">
     </head>
     <body>
         <!-- Modern Navbar -->
@@ -96,23 +96,54 @@
         <div class="container">
             <!-- Modern Search Box -->
             <div class="search-modern">
-                <form class="row g-4">
+                <form class="row g-4" action="${pageContext.request.contextPath}/searchcar" method="post">
+                    <!-- Địa điểm -->
                     <div class="col-md-6 col-lg-3">
-                        <label class="form-label fw-semibold"><i class="fas fa-map-marker-alt text-success me-2"></i>Địa điểm nhận</label>
-                        <input type="text" class="form-control" placeholder="Nhập địa điểm...">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-map-marker-alt text-primary me-2"></i>Địa điểm
+                        </label>
+                        <select class="form-select" name="location">
+                            <option selected disabled value="0">Chọn địa điểm...</option>
+                            <c:if test="${not empty allLocations}">
+                                <c:forEach var="l" items="${allLocations}">
+                                    <option value="${l.locationId}">${l.city}</option>
+                                </c:forEach>
+                            </c:if>
+                        </select>
                     </div>
+
+                    <!-- Tên xe -->
                     <div class="col-md-6 col-lg-3">
-                        <label class="form-label fw-semibold"><i class="fas fa-map-marker-alt text-danger me-2"></i>Địa điểm trả</label>
-                        <input type="text" class="form-control" placeholder="Nhập địa điểm...">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-car-side text-success me-2"></i>Tên xe
+                        </label>
+                        <input name="carName" type="text" class="form-control" placeholder="Nhập tên xe...">
                     </div>
+
+                    <!-- Loại xe -->
                     <div class="col-md-6 col-lg-2">
-                        <label class="form-label fw-semibold"><i class="far fa-calendar me-2"></i>Ngày nhận</label>
-                        <input type="date" class="form-control">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-car text-warning me-2"></i>Loại xe
+                        </label>
+                        <select name="category" class="form-select">
+                            <option selected disabled value="0">Chọn loại xe...</option>
+                            <c:if test="${not empty allCategories}">
+                                <c:forEach var="c" items="${allCategories}">
+                                    <option value="${c.categoryId}">${c.categoryName}</option>
+                                </c:forEach>
+                            </c:if>
+                        </select>
                     </div>
+
+                    <!-- Giá tiền -->
                     <div class="col-md-6 col-lg-2">
-                        <label class="form-label fw-semibold"><i class="far fa-calendar me-2"></i>Ngày trả</label>
-                        <input type="date" class="form-control">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-money-bill-wave text-danger me-2"></i>Giá tiền (VND)
+                        </label>
+                        <input name="price" type="number" class="form-control" step="10000" min="0" placeholder="Nhập giá tối đa...">
                     </div>
+
+                    <!-- Nút tìm kiếm -->
                     <div class="col-12 col-lg-2 d-flex align-items-end">
                         <button type="submit" class="btn btn-search w-100">
                             <i class="fas fa-search me-2"></i>Tìm xe
@@ -120,6 +151,7 @@
                     </div>
                 </form>
             </div>
+
 
             <!-- Chọn xe theo hãng -->
             <h3 class="fw-bold mt-5 mb-3 text-center">Chọn xe theo hãng</h3>

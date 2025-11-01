@@ -20,7 +20,6 @@ import service.CarService;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
 
-
 @Service
 public class CarServiceImpl implements CarService {
 
@@ -283,6 +282,20 @@ public class CarServiceImpl implements CarService {
         } catch (Exception e) {
             throw new RuntimeException("error.system", e);
         }
+    }
+
+    @Override
+    public List<CarDTO> searchCars(Integer locationId, String name, Integer categoryId, Double price) {
+        // lay danh sach tat ca xe
+        List<Cars> cars = carsDAO.searchCars(locationId, name, categoryId, price);
+        List<CarDTO> carDTOs = new ArrayList<>();
+
+        for (Cars car : cars) {
+            CarDTO dto = carMapper.toDTO(car);
+            carDTOs.add(dto);
+        }
+
+        return carDTOs;
     }
 
 }
