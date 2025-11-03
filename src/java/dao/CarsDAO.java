@@ -15,6 +15,7 @@ import model.Cars;
  */
 public interface CarsDAO {
     List<Cars> getAllCars();
+    List<Cars> getAllCar();
     Optional<Cars> getCarById(Integer carId);
     boolean addCar(Cars car);
     boolean updateCar(Cars car);
