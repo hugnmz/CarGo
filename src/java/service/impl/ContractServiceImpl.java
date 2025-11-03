@@ -1,9 +1,14 @@
 package service.impl;
 
+import dao.CarsDAO;
 import dao.ContractsDAO;
 import dao.ContractDetailsDAO;
 import dao.CustomersDAO;
 import dao.OrdersDAO;
+import dao.UsersDAO;
+import dao.VehiclesDAO;
+import dao.impl.CarsDAOImpl;
+import dao.impl.ContractDetailsDAOImpl;
 import dto.ContractDTO;
 import dto.ContractDetailDTO;
 import dto.OrderDTO;
@@ -17,6 +22,7 @@ import java.util.Optional;
 import mapper.ContractMapper;
 import mapper.ContractDetailMapper;
 import mapper.OrderMapper;
+import model.Cars;
 import model.ContractDetails;
 import model.Contracts;
 import model.Customers;
@@ -47,6 +53,15 @@ public class ContractServiceImpl implements ContractService {
 
     @Autowired
     private OrderMapper orderMapper;
+
+    @Autowired
+    private UsersDAO usersDAO;
+
+    @Autowired
+    private CarsDAO carsDAO;
+
+    @Autowired
+    private VehiclesDAO vehiclesDAO;
 
     @Override
     public List<ContractDTO> getContractsByCustomer(Integer customerId) {
@@ -86,6 +101,10 @@ public class ContractServiceImpl implements ContractService {
         List<ContractDetails> details = contractDetailsDAO.getContractDetailsByContractId(contractId);
 
         for (ContractDetails detail : details) {
+            Optional<model.Vehicles> vehicle = vehiclesDAO.getVehicleById(detail.getVehicleId());
+            vehicle.ifPresent(c -> detail.setVehicle(c));
+            Optional<model.Cars> car = carsDAO.getCarById(detail.getVehicle().getCarId());
+            car.ifPresent(c -> detail.getVehicle().setCar(c));
             ContractDetailDTO dto = contractDetailMapper.toDTO(detail);
             detailDTOs.add(dto);
         }
@@ -109,7 +128,14 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     public boolean deleteContract(Integer contractId) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        try {
+            boolean deleteContractDetail = contractDetailsDAO.deleteContractDetailByContractId(contractId);
+            boolean deleteContract = contractsDAO.deleteContract(contractId);
+            return  deleteContract;
+        } catch (Exception e) {
+            throw new RuntimeException("error.system", e);
+        }
+
     }
 
     @Override
@@ -139,6 +165,9 @@ public class ContractServiceImpl implements ContractService {
                 ContractDTO dto = contractMapper.toDTO(contract);
                 Optional<model.Customers> customer = customersDAO.getCustomerById(dto.getCustomerId());
                 customer.ifPresent(c -> dto.setCustomerName(c.getFullName()));
+                customer.ifPresent(c -> dto.setCustomerPhone(c.getPhone()));
+                Optional<model.Users> staff = usersDAO.getUserById(dto.getStaffId());
+                staff.ifPresent(s -> dto.setStaffName(s.getFullName()));
                 contractDTOs.add(dto);
             }
         } catch (Exception e) {
@@ -344,5 +373,11 @@ public class ContractServiceImpl implements ContractService {
 
     private BigDecimal calculateDepositAmount(BigDecimal total) {
         return new BigDecimal("30000000");
+    }
+
+    @Override
+    public int countContract() {
+        int totalContract = contractsDAO.countContract();
+        return totalContract;
     }
 }

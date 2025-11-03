@@ -36,7 +36,7 @@ public class ContractDetailsDAOImpl implements ContractDetailsDAO {
         String sql = "SELECT * FROM dbo.ContractDetails WHERE vehicleId = ?";
         return JdbcTemplateUtil.query(sql, ContractDetails.class, vehicleId);
     }
-    
+
     @Override
     public List<ContractDetails> getContractDetailsByContractId(Integer contractId) {
         String sql = "SELECT ct.*, v.plateNumber, c.name FROM dbo.ContractDetails ct JOIN dbo.Vehicles v ON v.vehicleId = ct.vehicleId JOIN dbo.Cars c ON c.carId = v.carId WHERE  ct.contractId = ? ORDER BY contractDetailId";
@@ -45,18 +45,18 @@ public class ContractDetailsDAOImpl implements ContractDetailsDAO {
 
     @Override
     public boolean checkVehicleAvailability(Integer vehicleId, LocalDateTime startDate, LocalDateTime endDate) {
-        String sql = "SELECT COUNT(*) FROM dbo.ContractDetails cd " +
-                    "JOIN dbo.Contracts c ON cd.contractId = c.contractId " +
-                    "WHERE cd.vehicleId = ? AND c.status IN ('PENDING', 'ACCEPTED', 'IN_PROGRESS') " +
-                    "AND (cd.rentStartDate < ? AND cd.rentEndDate > ?)";
+        String sql = "SELECT COUNT(*) FROM dbo.ContractDetails cd "
+                + "JOIN dbo.Contracts c ON cd.contractId = c.contractId "
+                + "WHERE cd.vehicleId = ? AND c.status IN ('PENDING', 'ACCEPTED', 'IN_PROGRESS') "
+                + "AND (cd.rentStartDate < ? AND cd.rentEndDate > ?)";
         int count = JdbcTemplateUtil.count(sql, vehicleId, endDate, startDate);
         return count == 0;
     }
 
     @Override
     public boolean addContractDetail(ContractDetails contractDetail) {
-        String sql = "INSERT INTO dbo.ContractDetails(contractId, vehicleId, price, rentStartDate, rentEndDate, note) " +
-                    "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO dbo.ContractDetails(contractId, vehicleId, price, rentStartDate, rentEndDate, note) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
         int result = JdbcTemplateUtil.insertAndReturnKey(sql,
                 contractDetail.getContractId(),
                 contractDetail.getVehicleId(),
@@ -65,5 +65,13 @@ public class ContractDetailsDAOImpl implements ContractDetailsDAO {
                 contractDetail.getRentEndDate(),
                 contractDetail.getNote());
         return result > 0;
+    }
+
+    @Override
+    public boolean deleteContractDetailByContractId(Integer contractId) {
+        String sql = "DELETE FROM dbo.ContractDetails WHERE contractId = ?";
+        int result = JdbcTemplateUtil.update(sql, contractId);
+        return result > 0;
+
     }
 }

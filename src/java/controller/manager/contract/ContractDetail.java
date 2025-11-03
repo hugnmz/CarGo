@@ -2,8 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package controller.manager;
+package controller.manager.contract;
 
+import dto.ContractDTO;
+import dto.ContractDetailDTO;
+import jakarta.servlet.ServletConfig;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -11,63 +14,57 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import java.util.List;
+import java.util.Optional;
 import service.ContractService;
-import service.VehicleService;
 import util.di.DIContainer;
-import service.CustomerService;
-import service.UserService;
 
 /**
  *
- * @author DELL
+ * @author Admin
  */
-@WebServlet(name = "HomeManage", urlPatterns = {"/homemange"})
-public class HomeManage extends HttpServlet {
+@WebServlet(name = "ContractDetail", urlPatterns = {"/contractdetail"})
+public class ContractDetail extends HttpServlet {
 
-    private VehicleService vehiclesService;
-    private CustomerService customerService;
     private ContractService contractService;
 
     @Override
-    public void init() throws ServletException {
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
         try {
-            vehiclesService = DIContainer.get(VehicleService.class);
-            customerService = DIContainer.get(CustomerService.class);
             contractService = DIContainer.get(ContractService.class);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to initialize ContractService", e);
         }
     }
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String contractIdStr = request.getParameter("contractId");
+        if (contractIdStr != null) {
+            try {
+                Integer contractId = Integer.parseInt(contractIdStr);
 
-        // Kiểm tra đăng nhập
-//        HttpSession session = request.getSession(false);
-//        if (session == null || session.getAttribute("roleName") == null) {
-//            response.sendRedirect("LoginServlet");
-//            return;
-//        }
-//
-//        // Kiểm tra quyền truy cập
-//        String role = (String) session.getAttribute("roleName");
-//        if (!"MANAGER".equalsIgnoreCase(role)) {
-//            request.setAttribute("errors", "Bạn không có quyền truy cập trang quản lý!");
-//            request.getRequestDispatcher("auth/login.jsp").forward(request, response);
-//            return;
-//        }
+                Optional<ContractDTO> contract = contractService.getContractById(contractId);
+                if (contract.isPresent()) {
+                    request.setAttribute("contract", contract.get());
+                    List<ContractDetailDTO> details = contractService.getContractDetails(contractId);
+                    request.setAttribute("details", details);
+                    request.getRequestDispatcher("/manager/contract_detail.jsp").forward(request, response);
+                } else {
+                    request.setAttribute("error", "Không tìm thấy hợp đồng");
+                    request.getRequestDispatcher("/listcontract").forward(request, response);
+                }
+            } catch (NumberFormatException e) {
+                request.setAttribute("error", "Mã hợp đồng không hợp lệ :" + e.getMessage());
+                request.getRequestDispatcher("/listcontract").forward(request, response);
 
-        int totalVehicles = vehiclesService.countVehical();
-        int totalCustomers = customerService.countCustomer();
-        int totalContracts = contractService.countContract();
+            }
+        } else {
+            request.setAttribute("error", "Mã hợp đồng không hợp lệ ");
+            request.getRequestDispatcher("/listcontract").forward(request, response);
 
-        request.setAttribute("totalCars", totalVehicles);
-        request.setAttribute("totalCustomers", totalCustomers);
-        request.setAttribute("totalContracts", totalContracts);
-
-        request.getRequestDispatcher("manager/manager_home.jsp").forward(request, response);
-
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

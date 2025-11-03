@@ -25,4 +25,5 @@ public interface ContractsDAO {
     List<Contracts> getContractByDateRange(LocalDateTime startDate, LocalDateTime endDate);
     List<Contracts> getContractByStatus(String status);
     boolean calculateTotalAmout(Integer contractId);
+    int countContract();
 }

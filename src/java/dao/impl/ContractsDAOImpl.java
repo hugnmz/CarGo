@@ -26,8 +26,8 @@ public class ContractsDAOImpl implements ContractsDAO {
 
     @Override
     public boolean addContract(Contracts contract) {
-        String sql = "INSERT INTO dbo.Contracts (customerId, staffId, status, startDate, endDate, totalAmount, depositAmount, createAt) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO dbo.Contracts (customerId, staffId, status, startDate, endDate, totalAmount, depositAmount, createAt) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         int result = JdbcTemplateUtil.insertAndReturnKey(sql,
                 contract.getCustomerId(),
                 contract.getStaffId(),
@@ -96,5 +96,11 @@ public class ContractsDAOImpl implements ContractsDAO {
     @Override
     public boolean calculateTotalAmout(Integer contractId) {
         return true;
+    }
+
+    @Override
+    public int countContract() {
+        String sql = "SELECT COUNT(*) FROM dbo.Contracts";
+        return JdbcTemplateUtil.count(sql);
     }
 }

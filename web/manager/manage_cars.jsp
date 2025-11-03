@@ -78,7 +78,7 @@
                class="<%= request.getRequestURI().contains("manage_cars.jsp") ? "active" : "" %>">
                 <i class="fa-solid fa-car-side"></i> Quản lý xe
             </a>
-            <a href="#"><i class="fa-solid fa-file-contract"></i> Hợp đồng</a>
+            <a href="listcontract"><i class="fa-solid fa-file-contract"></i> Hợp đồng</a>
             <a href="${pageContext.request.contextPath}/LogoutServlet"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
         </div>
 

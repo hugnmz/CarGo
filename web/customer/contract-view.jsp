@@ -20,7 +20,7 @@ contentType="text/html; charset=UTF-8" language="java" %>
       rel="stylesheet"
     />
     <link
-      href="${pageContext.request.contextPath}/css/customer/contract-view.css"
+      href="${pageContext.request.contextPath}/CSS/customer/contract-view.css"
       rel="stylesheet"
     />
   </head>

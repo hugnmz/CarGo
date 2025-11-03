@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+
 
 <%
     response.setHeader("Cache-Control","no-cache, no-store, must-revalidate");
@@ -18,7 +18,7 @@
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
-        <title>Quản lý khách hàng - Manager</title>
+        <title>Quản lý hợp đồng - Manager</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
         <style>
@@ -65,16 +65,16 @@
             <h4 class="text-center text-white mb-4"><i class="fa-solid fa-car"></i> Car Rental</h4>
             <a href="homemange"><i class="fa-solid fa-house"></i> Trang chủ</a>
             <a href="profile"><i class="fa-solid fa-user-gear"></i> Thông tin cá nhân</a>
-            <a href="managecus" class="active"><i class="fa-solid fa-users"></i> Quản lý khách hàng</a>
+            <a href="managecus"><i class="fa-solid fa-users"></i> Quản lý khách hàng</a>
             <a href="managecar"><i class="fa-solid fa-car-side"></i> Quản lý xe</a>
-            <a href="listcontract"><i class="fa-solid fa-file-contract"></i> Hợp đồng</a>
+            <a href="listcontract" class="active"><i class="fa-solid fa-file-contract"></i> Hợp đồng</a>
             <a href="${pageContext.request.contextPath}/LogoutServlet"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
         </div>
 
         <!-- Main Content -->
         <div class="content">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2><i class="fa-solid fa-users"></i> Danh sách khách hàng</h2>
+                <h2><i class="fa-solid fa-users"></i> Danh sách hợp đồng</h2>
             </div>
 
             <!-- Thông báo -->
@@ -84,6 +84,22 @@
             <c:if test="${not empty error}">
                 <div class="alert alert-danger">${error}</div>
             </c:if>
+            <!-- Thông báo thành công -->
+            <c:if test="${not empty sessionScope.flash_message}">
+                <div class="alert alert-success" role="alert">
+                    ${sessionScope.flash_message}
+                </div>
+                <c:remove var="flash_message" scope="session"/>
+            </c:if>
+
+            <!-- Thông báo lỗi -->
+            <c:if test="${not empty sessionScope.flash_error}">
+                <div class="alert alert-danger" role="alert">
+                    ${sessionScope.flash_error}
+                </div>
+                <c:remove var="flash_error" scope="session"/>
+            </c:if>
+
 
             <!-- Bảng danh sách khách hàng -->
             <div class="card shadow-sm">
@@ -92,52 +108,59 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Tên đăng nhập</th>
-                                <th>Họ và tên</th>
-                                <th>Email</th>
-                                <th>Điện thoại</th>
-                                <th>Thành phố</th>
+                                <th>Thời gian tạo</th>
+                                <th>Nhân viên xử lí</th>
+                                <th>Khách hàng</th>
+                                <th>Số điện thoại</th>
+                                <th>Ngày bắt đầu</th>
+                                <th>Ngày kết thúc</th>
                                 <th>Trạng thái</th>
                                 <th>Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <c:forEach var="cus" items="${allCustomers}">
+                            <c:forEach var="c" items="${allContracts}">
                                 <tr>
-                                    <td>${cus.customerId}</td>
-                                    <td>${cus.username}</td>
-                                    <td>${cus.fullName}</td>
-                                    <td>${cus.email}</td>
-                                    <td>${cus.phone}</td>
-                                    <td>${cus.city}</td>
+                                    <td>${c.contractId}</td>
+                                    <td>${c.createAtToString}</td>
+                                    <td>${not empty c.staffName? c.staffName:'Trống'}</td>
+                                    <td>${c.customerName}</td>
+                                    <td>${c.customerPhone}</td>
+                                    <td>${c.startDateToString}</td>
+                                    <td>${c.endDateToString}</td>
                                     <td>
                                         <c:choose>
-                                            <c:when test="${cus.isVerified}">
-                                                Hoạt động
+                                            <c:when test="${c.status == 'ACCEPTED'}">
+                                                Chấp nhận
+                                            </c:when>
+                                            <c:when test="${c.status == 'PENDING'}">
+                                                Chờ xử lý
+                                            </c:when>
+                                            <c:when test="${c.status == 'REJECTED'}">
+                                                Từ chối
                                             </c:when>
                                             <c:otherwise>
-                                                Không hoạt động
+                                                Không xác định
                                             </c:otherwise>
                                         </c:choose>
                                     </td>
                                     <td>
-                                        <a href="controllerinformationcustomer?action=edit&customerId=${cus.customerId}" class="btn btn-warning btn-sm">
-                                            <i class="fa-solid fa-pen"></i> Sửa
-                                        </a>
-                                        <a href="controllerinformationcustomer?action=detail&customerId=${cus.customerId}" class="btn btn-info btn-sm text-white">
-                                            <i class="fa-solid fa-circle-info"></i> Chi tiết
-                                        </a>
-                                        <a href="controllerinformationcustomer?action=delete&customerId=${c.customerId}" 
-                                           class="btn btn-danger btn-sm"
-                                           onclick="return confirm('Bạn có chắc chắn muốn xóa khách hàng này không?');">
-                                            Xóa
-                                        </a>
+                                        <form method="POST" action="listcontract">
+                                            <a href="contractdetail?contractId=${c.contractId}" class="btn btn-info btn-sm text-white">
+                                                <i class="fa-solid fa-circle-info"></i> Chi tiết
+                                            </a>
+                                            <input type="hidden" name="contractId" value="${c.contractId}">
+                                            <input type="submit" value="Xóa"
+                                                   class="btn btn-danger btn-sm"
+                                                   onclick="return confirm('Bạn có chắc chắn muốn xóa hợp đồng này không?');"/>
+                                        </form>
+
                                     </td>
                                 </tr>
                             </c:forEach>
-                            <c:if test="${empty allCustomers}">
+                            <c:if test="${empty allContracts}">
                                 <tr>
-                                    <td colspan="9" class="text-center text-muted">Chưa có khách hàng nào</td>
+                                    <td colspan="9" class="text-center text-muted">Chưa có hợp đồng nào</td>
                                 </tr>
                             </c:if>
                         </tbody>

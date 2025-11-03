@@ -29,7 +29,8 @@ public interface ContractService {
     List<ContractDTO> getAllContracts();
 
     boolean createContract(ContractDTO contractDTO);
-    
-    List<ContractDTO> createContractsFromCart(Integer customerId, Integer[] selectedOrderIds);
 
+    List<ContractDTO> createContractsFromCart(Integer customerId, Integer[] selectedOrderIds);
+    //dem so hop dong dang co
+    int countContract();
 }
