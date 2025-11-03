@@ -124,35 +124,6 @@
                 </form>
             </div>
 
-            <!-- Chọn xe theo hãng -->
-            <h3 class="fw-bold mt-5 mb-3 text-center">Chọn xe theo hãng</h3>
-            <div class="d-flex flex-wrap justify-content-center gap-3">
-                <div class="brand-logo text-center">
-                    <img src="https://cdnlogo.com/logos/f/41/ford.svg">
-                    <p>Ford</p>
-                </div>
-                <div class="brand-logo text-center">
-                    <img src="https://cdnlogo.com/logos/m/48/mercedes.svg">
-                    <p>Mercedes</p>
-                </div>
-                <div class="brand-logo text-center">
-                    <img src="https://cdnlogo.com/logos/a/56/audi.svg">
-                    <p>Audi</p>
-                </div>
-                <div class="brand-logo text-center">
-                    <img src="https://cdnlogo.com/logos/p/84/peugeot.svg">
-                    <p>Peugeot</p>
-                </div>
-                <div class="brand-logo text-center">
-                    <img src="https://cdnlogo.com/logos/s/32/subaru.svg">
-                    <p>Subaru</p>
-                </div>
-                <div class="brand-logo text-center">
-                    <img src="https://cdnlogo.com/logos/b/16/byd.svg">
-                    <p>BYD</p>
-                </div>
-            </div>
-
             <!-- Địa điểm nổi bật -->
             <h3 class="fw-bold mt-5 mb-3 text-center">Địa điểm nổi bật</h3>
             <div class="row g-4">
