@@ -2,6 +2,7 @@ package service;
 
 import dto.ContractDTO;
 import dto.ContractDetailDTO;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,8 +18,13 @@ public interface ContractService {
     List<ContractDetailDTO> getContractDetails(Integer contractId);
 
     boolean updateContractStatus(Integer contractId, String status);
-    // Tính tổng tiền hợp đồng
 
+    void updateContractTotalAmount(Integer contractId, BigDecimal totalAmount);
+    
+    void updateStaffId(Integer staffId,Integer contractId);
+    void updateNote(String note,Integer contractId);
+
+    // Tính tổng tiền hợp đồng
     boolean calculateTotalAmount(Integer contractId);
 
     // Xóa hợp đồng

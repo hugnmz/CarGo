@@ -1,0 +1,88 @@
+:root{
+      --sidebar-w: 260px;
+    }
+    body{
+      background-color:#f5f7fb;
+      min-height:100vh;
+    }
+    /* Sidebar */
+    .sidebar{
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: var(--sidebar-w);
+      background: #151a23;
+      color: #cbd5e1;
+      padding: 20px 16px;
+      box-shadow: 2px 0 16px rgba(0,0,0,.08);
+      z-index: 1020;
+    }
+    .sidebar .brand{
+      display:flex; align-items:center; gap:10px;
+      color:#fff; text-decoration:none;
+      font-weight:700; letter-spacing:.5px;
+      margin: 6px 8px 18px;
+    }
+    .nav-link{
+      color:#aab4c3;
+      border-radius:10px;
+      padding:.6rem .9rem;
+      transition: all .2s ease;
+      display:flex; align-items:center; gap:.6rem;
+      font-weight:500;
+    }
+    .nav-link:hover, .nav-link.active{
+      color:#fff; background:#1f2632;
+    }
+
+    /* Main */
+    .content{
+      margin-left: var(--sidebar-w);
+      padding: 24px;
+    }
+
+    /* Card polish */
+    .card{
+      border:0;
+      border-radius:16px;
+      box-shadow: 0 8px 24px rgba(16,24,40,.06);
+    }
+    .card-header{
+      background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);
+      border-bottom:1px solid #eef2f7;
+      border-top-left-radius:16px!important;
+      border-top-right-radius:16px!important;
+    }
+
+    /* Search input */
+    .form-control:focus{
+      box-shadow: 0 0 0 .2rem rgba(13,110,253,.15);
+      border-color:#86b7fe;
+    }
+
+    /* Table */
+    .table thead th{
+      background:#0d6efd;
+      color:#fff; border:0;
+      vertical-align:middle;
+    }
+    .table tbody tr{
+      transition: background .15s ease;
+    }
+    .table tbody tr:hover{
+      background:#f5f9ff;
+    }
+    .table td, .table th{
+      vertical-align: middle;
+    }
+
+    /* Badges for statuses */
+    .badge-status{font-weight:600; letter-spacing:.3px}
+    .status-pending{background:#fff3cd; color:#8a6d3b;}
+    .status-accepted{background:#d1e7dd; color:#0f5132;}
+    .status-rejected{background:#f8d7da; color:#842029;}
+
+    /* Small screens */
+    @media (max-width: 991.98px){
+      :root{ --sidebar-w: 0px; }
+      .sidebar{ position: static; width: 100%; border-radius: 0; }
+      .content{ margin-left: 0; padding: 16px; }}

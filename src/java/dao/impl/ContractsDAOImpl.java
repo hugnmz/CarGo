@@ -1,6 +1,7 @@
 package dao.impl;
 
 import dao.ContractsDAO;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -98,6 +99,28 @@ public class ContractsDAOImpl implements ContractsDAO {
     public boolean calculateTotalAmout(Integer contractId) {
         return true;
     }
+
+    @Override
+    public boolean updateContractTotalAmount(Integer contractId, BigDecimal totalAmount) {
+        String sql = "UPDATE dbo.Contracts SET totalAmount = ? WHERE contractId = ?";
+        int result = JdbcTemplateUtil.update(sql, totalAmount, contractId);
+        return result > 0;
+    }
+
+    @Override
+    public boolean updateStaffId(Integer staffId, Integer contractId) {
+        String sql = "UPDATE dbo.Contracts SET staffId = ? WHERE contractId = ?";
+        int result = JdbcTemplateUtil.update(sql, staffId, contractId);
+        return result > 0;
+    }
+
+    @Override
+    public boolean updateNote(String note, Integer contractId) {
+        String sql = "UPDATE dbo.Contracts SET note = ? WHERE contractId = ?";
+        int result = JdbcTemplateUtil.update(sql, note, contractId);
+        return result > 0;
+    }
+;
 
 
 
