@@ -72,4 +72,8 @@ public class ContractDTO {
     
     public List<PaymentDTO> getPayments() { return payments; }
     public void setPayments(List<PaymentDTO> payments) { this.payments = payments; }
+    private String rejectionReason; // Lý do từ chối
+
+public String getRejectionReason() { return rejectionReason; }
+public void setRejectionReason(String rejectionReason) { this.rejectionReason = rejectionReason; }
 }

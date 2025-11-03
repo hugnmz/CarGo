@@ -63,9 +63,10 @@ public class ContractsDAOImpl implements ContractsDAO {
     }
 
     @Override
-    public boolean updateContractStatus(Integer contractId, String status) {
-        String sql = "UPDATE dbo.Contracts SET status = ? WHERE contractId = ?";
-        int result = JdbcTemplateUtil.update(sql, status, contractId);
+    public boolean updateContractStatus(Integer contractId, String status, String reason) {
+        String sql = "UPDATE dbo.Contracts SET status = ?, rejectionReason = ? WHERE contractId = ?";
+        String reasonToSave = "REJECTED".equalsIgnoreCase(status) ? reason : null;
+        int result = JdbcTemplateUtil.update(sql, status, reasonToSave, contractId);
         return result > 0;
     }
 
@@ -96,6 +97,13 @@ public class ContractsDAOImpl implements ContractsDAO {
     @Override
     public boolean calculateTotalAmout(Integer contractId) {
         return true;
+    }
+
+
+
+    @Override
+    public boolean updateContractStatus(Integer contractId, String status) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override

@@ -55,144 +55,150 @@ contentType="text/html; charset=UTF-8" language="java" %>
       </div>
     </div>
 
-    <div class="container pb-5">
-      <div class="row">
-        <!-- Contract Info -->
-        <div class="col-lg-4 mb-4">
-          <div class="info-card">
-            <h5 class="fw-bold mb-4">Thông tin hợp đồng</h5>
-            <div class="info-row">
-              <span class="info-label"
-                ><i class="fas fa-hashtag"></i>Mã hợp đồng</span
-              >
-              <span class="info-value">#${contract.contractId}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label"
-                ><i class="fas fa-user"></i>Khách hàng</span
-              >
-              <span class="info-value"
-                ><strong>${contract.customerName}</strong></span
-              >
-            </div>
-            <div class="info-row">
-              <span class="info-label"
-                ><i class="fas fa-info-circle"></i>Trạng thái</span
-              >
-              <c:set
-                var="statusClass"
-                value="${contract.status == 'PENDING' ? 'status-pending' : contract.status == 'ACCEPTED' ? 'status-accepted' : contract.status == 'IN_PROGRESS' ? 'status-in-progress' : contract.status == 'COMPLETED' ? 'status-completed' : 'status-cancelled'}"
-              />
-              <span class="status-badge ${statusClass}"
-                >${contract.status}</span
-              >
-            </div>
-            <div class="info-row">
-              <span class="info-label"
-                ><i class="far fa-calendar-check"></i>Ngày bắt đầu</span
-              >
-              <span class="info-value"
-                >${contract.startDate.toLocalDate()}</span
-              >
-            </div>
-            <div class="info-row">
-              <span class="info-label"
-                ><i class="far fa-calendar-times"></i>Ngày kết thúc</span
-              >
-              <span class="info-value">${contract.endDate.toLocalDate()}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label"
-                ><i class="fas fa-piggy-bank"></i>Tiền đặt cọc</span
-              >
-              <span class="info-value"
-                ><fmt:formatNumber
-                  value="${contract.depositAmount}"
-                  pattern="#,###"
-                />
-                VNĐ</span
-              >
-            </div>
-          </div>
+                <div class="container pb-5">
+                    <div class="row">
+                        <!-- Contract Info -->
+                        <div class="col-lg-4 mb-4">
+                            <div class="info-card">
+                                <h5 class="fw-bold mb-4">Thông tin hợp đồng</h5>
+                                <div class="info-row">
+                                    <span class="info-label"
+                                          ><i class="fas fa-hashtag"></i>Mã hợp đồng</span
+                                    >
+                                    <span class="info-value">#${contract.contractId}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label"
+                                          ><i class="fas fa-user"></i>Khách hàng</span
+                                    >
+                                    <span class="info-value"
+                                          ><strong>${contract.customerName}</strong></span
+                                    >
+                                </div>
+                                <!-- Block trạng thái -->
+                                <div class="info-row">
+                                    <span class="info-label"><i class="fas fa-info-circle"></i>Trạng thái</span>
+                                    <c:set
+                                        var="statusClass"
+                                        value="${contract.status == 'PENDING' ? 'status-pending' : contract.status == 'ACCEPTED' ? 'status-accepted' : contract.status == 'IN_PROGRESS' ? 'status-in-progress' : contract.status == 'COMPLETED' ? 'status-completed' : 'status-cancelled'}"
+                                        />
+                                    <span class="status-badge ${statusClass}">${contract.status}</span>
+                                </div>
 
-          <div class="total-amount">
-            <small class="d-block opacity-75">Tổng giá trị hợp đồng</small>
-            <h2>
-              <fmt:formatNumber
-                value="${contract.totalAmount}"
-                pattern="#,###"
-              />
-            </h2>
-            <small class="opacity-75">VNĐ</small>
-          </div>
-        </div>
-
-        <!-- Vehicle Details -->
-        <div class="col-lg-8">
-          <div class="info-card">
-            <h5 class="fw-bold mb-4">
-              <i class="fas fa-car me-2"></i>Danh sách xe trong hợp đồng
-            </h5>
-            <c:forEach var="d" items="${details}">
-              <div class="detail-card">
-                <div class="row align-items-center">
-                  <div class="col-auto">
-                    <div class="vehicle-icon">
-                      <i class="fas fa-car"></i>
-                    </div>
-                  </div>
-                  <div class="col">
-                    <div
-                      class="d-flex justify-content-between align-items-start mb-2"
-                    >
-                      <div>
-                        <h6 class="fw-bold mb-1">
-                          ${d.plateNumber != null ? d.plateNumber : 'N/A'}
-                        </h6>
-                        <small class="text-muted"
-                          >Chi tiết #${d.contractDetailId}</small
-                        >
-                      </div>
-                      <div class="text-end">
-                        <div
-                          class="fw-bold text-success"
-                          style="font-size: 1.25rem"
-                        >
-                          <fmt:formatNumber
-                            value="${d.price}"
-                            pattern="#,###"
-                          />
-                          VNĐ
+                                <!-- Lý do từ chối (nếu có) -->
+                                <c:if test="${contract.status == 'REJECTED' && not empty contract.rejectionReason}">
+                                    <div class="alert alert-danger mt-2" role="alert">
+                                        <i class="fas fa-comment-dots me-1"></i>
+                                        Lý do từ chối: ${contract.rejectionReason}
+                                    </div>
+                                </c:if>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label"
+                                      ><i class="far fa-calendar-check"></i>Ngày bắt đầu</span
+                                >
+                                <span class="info-value"
+                                      >${contract.startDate.toLocalDate()}</span
+                                >
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label"
+                                      ><i class="far fa-calendar-times"></i>Ngày kết thúc</span
+                                >
+                                <span class="info-value">${contract.endDate.toLocalDate()}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label"
+                                      ><i class="fas fa-piggy-bank"></i>Tiền đặt cọc</span
+                                >
+                                <span class="info-value"
+                                      ><fmt:formatNumber
+                                        value="${contract.depositAmount}"
+                                        pattern="#,###"
+                                        />
+                                    VNĐ</span
+                                >
+                            </div>
                         </div>
-                      </div>
-                    </div>
-                    <div class="row g-2 text-muted small">
-                      <div class="col-sm-6">
-                        <i class="far fa-calendar-check text-success me-1"></i>
-                        Nhận: ${d.rentStartDate.toLocalDate()}
-                      </div>
-                      <div class="col-sm-6">
-                        <i class="far fa-calendar-times text-danger me-1"></i>
-                        Trả: ${d.rentEndDate.toLocalDate()}
-                      </div>
-                    </div>
-                    <c:if test="${not empty d.note}">
-                      <div class="mt-2 p-2 bg-light rounded">
-                        <small
-                          ><i class="fas fa-sticky-note me-1"></i
-                          >${d.note}</small
-                        >
-                      </div>
-                    </c:if>
-                  </div>
-                </div>
-              </div>
-            </c:forEach>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
-</html>
+                        <div class="total-amount">
+                            <small class="d-block opacity-75">Tổng giá trị hợp đồng</small>
+                            <h2>
+                                <fmt:formatNumber
+                                    value="${contract.totalAmount}"
+                                    pattern="#,###"
+                                    />
+                            </h2>
+                            <small class="opacity-75">VNĐ</small>
+                        </div>
+                    </div>
+
+                    <!-- Vehicle Details -->
+                    <div class="col-lg-8">
+                        <div class="info-card">
+                            <h5 class="fw-bold mb-4">
+                                <i class="fas fa-car me-2"></i>Danh sách xe trong hợp đồng
+                            </h5>
+                            <c:forEach var="d" items="${details}">
+                                <div class="detail-card">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+                                            <div class="vehicle-icon">
+                                                <i class="fas fa-car"></i>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div
+                                                class="d-flex justify-content-between align-items-start mb-2"
+                                                >
+                                                <div>
+                                                    <h6 class="fw-bold mb-1">
+                                                        ${d.plateNumber != null ? d.plateNumber : 'N/A'}
+                                                    </h6>
+                                                    <small class="text-muted"
+                                                           >Chi tiết #${d.contractDetailId}</small
+                                                    >
+                                                </div>
+                                                <div class="text-end">
+                                                    <div
+                                                        class="fw-bold text-success"
+                                                        style="font-size: 1.25rem"
+                                                        >
+                                                        <fmt:formatNumber
+                                                            value="${d.price}"
+                                                            pattern="#,###"
+                                                            />
+                                                        VNĐ
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row g-2 text-muted small">
+                                                <div class="col-sm-6">
+                                                    <i class="far fa-calendar-check text-success me-1"></i>
+                                                    Nhận: ${d.rentStartDate.toLocalDate()}
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <i class="far fa-calendar-times text-danger me-1"></i>
+                                                    Trả: ${d.rentEndDate.toLocalDate()}
+                                                </div>
+                                            </div>
+                                            <c:if test="${not empty d.note}">
+                                                <div class="mt-2 p-2 bg-light rounded">
+                                                    <small
+                                                        ><i class="fas fa-sticky-note me-1"></i
+                                                        >${d.note}</small
+                                                    >
+                                                </div>
+                                            </c:if>
+                                        </div>
+                                    </div>
+                                </div>
+                            </c:forEach>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        </body>
+    </html>

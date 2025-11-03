@@ -113,9 +113,9 @@ public class ContractServiceImpl implements ContractService {
     }
 
     @Override
-    public boolean updateContractStatus(Integer contractId, String status) {
+    public boolean updateContractStatus(Integer contractId, String status, String reason) {
         try {
-            return contractsDAO.updateContractStatus(contractId, status);
+            return contractsDAO.updateContractStatus(contractId, status, reason);
         } catch (Exception e) {
             throw new RuntimeException("error.system", e);
         }
@@ -374,6 +374,13 @@ public class ContractServiceImpl implements ContractService {
     private BigDecimal calculateDepositAmount(BigDecimal total) {
         return new BigDecimal("30000000");
     }
+
+    @Override
+    public boolean updateContractStatus(Integer contractId, String status) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+
 
     @Override
     public int countContract() {
