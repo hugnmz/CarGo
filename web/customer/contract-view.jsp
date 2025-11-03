@@ -44,12 +44,17 @@ contentType="text/html; charset=UTF-8" language="java" %>
             >
               <i class="fas fa-arrow-left me-2"></i>Danh sách HĐ
             </a>
+            <form action="${pageContext.request.contextPath}/returncar" method="post">  
+                <input type="hidden" name="" value="${contract.contractId}" />
+                <button type="submit" class="btn btn-back">Gửi yêu cầu trả xe</button>
+            </form>
             <a
               class="btn btn-back"
               href="${pageContext.request.contextPath}/home"
             >
               <i class="fas fa-home me-2"></i>Trang chủ
             </a>
+            
           </div>
         </div>
       </div>
