@@ -29,16 +29,17 @@
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark">
             <div class="container">
-                <a class="navbar-brand" href="${pageContext.request.contextPath}/staff/staff.jsp">
+                <a class="navbar-brand" href="${pageContext.request.contextPath}/staff">
                     <i class="fas fa-car"></i> CarGo Staff Dashboard
                 </a>
                 <div class="navbar-nav ms-auto">
                     <span class="navbar-text me-3">
-                        <i class="fas fa-user" name="staffId"></i> Staff ID: ${sessionScope.staffId}
+                        <i class="fas fa-user" name="staffId"></i> Staff ID: ${sessionScope.userId}
                     </span>
-                    <a class="btn btn-outline-light" href="#">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </a>
+                    <a class="btn btn-outline-light" href="${pageContext.request.contextPath}/LogoutServlet">
+                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    </a> 
+                    
                 </div>
             </div>
         </nav>

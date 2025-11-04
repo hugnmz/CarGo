@@ -17,12 +17,11 @@ public interface ContractService {
 
     List<ContractDetailDTO> getContractDetails(Integer contractId);
 
-    boolean updateContractStatus(Integer contractId, String status);
-
     void updateContractTotalAmount(Integer contractId, BigDecimal totalAmount);
-    
-    void updateStaffId(Integer staffId,Integer contractId);
-    void updateNote(String note,Integer contractId);
+
+    void updateStaffId(Integer staffId, Integer contractId);
+
+    void updateNote(String note, Integer contractId);
 
     // Tính tổng tiền hợp đồng
     boolean calculateTotalAmount(Integer contractId);
@@ -35,8 +34,11 @@ public interface ContractService {
     List<ContractDTO> getAllContracts();
 
     boolean createContract(ContractDTO contractDTO);
+
     boolean updateContractStatus(Integer contractId, String status, String reason);
+
     List<ContractDTO> createContractsFromCart(Integer customerId, Integer[] selectedOrderIds);
+
     //dem so hop dong dang co
     int countContract();
 }

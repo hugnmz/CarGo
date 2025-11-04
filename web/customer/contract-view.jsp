@@ -1,64 +1,80 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib
-prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %> <%@ page
-contentType="text/html; charset=UTF-8" language="java" %>
-<!DOCTYPE html>
-<html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Chi tiết hợp đồng #${contract.contractId} - CarGo</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="${pageContext.request.contextPath}/CSS/customer/contract-view.css"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div class="page-header">
-      <div class="container">
-        <div
-          class="d-flex justify-content-between align-items-center flex-wrap"
-        >
-          <div>
-            <h1 class="h2 mb-2">
-              <i class="fas fa-file-contract me-2"></i>Hợp đồng
-              #${contract.contractId}
-            </h1>
-            <p class="mb-0 opacity-75">Chi tiết đầy đủ về hợp đồng thuê xe</p>
-          </div>
-          <div class="d-flex gap-2 mt-3 mt-md-0">
-            <a
-              class="btn btn-back"
-              href="${pageContext.request.contextPath}/my-contracts"
-            >
-              <i class="fas fa-arrow-left me-2"></i>Danh sách HĐ
-            </a>
-            <form action="${pageContext.request.contextPath}/returncar" method="post">  
-                <input type="hidden" name="" value="${contract.contractId}" />
-                <button type="submit" class="btn btn-back">Gửi yêu cầu trả xe</button>
-            </form>
-            <a
-              class="btn btn-back"
-              href="${pageContext.request.contextPath}/home"
-            >
-              <i class="fas fa-home me-2"></i>Trang chủ
-            </a>
-            
-          </div>
-        </div>
-      </div>
-    </div>
+    prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %> <%@ page
+        contentType="text/html; charset=UTF-8" language="java" %>
+        <!DOCTYPE html>
+        <html lang="vi">
+            <head>
+                <meta charset="UTF-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <title>Chi tiết hợp đồng #${contract.contractId} - CarGo</title>
+                <link
+                    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+                    rel="stylesheet"
+                    />
+                <link
+                    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+                    rel="stylesheet"
+                    />
+                <link
+                    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+                    rel="stylesheet"
+                    />
+                <link
+                    href="${pageContext.request.contextPath}/CSS/customer/contract-view.css"
+                    rel="stylesheet"
+                    />
+            </head>
+            <body>
+                <div class="page-header">
+                    <div class="container">
+                        <div
+                            class="d-flex justify-content-between align-items-center flex-wrap"
+                            >
+                            <div>
+                                <h1 class="h2 mb-2">
+                                    <i class="fas fa-file-contract me-2"></i>Hợp đồng
+                                    #${contract.contractId}
+                                </h1>
+                                <p class="mb-0 opacity-75">Chi tiết đầy đủ về hợp đồng thuê xe</p>
+                            </div>
+                            <div class="d-flex gap-2 mt-3 mt-md-0">
+                                <a
+                                    class="btn btn-back"
+                                    href="${pageContext.request.contextPath}/my-contracts"
+                                    >
+                                    <i class="fas fa-arrow-left me-2"></i>Danh sách HĐ
+                                </a>
+                                <form action="${pageContext.request.contextPath}/returncar" method="post">  
+                                    <input type="hidden" name="contractId" value="${contract.contractId}" />
+                                    <button type="submit" class="btn btn-back">Gửi yêu cầu trả xe</button>
+                                </form>
+                                <a
+                                    class="btn btn-back"
+                                    href="${pageContext.request.contextPath}/home"
+                                    >
+                                    <i class="fas fa-home me-2"></i>Trang chủ
+                                </a>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <c:if test="${not empty sessionScope.message}">
+                    <div class="alert alert-success" role="alert">
+                        ${sessionScope.message}
+                    </div>
+                    <c:remove var="message" scope="session"/>
+                </c:if>
+                <c:if test="${not empty sessionScope.error}">
+                    <div class="alert alert-danger" role="alert" id="errorBox" style="display:none;">
+                        ${sessionScope.error}
+                    </div>
+
+
+
+                    <c:remove var="error" scope="session"/>
+                </c:if>
+
 
                 <div class="container pb-5">
                     <div class="row">
@@ -205,5 +221,16 @@ contentType="text/html; charset=UTF-8" language="java" %>
             </div>
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+            <script>
+                window.onload = function () {
+                    var errorMsg = document.getElementById("errorBox").innerText;
+                    if (errorMsg) {
+                        // Hiển thị hộp thoại confirm
+                        confirm(errorMsg);
+                        // Sau khi bấm OK -> chuyển về trang home
+                        window.location.href = "home";
+                    }
+                };
+            </script>
         </body>
     </html>

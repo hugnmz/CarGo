@@ -26,6 +26,7 @@ import mapper.OrderMapper;
 import model.Cars;
 import model.ContractDetails;
 import model.Contracts;
+import model.Customers;
 import service.ContractService;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
@@ -386,7 +387,7 @@ public class ContractServiceImpl implements ContractService {
                 // Lưu contract detail (cần implement method này trong DAO)
                 boolean ok = contractDetailsDAO.addContractDetail(detail);
 
-                boolean ok = contractDetailsDAO.addContractDetail(detail);
+              
 
                 // Xóa order khỏi giỏ
                 ordersDAO.deleteOrder(order.getCartDetailId());
@@ -460,5 +461,8 @@ public class ContractServiceImpl implements ContractService {
         }
     }
 ;
+
+ 
+
 
 }

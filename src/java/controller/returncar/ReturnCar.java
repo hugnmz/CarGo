@@ -22,6 +22,7 @@ import java.util.Optional;
 import model.RequestReturnCar;
 import service.ContractService;
 import service.ReturnCarService;
+import util.AuthUtil;
 import util.di.DIContainer;
 
 /**
@@ -49,12 +50,10 @@ public class ReturnCar extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // Lấy danh sách tạm thời từ queue (state toàn ứng dụng)
+        // Lấy danh sách tạm thời từ queue 
         List<RequestReturnCar> requests = new ArrayList<>(returnCarService.all());
         req.setAttribute("requests", requests);
-        
-        //giả định mã nhân viên
-        req.getSession().setAttribute("staffId", 1);
+
         //tạo mã csrf để bảo mật
         String csrf = java.util.UUID.randomUUID().toString();
         req.getSession().setAttribute("csrf", csrf);
@@ -77,7 +76,9 @@ public class ReturnCar extends HttpServlet {
 
         // 1) Validate input
         if (contractIdParam == null || contractIdParam.trim().isEmpty()) {
-            errors.add("Không nhận được mã hợp đồng");
+            req.getSession().setAttribute("error", "Không nhận được mã hợp đồng");
+            req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
+            return;
         }
 
         int id = 0;
@@ -85,7 +86,9 @@ public class ReturnCar extends HttpServlet {
             try {
                 id = Integer.parseInt(contractIdParam.trim());
             } catch (NumberFormatException ex) {
-                errors.add("Mã hợp đồng không hợp lệ");
+                req.getSession().setAttribute("error", "Mã hợp đồng không hợp lệ");
+                req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
+                return;
             }
         }
 
@@ -94,25 +97,26 @@ public class ReturnCar extends HttpServlet {
             try {
                 dtoOpt = contractService.getContractById(id);
                 if (dtoOpt.isEmpty()) {
-                    errors.add("Không tồn tại hợp đồng");
+                    req.getSession().setAttribute("error", "Không tồn tại hợp đồng");
+                    req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
+                    return;
                 } else {
                     if ("PENDING".equals(dtoOpt.get().getStatus()) || "REJECTED".equals(dtoOpt.get().getStatus())) {
-                        errors.add("Hợp đồng không hợp lệ");
+                        req.getSession().setAttribute("error", "Hợp đồng không hợp lệ");
+                        req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
+                        return;
+
                     } else if ("COMPLETED".equals(dtoOpt.get().getStatus())) {
-                        errors.add("Hợp đồng đã hoàn thành");
+                        req.getSession().setAttribute("error", "Hợp đồng đã hoàn thành");
+                        req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
+                        return;
                     }
                 }
             } catch (Exception e) {
-                errors.add("Lỗi hệ thống: " + e.getMessage());
+                req.getSession().setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+                req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
+                return;
             }
-        }
-
-        // Nếu có lỗi: trả lại cho KH 
-        if (!errors.isEmpty()) {
-            req.setAttribute("errors", errors);
-            // Ở đây forward để KH thấy lỗi ngay trên trang của họ
-            req.getRequestDispatcher("/staff/staff.jsp").forward(req, resp);
-            return;
         }
 
         // Không lỗi → thêm/ cập nhật vào queue theo contractId (chống trùng)
@@ -125,14 +129,14 @@ public class ReturnCar extends HttpServlet {
             // Chưa có → thêm mới
             RequestReturnCar newReq = new RequestReturnCar(dto, LocalDateTime.now());
             returnCarService.putIfAbsentOrKeep(cid, newReq);
-            req.getSession().setAttribute("flash", "Gửi yêu cầu trả xe thành công");
+            req.getSession().setAttribute("message", "Gửi yêu cầu trả xe thành công");
         } else {
             // Đã có trong hàng chờ
-            req.getSession().setAttribute("flash", "Hợp đồng đang chờ xử lí");
+            req.getSession().setAttribute("message", "Hợp đồng đang chờ xử lí");
         }
 
         // Redirect về trang khách để tránh submit lại khi F5
-        resp.sendRedirect(req.getContextPath() + "/staff/staff.jsp");
+        resp.sendRedirect(req.getContextPath() + "/view-contract?contractId=" + id);
     }
 
 }
