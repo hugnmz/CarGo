@@ -98,23 +98,27 @@ public class ReturnCar extends HttpServlet {
                 dtoOpt = contractService.getContractById(id);
                 if (dtoOpt.isEmpty()) {
                     req.getSession().setAttribute("error", "Không tồn tại hợp đồng");
-                    req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
+                    resp.sendRedirect(req.getContextPath() + "/view-contract?contractId=" + id);
                     return;
                 } else {
                     if ("PENDING".equals(dtoOpt.get().getStatus()) || "REJECTED".equals(dtoOpt.get().getStatus())) {
                         req.getSession().setAttribute("error", "Hợp đồng không hợp lệ");
-                        req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
+                        resp.sendRedirect(req.getContextPath() + "/view-contract?contractId=" + id);
                         return;
 
+                    } else if ("RETURNED".equals(dtoOpt.get().getStatus())) {
+                        req.getSession().setAttribute("error", "Hợp đồng đã xử lí trả xe");
+                        resp.sendRedirect(req.getContextPath() + "/view-contract?contractId=" + id);
+                        return;
                     } else if ("COMPLETED".equals(dtoOpt.get().getStatus())) {
                         req.getSession().setAttribute("error", "Hợp đồng đã hoàn thành");
-                        req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
+                        resp.sendRedirect(req.getContextPath() + "/view-contract?contractId=" + id);
                         return;
                     }
                 }
             } catch (Exception e) {
                 req.getSession().setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
-                req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
+                resp.sendRedirect(req.getContextPath() + "/view-contract?contractId=" + id);
                 return;
             }
         }
@@ -138,6 +142,5 @@ public class ReturnCar extends HttpServlet {
         // Redirect về trang khách để tránh submit lại khi F5
         resp.sendRedirect(req.getContextPath() + "/view-contract?contractId=" + id);
     }
-
 
 }

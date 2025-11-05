@@ -12,8 +12,8 @@
         <title>Yêu cầu trả xe</title>
         <!-- Bootstrap 5 -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/staff/returncar.css"/>
-        
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/CSS/staff/returncar.css"/>
+
     </head>
 
     <%
@@ -39,7 +39,7 @@
                     <a class="btn btn-outline-light" href="${pageContext.request.contextPath}/LogoutServlet">
                         <i class="fas fa-sign-out-alt"></i> Đăng xuất
                     </a> 
-                    
+
                 </div>
             </div>
         </nav>
@@ -53,10 +53,15 @@
 
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h1 class="mb-4">Danh sách yêu cầu trả xe</h1>
-                <a href="${pageContext.request.contextPath}/returncar" 
-                   class="btn btn-outline-primary btn-sm d-flex align-items-center">
-                    <i class="bi bi-arrow-clockwise me-1"></i> Làm mới
+                <div class="d-flex gap-3">
+                <a href="${pageContext.request.contextPath}/staff" class="btn btn-outline-primary btn-sm d-flex align-items-center ">
+                    <i class="fas"></i> ← Quay lại
                 </a>
+
+                <a href="${pageContext.request.contextPath}/returncar" 
+                   class="btn btn-outline-primary btn-sm d-flex align-items-center ">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Làm mới
+                </a></div>
             </div>
 
             <c:if test="${not empty sessionScope.flash}">
