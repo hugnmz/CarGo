@@ -1,0 +1,86 @@
+body {
+    background: #f7f7f9;
+}
+a{
+    text-decoration: none;
+    color: white;
+}
+.navbar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    color: white !important;
+}
+
+.staff-header {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    border-radius: 15px;
+}
+.staff-header {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    border-radius: 15px;
+}
+/* Khối bao toàn bộ nội dung hợp đồng */
+.contract-wrapper {
+    border: 2px solid #dee2e6;
+    border-radius: 15px;
+    background-color: #ffffff;
+    padding: 30px;
+    margin: 30px auto;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    max-width: 1500px;
+}
+
+.contract-header {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #0d6efd;
+    border-bottom: 2px solid #0d6efd;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+}
+
+.status-late {
+    color: red;
+    font-weight: 600;
+}
+
+.status-ontime {
+    color: green;
+    font-weight: 600;
+}
+
+.info-label {
+    font-weight: 500;
+    color: #333;
+}
+
+.vehicle-card {
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    background: #f8f9fa;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+
+.contract-row {
+
+    gap: 20px;
+}
+
+/* Cho mobile: xếp dọc */
+@media (max-width: 768px) {
+    .contract-row {
+        flex-direction: column;
+    }
+}

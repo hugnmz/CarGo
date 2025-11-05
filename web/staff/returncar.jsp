@@ -12,7 +12,7 @@
         <title>Yêu cầu trả xe</title>
         <!-- Bootstrap 5 -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/CSS/staff/returncar.css"/>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/staff/returncar.css"/>
         
     </head>
 
