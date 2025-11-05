@@ -133,4 +133,11 @@ public class CustomersDAOImpl implements CustomersDAO {
         return JdbcTemplateUtil.count(sql);
     }
 
+    @Override
+    public boolean deactivateCustomer(Integer customerId) {
+    String sql = "UPDATE Customers SET isVerified = 0 WHERE customerId = ?";
+    int affected = JdbcTemplateUtil.update(sql, customerId);
+    return affected > 0;
+}
+
 }

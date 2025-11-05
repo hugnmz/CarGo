@@ -433,5 +433,14 @@ public class CustomerServiceImpl implements CustomerService {
     public int countCustomer() {
         return customersDAO.countCustomer();
     }
-
+    @Override
+    public boolean deactivateCustomer(Integer customerId) {
+    if (customerId == null) return false;
+    try {
+        return customersDAO.deactivateCustomer(customerId);
+    } catch (Exception e) {
+        e.printStackTrace();
+        return false;
+    }
+}
 }

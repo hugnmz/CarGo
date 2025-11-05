@@ -53,4 +53,5 @@ public interface CustomerService {
     List<LocationDTO> getAllLocation();
     
     int countCustomer();
+    boolean deactivateCustomer(Integer customerId);
 }

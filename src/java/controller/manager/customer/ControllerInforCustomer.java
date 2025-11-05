@@ -161,11 +161,11 @@ public class ControllerInforCustomer extends HttpServlet {
                 request.setAttribute("error", "Không tìm thấy ID khách hàng!");
             } else {
                 Integer customerId = Integer.parseInt(idStr);
-                boolean deleted = customerService.deleteCustomer(customerId);
+                boolean deleted = customerService.deactivateCustomer(customerId);
                 if (deleted) {
-                    request.setAttribute("message", "Xóa khách hàng thành công!");
+                    request.setAttribute("message", "Vô hiệu hóa khách hàng thành công!");
                 } else {
-                    request.setAttribute("error", "Xóa thất bại! Có thể khách hàng không tồn tại hoặc đang có hợp đồng.");
+                    request.setAttribute("error", "Thao tác thất bại! Có thể khách hàng không tồn tại.");
                 }
             }
         } catch (Exception e) {

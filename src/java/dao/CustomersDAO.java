@@ -16,4 +16,5 @@ public interface CustomersDAO {
     boolean existEmail(String email);
     boolean existPhone(String phone);
     public int countCustomer();
+    boolean deactivateCustomer(Integer customerId);
 }
