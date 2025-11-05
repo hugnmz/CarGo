@@ -39,7 +39,9 @@ public class FeedBack extends HttpServlet {
             out.print("[");
             for (int i = 0; i < list.size(); i++) {
                 out.print(toJson(list.get(i)));
-                if (i < list.size() - 1) out.print(",");
+                if (i < list.size() - 1) {
+                    out.print(",");
+                }
             }
             out.print("]");
         }
@@ -61,7 +63,8 @@ public class FeedBack extends HttpServlet {
             if (req.getParameter("vehicleId") != null && !req.getParameter("vehicleId").isEmpty()) {
                 vehicleId = Integer.parseInt(req.getParameter("vehicleId"));
             }
-        } catch (NumberFormatException ignore) {}
+        } catch (NumberFormatException ignore) {
+        }
 
         try {
             FeedbackDTO dto = feedbackService.create(customerId, comment, vehicleId);
@@ -76,16 +79,26 @@ public class FeedBack extends HttpServlet {
             resp.setContentType("text/plain; charset=UTF-8");
             resp.getWriter().write(ex.getMessage());
         } catch (Exception ex) {
+            ex.printStackTrace(); // log ra console/server log
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.setCharacterEncoding("UTF-8");
+            resp.setContentType("text/plain; charset=UTF-8");
+            resp.getWriter().write(ex.getMessage() != null ? ex.getMessage() : "Internal error");
         }
     }
 
     private int parseIntOr(String s, int def) {
-        try { return Integer.parseInt(s); } catch (Exception e) { return def; }
+        try {
+            return Integer.parseInt(s);
+        } catch (Exception e) {
+            return def;
+        }
     }
 
     private String escape(String s) {
-        if (s == null) return "";
+        if (s == null) {
+            return "";
+        }
         return s.replace("\\", "\\\\")
                 .replace("\"", "\\\"")
                 .replace("<", "\\u003c")
