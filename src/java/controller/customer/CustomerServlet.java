@@ -138,6 +138,30 @@ public class CustomerServlet extends HttpServlet {
                 customerDTO.setDateOfBirth(LocalDate.parse(dateOfBirthStr));
             }
 
+            // kiểm tra trùng email/phone nếu người dùng thay đổi
+            Optional<CustomerDTO> currentOpt = customerService.getCustomerById(Integer.valueOf(customerIdStr));
+            if (currentOpt.isPresent()) {
+                CustomerDTO current = currentOpt.get();
+
+                if (email != null && !email.trim().equalsIgnoreCase(current.getEmail())) {
+                    if (customerService.isEmailExists(email.trim())) {
+                        errors.add(util.MessageUtil.getError("error.email.exists"));
+                    }
+                }
+
+                if (phone != null && !phone.trim().equals(current.getPhone())) {
+                    if (customerService.isPhoneExists(phone.trim())) {
+                        errors.add(util.MessageUtil.getError("error.phone.exists"));
+                    }
+                }
+            }
+
+            if (!errors.isEmpty()) {
+                request.setAttribute("errors", errors);
+                request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
+                return;
+            }
+
             // goi service de cap nhat thong tin khach hang
             boolean success = customerService.updateCustomer(customerDTO);
 

@@ -77,6 +77,17 @@ public class CustomerServiceImpl implements CustomerService {
                 return false; // Dữ liệu không hợp lệ
             }
 
+            // Defensive: chặn trùng username/email/phone trước khi tạo
+            if (customerDTO.getUsername() != null && customersDAO.existsUsername(customerDTO.getUsername())) {
+                return false;
+            }
+            if (customerDTO.getEmail() != null && customersDAO.existEmail(customerDTO.getEmail())) {
+                return false;
+            }
+            if (customerDTO.getPhone() != null && customersDAO.existPhone(customerDTO.getPhone())) {
+                return false;
+            }
+
             Integer locationId = null;
             if (customerDTO.getCity() != null) {
                 locationId = locationsDAO.findIdByCity(customerDTO.getCity());
@@ -210,10 +221,23 @@ public class CustomerServiceImpl implements CustomerService {
                 existing.setFullName(customerDTO.getFullName());
             }
             if (customerDTO.getEmail() != null) {
-                existing.setEmail(customerDTO.getEmail());
+                String newEmail = customerDTO.getEmail().trim();
+                if (!newEmail.equalsIgnoreCase(existing.getEmail())) {
+                    // email thay đổi -> kiểm tra trùng
+                    if (customersDAO.existEmail(newEmail)) {
+                        return false;
+                    }
+                    existing.setEmail(newEmail);
+                }
             }
             if (customerDTO.getPhone() != null) {
-                existing.setPhone(customerDTO.getPhone());
+                String newPhone = customerDTO.getPhone().trim();
+                if (!newPhone.equals(existing.getPhone())) {
+                    if (customersDAO.existPhone(newPhone)) {
+                        return false;
+                    }
+                    existing.setPhone(newPhone);
+                }
             }
             if (customerDTO.getDateOfBirth() != null) {
                 existing.setDateOfBirth(customerDTO.getDateOfBirth());

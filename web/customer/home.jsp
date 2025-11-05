@@ -345,60 +345,175 @@
                 </a>
             </div>
 
-            <!-- Testimonials -->
-            <h2 class="section-title mt-5">Khách hàng nói gì về chúng tôi</h2>
-            <div class="row g-4 mb-5">
-                <div class="col-md-4">
-                    <div class="testimonial-card">
-                        <div class="text-warning mb-3">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i>
+              <!-- Testimonials / Feedback -->
+            <div class="d-flex align-items-center justify-content-between mt-5">
+                <h2 class="section-title m-0">Khách hàng nói gì về chúng tôi</h2>
+                <button id="btnOpenFeedback" class="btn btn-primary-custom btn-sm">
+                    <i class="fa fa-comment-dots me-1"></i> Feedback
+                </button>
+            </div>
+
+            <!-- Dynamic Feedback List -->
+            <div id="feedbackList" class="row g-4 mb-3 mt-2"></div>
+            <div class="text-center mb-5">
+                <button id="btnLoadMoreFeedback" class="btn btn-outline-primary" style="display:none;">
+                    Xem thêm
+                </button>
+            </div>
+
+            <!-- Feedback Modal -->
+            <div class="modal fade" id="feedbackModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="fa fa-comment me-2"></i>Gửi nhận xét</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <p class="mb-3">"Xe mới, sạch sẽ và giao nhanh. Rất hài lòng với dịch vụ! Đội ngũ nhân viên chuyên nghiệp."</p>
-                        <div class="d-flex align-items-center">
-                            <img src="https://i.pravatar.cc/150?img=12" class="rounded-circle me-3" width="50" height="50">
-                            <div>
-                                <strong>Nguyễn Minh Đức</strong><br>
-                                <small class="text-muted">TP.HCM</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="testimonial-card">
-                        <div class="text-warning mb-3">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i>
-                        </div>
-                        <p class="mb-3">"Thủ tục nhanh gọn, giá hợp lý. Xe hoạt động tốt suốt chuyến đi. Sẽ giới thiệu cho bạn bè."</p>
-                        <div class="d-flex align-items-center">
-                            <img src="https://i.pravatar.cc/150?img=47" class="rounded-circle me-3" width="50" height="50">
-                            <div>
-                                <strong>Trần Thu Hà</strong><br>
-                                <small class="text-muted">Hà Nội</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="testimonial-card">
-                        <div class="text-warning mb-3">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i>
-                        </div>
-                        <p class="mb-3">"Nhân viên hỗ trợ nhiệt tình, xe giao đúng giờ. Trải nghiệm tuyệt vời. Chắc chắn sẽ thuê lại!"</p>
-                        <div class="d-flex align-items-center">
-                            <img src="https://i.pravatar.cc/150?img=33" class="rounded-circle me-3" width="50" height="50">
-                            <div>
-                                <strong>Phạm Quang Anh</strong><br>
-                                <small class="text-muted">Đà Nẵng</small>
-                            </div>
+                        <div class="modal-body">
+                            <c:choose>
+                                <c:when test="${empty sessionScope.c}">
+                                    <div class="alert alert-warning">
+                                        Bạn cần <a href='${pageContext.request.contextPath}/auth/login.jsp'>đăng nhập</a> để gửi nhận xét.
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <form id="feedbackForm">
+                                        <div class="mb-3">
+                                            <label class="form-label">Nội dung nhận xét</label>
+                                            <textarea class="form-control" name="comment" rows="4" maxlength="255" placeholder="Chia sẻ trải nghiệm của bạn..." required></textarea>
+                                        </div>
+                                        <div class="text-end">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                            <button type="submit" class="btn btn-primary">Gửi</button>
+                                        </div>
+                                    </form>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
+            <script>
+                (function () {
+                    var ctx = '${pageContext.request.contextPath}';
+                    var listEl = document.getElementById('feedbackList');
+                    var btnMore = document.getElementById('btnLoadMoreFeedback');
+                    var btnOpen = document.getElementById('btnOpenFeedback');
+                    var modalEl = document.getElementById('feedbackModal');
+                    var offset = 0;
+                    var limit = 6;
+
+                    if (btnOpen) {
+                        btnOpen.addEventListener('click', function () {
+                            var m = new bootstrap.Modal(modalEl);
+                            m.show();
+                        });
+                    }
+
+                    function renderItem(item) {
+                        var created = item.createAt ? new Date(item.createAt).toLocaleString() : '';
+                        var name = item.customerName || 'Khách hàng ẩn danh';
+                        var img = item.carImage || ('https://i.pravatar.cc/100?u=' + (item.customerEmail || name));
+                        return ''
+                                + '<div class="col-md-4">'
+                                + '<div class="testimonial-card">'
+                                + '<div class="text-warning mb-2">'
+                                + '<i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>'
+                                + '<i class="fas fa-star"></i><i class="fas fa-star"></i>'
+                                + '</div>'
+                                + '<p class="mb-3">' + escapeHtml(item.comment || '') + '</p>'
+                                + '<div class="d-flex align-items-center">'
+                                + '<img src="' + img + '" class="rounded-circle me-3" width="50" height="50"/>'
+                                + '<div>'
+                                + '<strong>' + escapeHtml(name) + '</strong><br/>'
+                                + '<small class="text-muted">' + created + '</small>'
+                                + '</div>'
+                                + '</div>'
+                                + '</div>'
+                                + '</div>';
+                    }
+
+                    function escapeHtml(str) {
+                        return String(str)
+                                .replace(/&/g, '&amp;')
+                                .replace(/</g, '&lt;')
+                                .replace(/>/g, '&gt;')
+                                .replace(/\"/g, '&quot;')
+                                .replace(/'/g, '&#039;');
+                    }
+
+                    async function load(pageOffset) {
+                        var url = ctx + '/feedbacks?offset=' + pageOffset + '&limit=' + limit;
+                        var res = await fetch(url);
+                        if (!res.ok)
+                            return;
+                        var data = await res.json();
+                        if (Array.isArray(data)) {
+                            var html = data.map(renderItem).join('');
+                            listEl.insertAdjacentHTML('beforeend', html);
+                            offset += data.length;
+                            btnMore.style.display = (data.length === limit ? 'inline-block' : 'none');
+                        }
+                    }
+
+                    if (btnMore) {
+                        btnMore.addEventListener('click', function () {
+                            load(offset);
+                        });
+                    }
+
+                    var form = document.getElementById('feedbackForm');
+                    if (form) {
+                        form.addEventListener('submit', async function (e) {
+                            e.preventDefault();
+                            var fd = new FormData(form);
+
+                            var submitBtn = form.querySelector('button[type="submit"]');
+                            if (submitBtn)
+                                submitBtn.disabled = true;
+
+                            try {
+                                var res = await fetch(ctx + '/feedbacks', {
+                                    method: 'POST',
+                                    body: new URLSearchParams(fd)
+                                });
+
+                                if (!res.ok) {
+                                    var msg = '';
+                                    try {
+                                        msg = await res.text();
+                                    } catch (err) {
+                                    }
+                                    alert('Gửi nhận xét thất bại (' + res.status + '): ' + (msg || ''));
+                                    return;
+                                }
+
+                                var item = await res.json();
+                                if (listEl) {
+                                    listEl.insertAdjacentHTML('afterbegin', renderItem(item));
+                                } else {
+                                    location.reload();
+                                }
+
+                                var inst = bootstrap.Modal.getInstance(modalEl);
+                                if (inst)
+                                    inst.hide();
+                                form.reset();
+                            } catch (err) {
+                                console.error(err);
+                                alert('Có lỗi kết nối khi gửi nhận xét.');
+                            } finally {
+                                if (submitBtn)
+                                    submitBtn.disabled = false;
+                            }
+                        });
+                    }
+
+                    // Initial load
+                    load(offset);
+                })();
+            </script>
         <!-- Footer -->
         <footer class="footer-modern">
             <div class="container">
