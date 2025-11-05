@@ -152,6 +152,64 @@ body {
   color: white;
 }
 
+/* Terms & print */
+.terms-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.terms-card h5 {
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.terms-list {
+  counter-reset: term;
+  margin: 0;
+  padding-left: 1.25rem;
+  color: #374151;
+}
+
+.terms-list li {
+  margin-bottom: .6rem;
+  line-height: 1.6;
+}
+
+.signature-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+.signature {
+  text-align: center;
+  padding: 1rem;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.toolbar .btn-print {
+  background: rgba(255,255,255,.15);
+  border: 2px solid rgba(255,255,255,.25);
+  color: #fff;
+}
+
+.toolbar .btn-print:hover {
+  background: rgba(255,255,255,.25);
+}
+
+@media print {
+  body { background: #fff; }
+  .page-header, .toolbar { display: none !important; }
+  .info-card, .detail-card, .terms-card { box-shadow: none; border: 1px solid #e5e7eb; }
+}
+
 @media (max-width: 768px) {
   .info-row {
     flex-direction: column;
@@ -170,4 +228,29 @@ body {
   .detail-card {
     padding: 1rem;
   }
+}
+
+/* Action bar (payment) */
+.action-bar {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.action-amount h2 { font-weight: 800; }
+
+.action-cta .btn-primary {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.action-cta .btn-primary:hover {
+  filter: brightness(1.05);
+}
+
+@media (max-width: 992px) {
+  .action-bar { flex-direction: column; gap: 1rem; align-items: flex-start !important; }
 }
