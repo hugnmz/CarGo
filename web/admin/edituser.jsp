@@ -8,12 +8,7 @@
     
     String role = (String) session.getAttribute("roleName");
     if (role == null) {
-        response.sendRedirect("LoginAdmin");
-        return;
-    }
-    if (!"ADMIN".equalsIgnoreCase(role)) {
-        request.setAttribute("error", "Bạn không có quyền truy cập trang này!");
-        request.getRequestDispatcher("error.jsp").forward(request, response);
+        response.sendRedirect("LoginServlet");
         return;
     }
 %>

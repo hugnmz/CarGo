@@ -26,4 +26,5 @@ public interface ContractsDAO {
     List<Contracts> getContractByStatus(String status);
     boolean calculateTotalAmout(Integer contractId);
     
+    
 }

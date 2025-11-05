@@ -41,4 +41,8 @@ public interface PaymentsDAO {
     
     // Kiểm tra thanh toán có thành công không
     boolean isPaymentCompleted(Integer paymentId);
+    
+    Payments findPendingPayment(Integer contractId, BigDecimal amount);
+    
+    Payments findPendingPaymentByCode(Integer contractId, BigDecimal amount);
 }

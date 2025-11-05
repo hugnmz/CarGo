@@ -48,13 +48,13 @@ public class ChangePassword extends HttpServlet {
         Integer userId = Integer.valueOf(request.getParameter("userId"));
 
         if (userService.changeUserPassword(userId, oldPass, newPass)) {
-            request.setAttribute("ok", "password.change.success");
+            request.setAttribute("ok", "Đổi mật khẩu thành công");
         } else {
-            request.setAttribute("errorMess", "error.password.change.failed");
+            request.setAttribute("errorMess", "Đổi mật khẩu thất bại");
         }
 
         // Sau khi đổi xong, trở lại trang profile
-        request.getRequestDispatcher("/manager/user_profile.jsp").forward(request, response);
+        request.getRequestDispatcher("profile").forward(request, response);
     }
 
 }

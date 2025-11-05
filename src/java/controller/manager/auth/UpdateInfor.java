@@ -70,6 +70,7 @@ public class UpdateInfor extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Lỗi khi cập nhật user: " + e.getMessage());
+            request.getRequestDispatcher("profile").forward(request, response);
         }
     }
 

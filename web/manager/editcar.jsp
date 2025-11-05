@@ -162,13 +162,15 @@
                         <!-- Giá thuê -->
                         <div class="mb-3">
                             <label class="form-label">Giá thuê (VNĐ)</label>
-                            <input type="number" class="form-control" name="price" min="0" step="10000" value="${car.dailyPrice}" required>
+                            <input type="number" class="form-control" name="price" min="0" step="10000" 
+                                   value="${car.dailyPrice}" required>
                         </div>
 
                         <!-- Tiền đặt cọc -->
                         <div class="mb-3">
                             <label class="form-label">Tiền đặt cọc (VNĐ)</label>
-                            <input type="number" class="form-control" name="deposit" min="0" step="100000" value="${car.depositAmount}" required>
+                            <input type="number" class="form-control" name="deposit" min="0" step="100000" 
+                                   value="${car.depositAmount}" required>
                         </div>
 
                         <!-- Nút hành động -->

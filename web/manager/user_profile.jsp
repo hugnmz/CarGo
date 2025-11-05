@@ -8,13 +8,8 @@
     response.setDateHeader("Expires", 0);
 
     String role = (String) session.getAttribute("roleName");
-    if (role == null) {
-        response.sendRedirect("../login.jsp");
-        return;
-    }
-    if (!"MANAGER".equalsIgnoreCase(role)) {
-        request.setAttribute("error", "Bạn không có quyền truy cập trang này!");
-        request.getRequestDispatcher("../error.jsp").forward(request, response);
+    if (role == null || !"MANAGER".equalsIgnoreCase(role)) {
+        response.sendRedirect("auth/login.jsp");
         return;
     }
 %>
@@ -99,6 +94,21 @@
                 <span class="badge bg-primary">Vai trò: <c:out value="${sessionScope.roleName}" /></span>
             </div>
 
+            <!-- Thông báo lỗi / thành công -->
+            <c:if test="${not empty message}">
+                <div class="alert alert-success">${message}</div>
+            </c:if>
+            <c:if test="${not empty error}">
+                <div class="alert alert-danger">${error}</div>
+            </c:if>
+
+            <c:if test="${not empty ok}">
+                <div class="alert alert-success">${ok}</div>
+            </c:if>
+            <c:if test="${not empty errorMess}">
+                <div class="alert alert-danger">${errorMess}</div>
+            </c:if>
+
             <!-- Thẻ thông tin -->
             <div class="card shadow-sm p-4 mb-3">
 
@@ -177,14 +187,6 @@
                 <div class="card shadow-sm p-4 mb-3">
                     <h5><i class="fa-solid fa-pen-to-square"></i> Chỉnh sửa thông tin cá nhân</h5>
 
-                    <!-- Thông báo lỗi / thành công -->
-                    <c:if test="${not empty successMsg}">
-                        <div class="alert alert-success">${successMsg}</div>
-                    </c:if>
-                    <c:if test="${not empty errorMsg}">
-                        <div class="alert alert-danger">${errorMsg}</div>
-                    </c:if>
-
                     <form action="${pageContext.request.contextPath}/updateinfor" method="post">
                         <div class="row mb-3">
                             <div class="col-md-6">
@@ -239,12 +241,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <c:if test="${not empty ok}">
-                                    <div class="alert alert-success">${ok}</div>
-                                </c:if>
-                                <c:if test="${not empty errorMess}">
-                                    <div class="alert alert-danger">${errorMess}</div>
-                                </c:if>
+
 
                                 <div class="mb-3">
                                     <label for="oldPassword" class="form-label">Mật khẩu cũ</label>

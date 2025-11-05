@@ -177,21 +177,7 @@ public class CarSerImpl implements CarService {
         }
     }
 
-    /*
-    @Override
-    public boolean updateCar(CarDTO carDTO) {
-        if (carDTO == null) {
-            return false;
-        }
-        try {
-            Cars cars = carMapper.toModel(carDTO);
-            return carsDAO.updateCar(cars);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-     */
+    
     @Override
     public boolean deleteCar(Integer carId) {
         if (carId == null) {
