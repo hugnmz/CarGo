@@ -14,16 +14,30 @@ import model.Cars;
  * @author admin
  */
 public interface CarsDAO {
+
     List<Cars> getAllCars();
+
+    List<Cars> getAllCar();
+
     Optional<Cars> getCarById(Integer carId);
+
     boolean addCar(Cars car);
+
     boolean updateCar(Cars car);
+
     boolean deleteCar(Integer carId);
+
     List<Cars> getCarByCategory(Integer categoryId);
+
     List<Cars> getCarByFuel(Integer fuelId);
+
     List<Cars> getCarBySeating(Integer seatingId);
+
     List<Cars> getCarByLocation(Integer locationId);
+
     List<Cars> searchCars(Integer locationId, String name, Integer categoryId, Double price);
+
     List<Cars> getCarWithCurrentPrice(BigDecimal minPrice, BigDecimal maxPrice);
+
     int addCarAndReturnId(Cars car);
 }

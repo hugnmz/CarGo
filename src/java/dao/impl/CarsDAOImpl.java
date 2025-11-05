@@ -31,6 +31,35 @@ public class CarsDAOImpl implements CarsDAO {
         return JdbcTemplateUtil.query(sql, Cars.class);
     }
 
+     @Override
+    public List<Cars> getAllCar() {
+        String sql = """
+        SELECT 
+            c.carId, c.name, c.year, c.description, c.image,
+            c.categoryId, c.fuelId, c.seatingId,
+            cat.categoryName,
+            f.fuelType,
+            s.seatingType,
+            cp.priceId AS cp_priceId,
+            cp.dailyPrice AS cp_dailyPrice,
+            cp.depositAmount AS cp_depositAmount,
+            cp.startDate AS cp_startDate,
+            cp.endDate AS cp_endDate,
+            cp.createAt AS cp_createAt
+        FROM dbo.Cars c
+        LEFT JOIN dbo.Categories cat ON c.categoryId = cat.categoryId
+        LEFT JOIN dbo.Fuels f ON c.fuelId = f.fuelId
+        LEFT JOIN dbo.Seatings s ON c.seatingId = s.seatingId
+        LEFT JOIN dbo.CarPrices cp ON cp.priceId = (
+            SELECT TOP 1 priceId
+            FROM dbo.CarPrices
+            WHERE carId = c.carId
+            ORDER BY createAt DESC
+        );
+    """;
+
+        return JdbcTemplateUtil.query(sql, Cars.class);
+    }
 
     @Override
     public Optional<Cars> getCarById(Integer carId) {
@@ -155,12 +184,33 @@ public class CarsDAOImpl implements CarsDAO {
     @Override
     public List<Cars> searchCars(Integer locationId, String name, Integer categoryId, Double price) {
         String condition = JdbcTemplateUtil.formatConditionSearchCar(locationId, name, categoryId, price);
-        String sql = "select * from Cars c "
-                + "join Vehicles v on v.carId = c.carId "
-                + "join Locations l on l.locationId = v.locationId "
-                + "join CarPrices cp on cp.carId = c.carId "
-                + "join Fuels f on f.fuelId = c.fuelId "
-                + "join Seatings s on s.seatingId = c.seatingId " + condition;
+        String sql = """
+        SELECT 
+            c.carId, c.name, c.year, c.description, c.image,
+            c.categoryId, c.fuelId, c.seatingId,
+            cat.categoryName,
+            f.fuelType,
+            s.seatingType,
+            l.city,
+            cp.priceId AS cp_priceId,
+            cp.dailyPrice AS cp_dailyPrice,
+            cp.depositAmount AS cp_depositAmount,
+            cp.startDate AS cp_startDate,
+            cp.endDate AS cp_endDate,
+            cp.createAt AS cp_createAt
+        FROM dbo.Cars c
+        JOIN dbo.Vehicles v ON v.carId = c.carId
+        JOIN dbo.Locations l ON l.locationId = v.locationId
+        JOIN dbo.CarPrices cp ON cp.priceId = (
+            SELECT TOP 1 priceId
+            FROM dbo.CarPrices
+            WHERE carId = c.carId
+            ORDER BY createAt DESC
+        )
+        JOIN dbo.Categories cat ON c.categoryId = cat.categoryId
+        JOIN dbo.Fuels f ON f.fuelId = c.fuelId
+        JOIN dbo.Seatings s ON s.seatingId = c.seatingId
+        """ + condition;
         return JdbcTemplateUtil.query(sql, Cars.class);
     }
 

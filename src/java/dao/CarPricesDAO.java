@@ -36,6 +36,5 @@ public interface CarPricesDAO {
     Optional<BigDecimal> getCurrentDailyPrice(Integer carId);
     
     Optional<BigDecimal> getCurrentDepositAmount(Integer carId);
-    
-    
+
 }

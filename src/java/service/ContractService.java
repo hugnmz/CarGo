@@ -2,6 +2,7 @@ package service;
 
 import dto.ContractDTO;
 import dto.ContractDetailDTO;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,4 +33,12 @@ public interface ContractService {
     
     List<ContractDTO> createContractsFromCart(Integer customerId, Integer[] selectedOrderIds);
 
+        void updateContractTotalAmount(Integer contractId, BigDecimal totalAmount);
+
+    void updateStaffId(Integer staffId, Integer contractId);
+
+    void updateNote(String note, Integer contractId);    boolean updateContractStatus(Integer contractId, String status, String reason);
+
+    //dem so hop dong dang co
+    int countContract();
 }

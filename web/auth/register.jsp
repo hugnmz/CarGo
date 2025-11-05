@@ -92,8 +92,19 @@
                         type="email"
                         name="email"
                         class="form-control"
-                        placeholder="Nhập email*)"
+                        placeholder="Nhập email *"
                         value="${email != null ? email : ''}"
+                        />
+                </div>
+
+                <!-- Ngày tháng năm sinh -->
+                <div class="mb-3">
+                    <input
+                        type="date"
+                        name="dateOfBirth"
+                        class="form-control"
+                        value="${dateOfBirth != null ? dateOfBirth : ''}"
+                        required
                         />
                 </div>
 
@@ -108,6 +119,7 @@
                         </c:forEach>
                     </select>
                 </div>
+
 
                 <!-- Username -->
                 <div class="mb-3">
@@ -177,7 +189,7 @@
             </div>
         </div>
 
-        <!-- Bootstrap JS -->
+        <!-- Bootstrap JS -->   
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>

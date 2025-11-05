@@ -2,6 +2,7 @@ package model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import util.di.annotation.Column;
 import util.di.annotation.Nested;
@@ -34,7 +35,7 @@ public class Contracts {
     private Users staff;            // Nhân viên
     private List<ContractDetails> contractDetails; // Chi tiết hợp đồng
     private List<Payments> payments; // Thanh toán
-
+    
     // Constructors
     public Contracts() {
     }
@@ -153,4 +154,16 @@ public class Contracts {
     public void setPayments(List<Payments> payments) {
         this.payments = payments;
     }
+    // fields
+@Column()
+private String rejectionReason; // Lý do từ chối (nếu có)
+
+// getters/setters
+public String getRejectionReason() {
+    return rejectionReason;
+}
+
+public void setRejectionReason(String rejectionReason) {
+    this.rejectionReason = rejectionReason;
+}
 }

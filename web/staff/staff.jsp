@@ -174,10 +174,10 @@
                 </a>
                 <div class="navbar-nav ms-auto">
                     <span class="navbar-text me-3">
-                        <i class="fas fa-user"></i> Staff ID: 001
+                        <i class="fas fa-user"></i> Staff ID:  ${sessionScope.userId}
                     </span>
-                    <a class="btn btn-outline-light" href="#">
-                        <i class="fas fa-sign-out-alt"></i> Logout
+                    <a class="btn btn-outline-light" href="${pageContext.request.contextPath}/LogoutServlet">
+                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
                     </a>
                 </div>
             </div>
@@ -194,9 +194,14 @@
                 <div class="col-12">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h3><i class="fas fa-list"></i> Danh sách hợp đồng từ khách hàng</h3>
-                        <button class="btn btn-primary btn-action" onclick="location.reload()">
-                            <i class="fas fa-sync-alt"></i> Làm mới
-                        </button>
+                        <div>
+                            <a href="${pageContext.request.contextPath}/returncar" class="btn btn-primary btn-action">
+                                <i class="fas"></i> Danh sách yêu cầu trả xe
+                            </a>
+
+                            <button class="btn btn-primary btn-action" onclick="location.reload()">
+                                <i class="fas fa-sync-alt"></i> Làm mới
+                            </button></div>
                     </div>
                 </div>
             </div>
@@ -211,7 +216,7 @@
                 <c:otherwise>
                     <c:forEach var="contract" items="${contracts}">
                         <!-- Contract Item -->
-                        <!-- Contract Item -->
+
                         <div class="contract-card">
                             <div class="card-body">
                                 <div class="row align-items-center">
@@ -308,7 +313,7 @@
                                                         <i class="fas fa-check"></i>
                                                     </button>
                                                     <button type="button" class="btn btn-danger btn-sm"
-                                                            onclick="updateStatus(${contract.contractId}, 'REJECTED')">
+                                                            onclick="openRejectModal(${contract.contractId})">
                                                         <i class="fas fa-times"></i>
                                                     </button>
                                                 </div>
@@ -330,39 +335,100 @@
             </div>
 
         </div>
+    </div>
 
-        <!-- Scripts -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script>
+    <!-- Reject Reason Modal -->
+    <div class="modal fade" id="rejectReasonModal" tabindex="-1" aria-labelledby="rejectReasonLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rejectReasonLabel">Nhập lý do từ chối</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="rejectReasonTextarea" class="form-label">Lý do</label>
+                        <textarea id="rejectReasonTextarea" class="form-control" rows="4" placeholder="Nhập lý do từ chối..." required></textarea>
+                    </div>
+                    <div class="form-text">Lý do sẽ được hiển thị cho khách hàng trong chi tiết hợp đồng.</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger" id="confirmRejectBtn">Từ chối</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+                                                                let rejectContractId = null;
+
+                                                                function openRejectModal(contractId) {
+                                                                    rejectContractId = contractId;
+                                                                    document.getElementById('rejectReasonTextarea').value = '';
+                                                                    const modal = new bootstrap.Modal(document.getElementById('rejectReasonModal'));
+                                                                    modal.show();
+
+                                                                    const btn = document.getElementById('confirmRejectBtn');
+                                                                    btn.onclick = function () {
+                                                                        const reason = document.getElementById('rejectReasonTextarea').value.trim();
+                                                                        if (!reason) {
+                                                                            document.getElementById('rejectReasonTextarea').focus();
+                                                                            return;
+                                                                        }
+                                                                        submitStatusForm(rejectContractId, 'REJECTED', reason);
+                                                                    };
+                                                                }
+
+                                                                // Giữ behavior cũ cho ACCEPTED: xác nhận -> submit ngay
                                                                 function updateStatus(contractId, status) {
+                                                                    if (status === 'REJECTED') {
+                                                                        openRejectModal(contractId);
+                                                                        return;
+                                                                    }
                                                                     if (confirm('Bạn có chắc muốn cập nhật trạng thái hợp đồng?')) {
-                                                                        var form = document.createElement('form');
-                                                                        form.method = 'POST';
-                                                                        form.action = '${pageContext.request.contextPath}/ContractServlet';
-
-                                                                        var actionInput = document.createElement('input');
-                                                                        actionInput.type = 'hidden';
-                                                                        actionInput.name = 'action';
-                                                                        actionInput.value = 'update_status';
-                                                                        form.appendChild(actionInput);
-
-                                                                        var contractIdInput = document.createElement('input');
-                                                                        contractIdInput.type = 'hidden';
-                                                                        contractIdInput.name = 'contractId';
-                                                                        contractIdInput.value = contractId;
-                                                                        form.appendChild(contractIdInput);
-
-                                                                        var statusInput = document.createElement('input');
-                                                                        statusInput.type = 'hidden';
-                                                                        statusInput.name = 'status';
-                                                                        statusInput.value = status;
-                                                                        form.appendChild(statusInput);
-
-                                                                        document.body.appendChild(form);
-                                                                        form.submit();
+                                                                        submitStatusForm(contractId, status, null);
                                                                     }
                                                                 }
 
-        </script>
-    </body>
+                                                                function submitStatusForm(contractId, status, reason) {
+                                                                    const form = document.createElement('form');
+                                                                    form.method = 'POST';
+                                                                    form.action = '${pageContext.request.contextPath}/ContractServlet';
+
+                                                                    const actionInput = document.createElement('input');
+                                                                    actionInput.type = 'hidden';
+                                                                    actionInput.name = 'action';
+                                                                    actionInput.value = 'update_status';
+                                                                    form.appendChild(actionInput);
+
+                                                                    const contractIdInput = document.createElement('input');
+                                                                    contractIdInput.type = 'hidden';
+                                                                    contractIdInput.name = 'contractId';
+                                                                    contractIdInput.value = contractId;
+                                                                    form.appendChild(contractIdInput);
+
+                                                                    const statusInput = document.createElement('input');
+                                                                    statusInput.type = 'hidden';
+                                                                    statusInput.name = 'status';
+                                                                    statusInput.value = status;
+                                                                    form.appendChild(statusInput);
+
+                                                                    if (reason !== null && reason !== undefined) {
+                                                                        const reasonInput = document.createElement('input');
+                                                                        reasonInput.type = 'hidden';
+                                                                        reasonInput.name = 'reason';
+                                                                        reasonInput.value = reason;
+                                                                        form.appendChild(reasonInput);
+                                                                    }
+
+                                                                    document.body.appendChild(form);
+                                                                    form.submit();
+                                                                }
+    </script>
+</body>
 </html>

@@ -60,7 +60,6 @@ public class LoginServlet extends HttpServlet {
         // Lay tham so tu form
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        String rememberMe = request.getParameter("rememberMe");
 
         // Check du lieu dau vao
         if (username == null || username.trim().isEmpty()
@@ -93,6 +92,7 @@ public class LoginServlet extends HttpServlet {
             }
 
             //3. Sai thông tin đăng nhập
+            request.setAttribute("username", username);
             request.setAttribute("errors", "Sai tên đăng nhập hoặc mật khẩu.");
             request.getRequestDispatcher("auth/login.jsp").forward(request, response);
 
@@ -130,7 +130,7 @@ public class LoginServlet extends HttpServlet {
                 response.sendRedirect(path + "/homemange");
                 break;
             case "STAFF":
-                response.sendRedirect(path + "/home");
+                response.sendRedirect(path + "/staff");
                 break;
             case "CUSTOMER":
                 response.sendRedirect(path + "/home");

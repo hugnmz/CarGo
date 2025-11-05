@@ -142,9 +142,9 @@ public class ContractServlet extends HttpServlet {
         try {
             Integer contractId = Integer.parseInt(request.getParameter("contractId"));
             String status = request.getParameter("status");
+            String reason = request.getParameter("reason"); // có thể null
 
-            boolean success = contractService.updateContractStatus(contractId, status);
-
+            boolean success = contractService.updateContractStatus(contractId, status, reason); 
             if (success) {
                 response.sendRedirect(request.getContextPath() + "/staff?success=status_updated&contractId=" + contractId + "&status=" + status);
             } else {

@@ -36,4 +36,5 @@ public interface CarService {
 
     List<CarDTO> searchCars(Integer locationId, String name, Integer categoryId, Double price);
 
+    
 }

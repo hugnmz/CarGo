@@ -135,7 +135,7 @@
     </div>
 </div>
 
-<footer>
+<footer >
     <p>© 2025 CarRental. Mọi quyền được bảo lưu.</p>
 </footer>
 

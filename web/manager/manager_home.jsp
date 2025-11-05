@@ -72,7 +72,7 @@
         <a href="profile"><i class="fa-solid fa-user-gear"></i> Thông tin cá nhân</a>
         <a href="managecus"><i class="fa-solid fa-users"></i> Quản lý khách hàng</a>
         <a href="managecar"><i class="fa-solid fa-car-side"></i> Quản lý xe</a>
-        <a href="#"><i class="fa-solid fa-file-contract"></i> Hợp đồng</a>
+        <a href="listcontract"><i class="fa-solid fa-file-contract"></i> Hợp đồng</a>
         <a href="${pageContext.request.contextPath}/LogoutServlet">
             <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
     </div>

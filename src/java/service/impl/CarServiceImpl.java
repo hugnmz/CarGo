@@ -63,7 +63,7 @@ public class CarServiceImpl implements CarService {
     @Override
     public List<CarDTO> getAllCars() {
         // lay danh sach tat ca xe
-        List<Cars> cars = carsDAO.getAllCars();
+        List<Cars> cars = carsDAO.getAllCar();
         List<CarDTO> carDTOs = new ArrayList<>();
 
         for (Cars car : cars) {
@@ -209,6 +209,7 @@ public class CarServiceImpl implements CarService {
 
             return deletedCar;
         } catch (Exception e) {
+            
             e.printStackTrace();
             return false;
         }
@@ -293,6 +294,15 @@ public class CarServiceImpl implements CarService {
 
         for (Cars car : cars) {
             CarDTO dto = carMapper.toDTO(car);
+            
+            // Set locationCity from Vehicles if available
+            if (car.getVehicles() != null && !car.getVehicles().isEmpty()) {
+                var firstVehicle = car.getVehicles().get(0);
+                if (firstVehicle.getLocation() != null && firstVehicle.getLocation().getCity() != null) {
+                    dto.setLocationCity(firstVehicle.getLocation().getCity());
+                }
+            }
+            
             carDTOs.add(dto);
         }
 

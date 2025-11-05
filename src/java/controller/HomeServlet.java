@@ -20,12 +20,14 @@ public class HomeServlet extends HttpServlet {
 
     private CarService carService;
 
+
     @Override
     public void init() throws ServletException {
         super.init();
         // khoi tao carservice tu di container
         try {
             carService = DIContainer.get(CarService.class);
+
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize CarService", e);
         }

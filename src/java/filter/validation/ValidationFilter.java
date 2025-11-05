@@ -42,7 +42,6 @@ public class ValidationFilter implements Filter {
         fieldMap.put("pickupDate", DataType.DATE);
         fieldMap.put("returnDate", DataType.DATE);
         fieldMap.put("dateOfBirth", DataType.DATE);
-
     }
 
     @Override

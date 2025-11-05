@@ -134,10 +134,10 @@ public class ContractServiceImpl implements ContractService {
         List<ContractDTO> contractDTOs = new ArrayList<>();
 
         try {
-            List<model.Contracts> contracts = contractsDAO.getAllContracts(); // ✅ lấy tất cả
+            List<model.Contracts> contracts = contractsDAO.getAllContracts();
             for (Contracts contract : contracts) {
                 ContractDTO dto = contractMapper.toDTO(contract);
-                Optional<model.Customers> customer = customersDAO.getCustomerById(dto.getCustomerId());
+                Optional<Customers> customer = customersDAO.getCustomerById(dto.getCustomerId());
                 customer.ifPresent(c -> dto.setCustomerName(c.getFullName()));
                 contractDTOs.add(dto);
             }
@@ -157,6 +157,9 @@ public class ContractServiceImpl implements ContractService {
             if (contract.getStatus() != null) {
                 contract.setStatus(contract.getStatus().toUpperCase());
             }
+
+            Integer staffId = contractsDAO.findLeastLoadedStaffId();
+            contract.setStaffId(staffId);
             return contractsDAO.addContract(contract);
         } catch (Exception e) {
             throw new RuntimeException("error.system", e);
@@ -275,13 +278,15 @@ public class ContractServiceImpl implements ContractService {
             contract.setDepositAmount(deposit);
             contract.setCreateAt(LocalDateTime.now());
 
+            Integer staffId = contractsDAO.findLeastLoadedStaffId();
+            contract.setStaffId(staffId);
             // Lưu contract
             boolean contractSaved = contractsDAO.addContract(contract);
             if (!contractSaved) {
                 return null;
             }
 
-            // Lấy contract ID vừa tạo - KHÔNG DÙNG STREAM
+            // Lấy contract ID vừa tạo
             List<Contracts> customerContracts = contractsDAO.getContractByCustomer(customerId);
             model.Contracts savedContract = null;
             for (model.Contracts c : customerContracts) {
@@ -301,7 +306,7 @@ public class ContractServiceImpl implements ContractService {
             List<ContractDetailDTO> contractDetails = new ArrayList<>();
             for (OrderDTO order : orders) {
                 // Tạo contract detail
-                model.ContractDetails detail = new model.ContractDetails();
+                ContractDetails detail = new ContractDetails();
                 detail.setContractId(contractId);
                 detail.setVehicleId(order.getVehicleId());
                 detail.setPrice(order.getPrice());
@@ -345,4 +350,43 @@ public class ContractServiceImpl implements ContractService {
     private BigDecimal calculateDepositAmount(BigDecimal total) {
         return new BigDecimal("30000000");
     }
+
+    @Override
+    public int countContract() {
+        int totalContract = contractsDAO.countContract();
+        return totalContract;
+    }
+
+    @Override
+    public void updateContractTotalAmount(Integer contractId, BigDecimal totalAmount) {
+        boolean result = contractsDAO.updateContractTotalAmount(contractId, totalAmount);
+        if (!result) {
+            throw new RuntimeException("Không thể cập nhật tổng tiền hợp đồng mã " + contractId);
+        }
+    }
+
+    @Override
+    public void updateStaffId(Integer staffId, Integer contractId) {
+        boolean result = contractsDAO.updateStaffId(staffId, contractId);
+        if (!result) {
+            throw new RuntimeException("Không thể cập nhật mã nhân viên hợp đồng mã " + contractId);
+        }
+    }
+
+    public void updateNote(String note, Integer contractId) {
+        boolean result = contractsDAO.updateNote(note, contractId);
+        if (!result) {
+            throw new RuntimeException("Không thể cập nhật ghi chú hợp đồng mã " + contractId);
+        }
+    }
+
+    @Override
+    public boolean updateContractStatus(Integer contractId, String status, String reason) {
+        try {
+            return contractsDAO.updateContractStatus(contractId, status, reason);
+        } catch (Exception e) {
+            throw new RuntimeException("error.system", e);
+        }
+    }
+
 }

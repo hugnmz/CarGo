@@ -1,10 +1,12 @@
 package dao.impl;
 
 import dao.ContractsDAO;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import model.Contracts;
+import model.Users;
 import util.JdbcTemplateUtil;
 import util.di.annotation.Repository;
 
@@ -26,8 +28,8 @@ public class ContractsDAOImpl implements ContractsDAO {
 
     @Override
     public boolean addContract(Contracts contract) {
-        String sql = "INSERT INTO dbo.Contracts (customerId, staffId, status, startDate, endDate, totalAmount, depositAmount, createAt) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO dbo.Contracts (customerId, staffId, status, startDate, endDate, totalAmount, depositAmount, createAt) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         int result = JdbcTemplateUtil.insertAndReturnKey(sql,
                 contract.getCustomerId(),
                 contract.getStaffId(),
@@ -94,7 +96,58 @@ public class ContractsDAOImpl implements ContractsDAO {
     }
 
     @Override
+    public boolean updateContractTotalAmount(Integer contractId, BigDecimal totalAmount) {
+        String sql = "UPDATE dbo.Contracts SET totalAmount = ? WHERE contractId = ?";
+        int result = JdbcTemplateUtil.update(sql, totalAmount, contractId);
+        return result > 0;
+    }
+
+    @Override
+    public boolean updateStaffId(Integer staffId, Integer contractId) {
+        String sql = "UPDATE dbo.Contracts SET staffId = ? WHERE contractId = ?";
+        int result = JdbcTemplateUtil.update(sql, staffId, contractId);
+        return result > 0;
+    }
+
+    @Override
+    public boolean updateNote(String note, Integer contractId) {
+        String sql = "UPDATE dbo.Contracts SET note = ? WHERE contractId = ?";
+        int result = JdbcTemplateUtil.update(sql, note, contractId);
+        return result > 0;
+    }
+
+    @Override
+    public int countContract() {
+        String sql = "SELECT COUNT(*) FROM dbo.Contracts";
+        return JdbcTemplateUtil.count(sql);
+    }
+
+    @Override
     public boolean calculateTotalAmout(Integer contractId) {
         return true;
+    }
+
+    @Override
+    public boolean updateContractStatus(Integer contractId, String status, String reason) {
+        String sql = "UPDATE dbo.Contracts SET status = ?, rejectionReason = ? WHERE contractId = ?";
+        String reasonToSave = "REJECTED".equalsIgnoreCase(status) ? reason : null;
+        int result = JdbcTemplateUtil.update(sql, status, reasonToSave, contractId);
+        return result > 0;
+    }
+
+    @Override
+    public Integer findLeastLoadedStaffId() {
+        String sql = """
+        SELECT TOP 1 u.userId
+        FROM Users u
+        JOIN Roles r ON r.roleId = u.roleId AND r.roleName = 'STAFF'
+        LEFT JOIN Contracts c
+            ON c.staffId = u.userId
+            AND c.status = 'PENDING'
+        GROUP BY u.userId
+        ORDER BY COUNT(c.contractId) ASC, MIN(c.createAt) ASC
+        """;
+        Users u = JdbcTemplateUtil.queryOne(sql, model.Users.class);
+        return (u != null) ? u.getUserId() : null;
     }
 }
