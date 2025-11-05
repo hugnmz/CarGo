@@ -105,12 +105,13 @@ public class LoginServlet extends HttpServlet {
 
     private void setCustomerSession(HttpSession session, CustomerDTO customer) {
         session.setAttribute("userType", "CUSTOMER");
+        session.setAttribute("customerId", customer.getCustomerId());
         session.setAttribute("c", customer);
         session.setAttribute("loginTime", System.currentTimeMillis());
-        session.setMaxInactiveInterval(2 * 60 * 60); // tang len 2 gio
+        session.setMaxInactiveInterval(2 * 60 * 60);
     }
 
-     private void setUserSession(HttpSession session, UserDTO user) {
+    private void setUserSession(HttpSession session, UserDTO user) {
         session.setAttribute("userType", user.getRoleName());
         session.setAttribute("userId", user.getUserId());
         session.setAttribute("usernameu", user.getUsername());
@@ -119,9 +120,8 @@ public class LoginServlet extends HttpServlet {
         session.setAttribute("roleName", user.getRoleName());
         session.setMaxInactiveInterval(60 * 60);
     }
-    
 
-        private void redirectByRole(HttpServletResponse response, HttpServletRequest request, String role)
+    private void redirectByRole(HttpServletResponse response, HttpServletRequest request, String role)
             throws IOException, ServletException {
         String path = request.getContextPath();
 
