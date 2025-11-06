@@ -15,7 +15,7 @@
     }
     if (!"MANAGER".equalsIgnoreCase(role)) {
         request.setAttribute("errors", "Bạn không có quyền truy cập trang này!");
-        request.getRequestDispatcher("auth/login.jsp").forward(request, response);
+        request.getRequestDispatcher("LoginServlet").forward(request, response);
         return;
     }
 %>

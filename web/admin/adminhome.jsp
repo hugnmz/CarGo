@@ -8,12 +8,11 @@
     
     String role = (String) session.getAttribute("roleName");
     if (role == null) {
-        response.sendRedirect("LoginAdmin");
+        response.sendRedirect("LoginServlet");
         return;
     }
     if (!"ADMIN".equalsIgnoreCase(role)) {
-        request.setAttribute("error", "Bạn không có quyền truy cập trang này!");
-        request.getRequestDispatcher("error.jsp").forward(request, response);
+        response.sendRedirect("LoginServlet");
         return;
     }
 %>
@@ -38,7 +37,7 @@
                     <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#addUserForm">
                         + Thêm User
                     </button>
-                    <a href="LogoutAdmin" class="btn btn-outline-light">Đăng xuất</a>
+                    <a href="LogoutServlet" class="btn btn-outline-light">Đăng xuất</a>
                 </div>
             </div>
         </nav>
@@ -106,7 +105,7 @@
                             <div class="col-md-6">
                                 <label class="form-label">Vai trò:</label>
                                 <select name="roleid" class="form-control" required>
-                                    <option value="">-- Chọn vai trò --</option>
+                                    <option value="" hidden>-- Chọn vai trò --</option>
                                     <c:forEach var="r" items="${roles}">
                                         <option value="${r.roleId}">${r.roleName}</option>
                                     </c:forEach>
@@ -116,7 +115,7 @@
                             <div class="col-md-6">
                                 <label class="form-label">Thành phố:</label>
                                 <select name="locationid" class="form-control">
-                                    <option value="">-- Chọn thành phố --</option>
+                                    <option value="" hidden>-- Chọn thành phố --</option>
                                     <c:forEach var="l" items="${locations}">
                                         <option value="${l.locationId}">${l.city}</option>
                                     </c:forEach>

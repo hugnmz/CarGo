@@ -47,7 +47,6 @@
         <div class="col-md-6">
             <label class="form-label">Thành phố:</label>
             <select name="locationid" class="form-control">
-                <option value="">-- Chọn thành phố --</option>
                 <c:forEach var="l" items="${locations}">
                     <option value="${l.locationId}" <c:if test="${l.locationId == editUser.locationId}">selected</c:if>>
                         ${l.city}

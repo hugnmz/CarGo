@@ -20,6 +20,7 @@ import dto.FuelDTO;
 import dto.LocationDTO;
 import dto.SeatingDTO;
 import dto.VehicleDTO;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Optional;
 
@@ -143,11 +144,11 @@ public class ControllerInfoCar extends HttpServlet {
 
             // Lấy các số thực, tránh null hoặc rỗng
             String priceStr = request.getParameter("price");
-            carDTO.setDailyPrice(priceStr != null && !priceStr.isEmpty() 
+            carDTO.setDailyPrice(priceStr != null && !priceStr.isEmpty()
                     ? Double.parseDouble(priceStr) : 0);
 
             String depositStr = request.getParameter("deposit");
-            carDTO.setDepositAmount(depositStr != null && !depositStr.isEmpty() 
+            carDTO.setDepositAmount(depositStr != null && !depositStr.isEmpty()
                     ? Double.parseDouble(depositStr) : 0);
 
             boolean success = carService.updateCar(carDTO);
@@ -205,6 +206,13 @@ public class ControllerInfoCar extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        //Kiểm tra quyền
+        HttpSession session = request.getSession(false);
+        if (session == null || !"MANAGER".equals(session.getAttribute("roleName"))) {
+            response.sendRedirect("LoginServlet");
+            return;
+        }
+
         //Lấy action từ server
         String action = request.getParameter("action");
 
@@ -236,7 +244,7 @@ public class ControllerInfoCar extends HttpServlet {
             throws ServletException, IOException {
         processRequest(request, response);
     }
-    
+
     private void showDetailCarForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
@@ -257,7 +265,6 @@ public class ControllerInfoCar extends HttpServlet {
                     // Lấy danh sách các vehicle thuộc car này
                     List<VehicleDTO> vehicles = carService.getVehicalByCarId(carId);
                     List<LocationDTO> locations = carService.getAllLocation();
-                    
 
                     request.setAttribute("categories", categories);
                     request.setAttribute("fuels", fuels);

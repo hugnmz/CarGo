@@ -14,6 +14,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import model.Users;
 import service.RoleService;
@@ -43,9 +44,19 @@ public class ControllerAdmin extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
 
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
+        
+        HttpSession session = request.getSession(false);
+        
+        //Kiểm tra quyền truy cập
+        if (session == null || !"ADMIN".equals(session.getAttribute("roleName"))) {
+            request.setAttribute("errors", "Bạn không có quyền truy cập trang này!");
+            request.getRequestDispatcher("auth/login.jsp").forward(request, response);
+            return;
+        }
 
         //Lấy action từ server
         String action = request.getParameter("action");

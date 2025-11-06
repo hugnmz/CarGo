@@ -39,6 +39,14 @@ public class UpdateInfor extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        //Kiểm tra quyền
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null
+                || !"MANAGER".equals(session.getAttribute("roleName"))) {
+            response.sendRedirect("LoginServlet");
+            return;
+        }
+
         //Lấy parameter từ server
         String userIdStr = request.getParameter("userId");
         // Xóa check - service sẽ check và throw WebException

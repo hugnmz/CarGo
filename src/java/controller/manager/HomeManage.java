@@ -40,20 +40,13 @@ public class HomeManage extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Kiểm tra đăng nhập
-//        HttpSession session = request.getSession(false);
-//        if (session == null || session.getAttribute("roleName") == null) {
-//            response.sendRedirect("LoginServlet");
-//            return;
-//        }
-//
-//        // Kiểm tra quyền truy cập
-//        String role = (String) session.getAttribute("roleName");
-//        if (!"MANAGER".equalsIgnoreCase(role)) {
-//            request.setAttribute("errors", "Bạn không có quyền truy cập trang quản lý!");
-//            request.getRequestDispatcher("auth/login.jsp").forward(request, response);
-//            return;
-//        }
+        //Kiểm tra quyền
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null
+                || !"MANAGER".equals(session.getAttribute("roleName"))) {
+            response.sendRedirect("LoginServlet");
+            return;
+        }
 
         int totalVehicles = vehiclesService.countVehical();
         int totalCustomers = customerService.countCustomer();
