@@ -9,7 +9,7 @@
 
     String role = (String) session.getAttribute("roleName");
     if (role == null || !"MANAGER".equalsIgnoreCase(role)) {
-        response.sendRedirect("auth/login.jsp");
+        response.sendRedirect("LoginServlet");
         return;
     }
 %>
@@ -215,7 +215,8 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">Số điện thoại</label>
-                                <input type="text" class="form-control" name="phone" value="${user.phone}" required>
+                                <input type="text" class="form-control" name="phone" 
+                                       value="${user.phone}" pattern="^0[0-9]{9}$" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Địa chỉ</label>

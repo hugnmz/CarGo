@@ -5,29 +5,74 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * PaymentService - Service layer cho Payment business logic
+ */
 public interface PaymentService {
     
-    // Tạo thanh toán mới
-    boolean createPayment(PaymentDTO paymentDTO);
-    
-    // Lấy thanh toán theo ID
-    Optional<PaymentDTO> getPaymentById(Integer paymentId);
-    
-    // Lấy tất cả thanh toán
+    /**
+     * Lấy tất cả thanh toán và chuyển thành DTO
+     */
     List<PaymentDTO> getAllPayments();
     
-    // Lấy thanh toán theo hợp đồng
+    /**
+     * Lấy thanh toán theo ID và chuyển thành DTO
+     */
+    Optional<PaymentDTO> getPaymentById(Integer paymentId);
+    
+    /**
+     * Lấy thanh toán theo hợp đồng
+     */
     List<PaymentDTO> getPaymentsByContract(Integer contractId);
     
-    // Cập nhật trạng thái thanh toán
+    /**
+     * Thêm thanh toán mới
+     */
+    boolean addPayment(PaymentDTO paymentDTO);
+    /**
+     * Cập nhật trạng thái thanh toán
+     */
     boolean updatePaymentStatus(Integer paymentId, String status);
     
-    // Tính tổng tiền đã thanh toán
-    BigDecimal getTotalPaidAmount(Integer contractId);
+    /**
+     * Tìm thanh toán đang pending
+     */
+    Optional<PaymentDTO> findPendingPayment(Integer contractId, BigDecimal amount);
     
-    // Tính số tiền còn lại
+    /**
+     * Hoàn thành thanh toán theo ID
+     */
+    boolean completePaymentById(Integer paymentId);
+    
+    /**
+     * Kiểm tra thanh toán đã hoàn thành chưa
+     */
+    boolean isPaymentCompleted(Integer paymentId);
+    
+    /**
+     * Kiểm tra hợp đồng đã có thanh toán hoàn thành chưa
+     */
+    boolean hasCompleted(Integer contractId);
+    
+    /**
+     * Lấy trạng thái thanh toán của hợp đồng
+     */
+    String getPaymentStatus(Integer contractId);
+    
+    /**
+     * Tính tổng tiền đã thanh toán của hợp đồng
+     */
+    BigDecimal getTotalPaidAmount(Integer contractId);
+     /**
+     * Tính số tiền còn lại cần thanh toán
+     */
     BigDecimal getRemainingAmount(Integer contractId);
     
-    // Xóa thanh toán
-    boolean deletePayment(Integer paymentId);
+    /**
+     * Lấy tổng tiền của hợp đồng (để hiển thị payment)
+     * Method này gọi ContractsDAO bên trong để không cần tạo ContractService
+     */
+    Optional<BigDecimal> getContractTotalAmount(Integer contractId);
+    
+
 }

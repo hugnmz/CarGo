@@ -6,9 +6,9 @@ import util.di.annotation.Column;
 
 public class PaymentMethods {
     
-    @Column
+    @Column()
     private Integer methodId;        // ID phương thức thanh toán
-    @Column
+    @Column()
     private String methodName;       // Tên phương thức thanh toán
     private List<Payments> payments; // Danh sách thanh toán
     

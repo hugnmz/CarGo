@@ -12,6 +12,9 @@ import dto.ContractDTO;
 import util.AuthUtil;
 import util.MessageUtil;
 import util.di.DIContainer;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
+import util.exception.DataAccessException;
 
 @WebServlet(name = "CheckoutServlet", urlPatterns = {"/checkout"})
 public class CheckoutServlet extends HttpServlet {
@@ -26,8 +29,7 @@ public class CheckoutServlet extends HttpServlet {
             // khoi tao contract service tu di container
             contractService = DIContainer.get(ContractService.class);
         } catch (Exception e) {
-            // nem loi neu khoi tao service that bai
-            throw new RuntimeException("Failed to initialize ContractService", e);
+            throw new ServletException(MessageUtil.getError("error.system"), e);
         }
     }
 
@@ -84,12 +86,13 @@ public class CheckoutServlet extends HttpServlet {
             // chuyen huong den trang hien thi ket qua thanh toan
             request.getRequestDispatcher("/customer/checkout-result.jsp").forward(request, response);
 
-        } catch (Exception e) {
-            // log loi ra console
+        } catch (ValidationException | BusinessException | DataAccessException e) {
             e.printStackTrace();
-            // dat thong bao loi vao request
-            request.setAttribute("error", MessageUtil.getError("error.checkout.failed") + ": " + e.getMessage());
-            // chuyen ve trang gio hang voi thong bao loi
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
+            response.sendRedirect(request.getContextPath() + "/ViewCartDetail");
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", MessageUtil.getError("error.checkout.failed"));
             response.sendRedirect(request.getContextPath() + "/ViewCartDetail");
         }
     }

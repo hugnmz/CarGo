@@ -1,9 +1,12 @@
 package service.impl;
 
+import dao.CarsDAO;
 import dao.ContractsDAO;
 import dao.ContractDetailsDAO;
 import dao.CustomersDAO;
 import dao.OrdersDAO;
+import dao.UsersDAO;
+import dao.VehiclesDAO;
 import dto.ContractDTO;
 import dto.ContractDetailDTO;
 import dto.OrderDTO;
@@ -23,6 +26,10 @@ import model.Customers;
 import service.ContractService;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
+import util.MessageUtil;
+import util.exception.ApplicationException;
+import util.exception.DataAccessException;
+import util.exception.BusinessException;
 
 @Service
 public class ContractServiceImpl implements ContractService {
@@ -47,6 +54,16 @@ public class ContractServiceImpl implements ContractService {
 
     @Autowired
     private OrderMapper orderMapper;
+    
+    @Autowired
+    private VehiclesDAO vehiclesDAO;
+    
+    @Autowired
+    private CarsDAO carsDAO;
+    
+    @Autowired
+    private UsersDAO usersDAO;
+    
 
     @Override
     public List<ContractDTO> getContractsByCustomer(Integer customerId) {
@@ -73,6 +90,10 @@ public class ContractServiceImpl implements ContractService {
             if (customer.isPresent() && customer.get().getFullName() != null) {
                 dto.setCustomerName(customer.get().getFullName());
             }
+              //lấy số điện thoại
+            if (customer.isPresent() && customer.get().getPhone() != null) {
+                dto.setCustomerPhone(customer.get().getPhone());
+            }
 
             return Optional.of(dto);
         }
@@ -86,6 +107,10 @@ public class ContractServiceImpl implements ContractService {
         List<ContractDetails> details = contractDetailsDAO.getContractDetailsByContractId(contractId);
 
         for (ContractDetails detail : details) {
+            Optional<model.Vehicles> vehicle = vehiclesDAO.getVehicleById(detail.getVehicleId());
+            vehicle.ifPresent(c -> detail.setVehicle(c));
+            Optional<model.Cars> car = carsDAO.getCarById(detail.getVehicle().getCarId());
+            car.ifPresent(c -> detail.getVehicle().setCar(c));
             ContractDetailDTO dto = contractDetailMapper.toDTO(detail);
             detailDTOs.add(dto);
         }
@@ -96,9 +121,15 @@ public class ContractServiceImpl implements ContractService {
     @Override
     public boolean updateContractStatus(Integer contractId, String status) {
         try {
-            return contractsDAO.updateContractStatus(contractId, status);
+            boolean result = contractsDAO.updateContractStatus(contractId, status);
+            if (!result) {
+                throw new BusinessException(MessageUtil.getError("error.dataaccess.contract.update.failed"));
+            }
+            return true;
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("error.system", e);
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.contract.update.failed"), e);
         }
     }
 
@@ -109,7 +140,18 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     public boolean deleteContract(Integer contractId) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        try {
+            contractDetailsDAO.deleteContractDetailByContractId(contractId);
+            boolean deleteContract = contractsDAO.deleteContract(contractId);
+            if (!deleteContract) {
+                throw new BusinessException(MessageUtil.getError("error.dataaccess.contract.delete.failed"));
+            }
+            return true;
+        } catch (ApplicationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.contract.delete.failed"), e);
+        }
     }
 
     @Override
@@ -123,8 +165,10 @@ public class ContractServiceImpl implements ContractService {
                 customer.ifPresent(c -> dto.setCustomerName(c.getFullName()));
                 contractDTOs.add(dto);
             }
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("error.system", e);
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.contract.list.failed"), e);
         }
         return contractDTOs;
     }
@@ -137,12 +181,17 @@ public class ContractServiceImpl implements ContractService {
             List<model.Contracts> contracts = contractsDAO.getAllContracts();
             for (Contracts contract : contracts) {
                 ContractDTO dto = contractMapper.toDTO(contract);
-                Optional<Customers> customer = customersDAO.getCustomerById(dto.getCustomerId());
+                Optional<model.Customers> customer = customersDAO.getCustomerById(dto.getCustomerId());
                 customer.ifPresent(c -> dto.setCustomerName(c.getFullName()));
+                customer.ifPresent(c -> dto.setCustomerPhone(c.getPhone()));
+                Optional<model.Users> staff = usersDAO.getUserById(dto.getStaffId());
+                staff.ifPresent(s -> dto.setStaffName(s.getFullName()));
                 contractDTOs.add(dto);
             }
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("error.system", e);
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.contract.list.failed"), e);
         }
         return contractDTOs;
     }
@@ -160,9 +209,15 @@ public class ContractServiceImpl implements ContractService {
 
             Integer staffId = contractsDAO.findLeastLoadedStaffId();
             contract.setStaffId(staffId);
-            return contractsDAO.addContract(contract);
+            boolean result = contractsDAO.addContract(contract);
+            if (!result) {
+                throw new BusinessException(MessageUtil.getError("error.dataaccess.contract.create.failed"));
+            }
+            return true;
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("error.system", e);
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.contract.create.failed"), e);
         }
     }
 
@@ -197,8 +252,10 @@ public class ContractServiceImpl implements ContractService {
                 }
             }
 
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("error.system", e);
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.contract.create.failed"), e);
         }
 
         return createdContracts;
@@ -210,8 +267,10 @@ public class ContractServiceImpl implements ContractService {
             if (customer.isPresent() && customer.get().getFullName() != null) {
                 return customer.get().getFullName();
             }
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("error.system", e);
+            throw new DataAccessException(MessageUtil.getError("error.system"), e);
         }
         return "Khách hàng";
     }
@@ -237,8 +296,10 @@ public class ContractServiceImpl implements ContractService {
                     selectedOrders.add(dto);
                 }
             }
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("error.system", e);
+            throw new DataAccessException(MessageUtil.getError("error.system"), e);
         }
 
         return selectedOrders;
@@ -315,7 +376,7 @@ public class ContractServiceImpl implements ContractService {
                 detail.setNote(null);
 
                 // Lưu contract detail (cần implement method này trong DAO)
-                boolean ok = contractDetailsDAO.addContractDetail(detail);
+                contractDetailsDAO.addContractDetail(detail);
 
                 // Xóa order khỏi giỏ
                 ordersDAO.deleteOrder(order.getCartDetailId());
@@ -332,8 +393,10 @@ public class ContractServiceImpl implements ContractService {
 
             return contractDTO;
 
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("error.system", e);
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.contract.create.failed"), e);
         }
     }
 
@@ -359,33 +422,57 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     public void updateContractTotalAmount(Integer contractId, BigDecimal totalAmount) {
-        boolean result = contractsDAO.updateContractTotalAmount(contractId, totalAmount);
-        if (!result) {
-            throw new RuntimeException("Không thể cập nhật tổng tiền hợp đồng mã " + contractId);
+        try {
+            boolean result = contractsDAO.updateContractTotalAmount(contractId, totalAmount);
+            if (!result) {
+                throw new BusinessException(MessageUtil.getError("error.dataaccess.contract.update.failed"));
+            }
+        } catch (ApplicationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.contract.update.failed"), e);
         }
     }
 
     @Override
     public void updateStaffId(Integer staffId, Integer contractId) {
-        boolean result = contractsDAO.updateStaffId(staffId, contractId);
-        if (!result) {
-            throw new RuntimeException("Không thể cập nhật mã nhân viên hợp đồng mã " + contractId);
+        try {
+            boolean result = contractsDAO.updateStaffId(staffId, contractId);
+            if (!result) {
+                throw new BusinessException(MessageUtil.getError("error.dataaccess.contract.update.failed"));
+            }
+        } catch (ApplicationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.contract.update.failed"), e);
         }
     }
 
     public void updateNote(String note, Integer contractId) {
-        boolean result = contractsDAO.updateNote(note, contractId);
-        if (!result) {
-            throw new RuntimeException("Không thể cập nhật ghi chú hợp đồng mã " + contractId);
+        try {
+            boolean result = contractsDAO.updateNote(note, contractId);
+            if (!result) {
+                throw new BusinessException(MessageUtil.getError("error.dataaccess.contract.update.failed"));
+            }
+        } catch (ApplicationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.contract.update.failed"), e);
         }
     }
 
     @Override
     public boolean updateContractStatus(Integer contractId, String status, String reason) {
         try {
-            return contractsDAO.updateContractStatus(contractId, status, reason);
+            boolean result = contractsDAO.updateContractStatus(contractId, status, reason);
+            if (!result) {
+                throw new BusinessException(MessageUtil.getError("error.dataaccess.contract.update.failed"));
+            }
+            return true;
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("error.system", e);
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.contract.update.failed"), e);
         }
     }
 

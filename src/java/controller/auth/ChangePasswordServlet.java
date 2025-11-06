@@ -13,6 +13,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import service.CustomerService;
 import util.di.DIContainer;
 import util.MessageUtil;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
+import util.exception.DataAccessException;
 
 /**
  *
@@ -43,22 +46,29 @@ public class ChangePasswordServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String oldPass = request.getParameter("old");
-        String newPass = request.getParameter("new");
-        String confirmPass = request.getParameter("confirm");
-        Integer customerId = Integer.valueOf(request.getParameter("customerId"));
+        try {
+            String oldPass = request.getParameter("old");
+            String newPass = request.getParameter("new");
+            String confirmPass = request.getParameter("confirm");
+            Integer customerId = Integer.valueOf(request.getParameter("customerId"));
 
-        // Kiểm tra xác nhận mật khẩu
-        if (!newPass.equals(confirmPass)) {
-            request.setAttribute("errorMess", MessageUtil.getError("error.password.mismatch"));
-            request.getRequestDispatcher("/CustomerServlet").forward(request, response);
-            return;
-        }
+            // Kiểm tra xác nhận mật khẩu
+            if (!newPass.equals(confirmPass)) {
+                throw new ValidationException("error.password.mismatch");
+            }
 
-        if (customerService.changeCustomerPassword(customerId, oldPass, newPass)) {
-            request.setAttribute("ok", MessageUtil.getMessage("password.change.success"));
-        } else {
-            request.setAttribute("errorMess", MessageUtil.getError("error.password.change.failed"));
+            if (customerService.changeCustomerPassword(customerId, oldPass, newPass)) {
+                request.setAttribute("ok", MessageUtil.getMessage("password.change.success"));
+            } else {
+                throw new BusinessException("error.password.change.failed");
+            }
+
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            request.setAttribute("errorMess", MessageUtil.getErrorFromException(e));
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMess", MessageUtil.getError("error.system"));
         }
 
         request.getRequestDispatcher("/CustomerServlet").forward(request, response);

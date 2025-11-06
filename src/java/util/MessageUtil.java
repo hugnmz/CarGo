@@ -49,4 +49,23 @@ public class MessageUtil {
     public static String getError(String key) {
         return errors.getProperty(key, "Error not found: " + key);
     }
+    
+    // method lay error message tu exception
+    // neu exception message la error key thi lay tu properties
+    // nguoc lai tra ve message goc
+    public static String getErrorFromException(Exception e) {
+        if (e == null || e.getMessage() == null) {
+            return getError("error.system");
+        }
+        
+        String message = e.getMessage();
+        
+        // Neu message bat dau bang "error." thi coi nhu la error key
+        if (message.startsWith("error.")) {
+            return getError(message);
+        }
+        
+        // Nguoc lai tra ve message goc
+        return message;
+    }
 }

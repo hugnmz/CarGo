@@ -30,7 +30,8 @@
 
         <div class="col-md-6">
             <label class="form-label">Số điện thoại:</label>
-            <input type="text" name="phone" class="form-control" value="${editUser.phone}">
+            <input type="text" name="phone" class="form-control" 
+                   value="${editUser.phone}" pattern="^0[0-9]{9}$">
         </div>
 
         <div class="col-md-6">
@@ -47,7 +48,6 @@
         <div class="col-md-6">
             <label class="form-label">Thành phố:</label>
             <select name="locationid" class="form-control">
-                <option value="">-- Chọn thành phố --</option>
                 <c:forEach var="l" items="${locations}">
                     <option value="${l.locationId}" <c:if test="${l.locationId == editUser.locationId}">selected</c:if>>
                         ${l.city}

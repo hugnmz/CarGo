@@ -11,7 +11,7 @@
                     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
                     rel="stylesheet"
                     />
-                <link rel="stylesheet" href="${pageContext.request.contextPath}/CSS/manager/contract_detail.css"/>
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/css/manager/contract_detail.css"/>
             </head>
 
             <body>
@@ -112,7 +112,7 @@
                                           ><i class="fas fa-piggy-bank "></i>Ghi chú</span>
 
                                     <div> <p class="info-text">
-                                           Trống
+                                           ${not empty ccontract.note?contract.note:'Trống'}
                                         </p></div>
 
 
@@ -195,8 +195,6 @@
                                         <p  class="text-center text-muted">Danh sách trống</p>
                                     </c:otherwise>
                                 </c:choose>
-
-
                             </div>
                         </div>
                     </div>

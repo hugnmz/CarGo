@@ -11,7 +11,11 @@ import java.util.Optional;
 import service.CustomerService;
 import service.UserService;
 import util.di.DIContainer;
-import util.exception.WebException;
+import util.MessageUtil;
+import util.exception.ApplicationException;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
+import util.exception.DataAccessException;
 
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
@@ -30,8 +34,7 @@ public class LoginServlet extends HttpServlet {
             // khoi tao user service tu di container
             userService = DIContainer.get(UserService.class);
         } catch (Exception e) {
-            // nem loi neu khoi tao service that bai
-            throw new RuntimeException("Dependency injection error", e);
+            throw new ServletException(MessageUtil.getError("error.system"), e);
         }
     }
 
@@ -61,39 +64,43 @@ public class LoginServlet extends HttpServlet {
 
         try {
             //1. Đăng nhập với vai trò Customer
-            Optional<CustomerDTO> customerOpt = customerService.loginCustomer(username, password);
-            if (customerOpt.isPresent()) {
-                CustomerDTO customer = customerOpt.get();
-                HttpSession session = request.getSession(true);
-                setCustomerSession(session, customer);
-                redirectByRole(response, request, "CUSTOMER");
-                return;
+            try {
+                Optional<CustomerDTO> customerOpt = customerService.loginCustomer(username, password);
+                if (customerOpt.isPresent()) {
+                    CustomerDTO customer = customerOpt.get();
+                    HttpSession session = request.getSession(true);
+                    setCustomerSession(session, customer);
+                    redirectByRole(response, request, "CUSTOMER");
+                    return;
+                }
+            } catch (ValidationException | BusinessException | DataAccessException e) {
+                // Customer login thất bại, tiếp tục thử login user
+                // Không làm gì, để tiếp tục thử login user
             }
 
-            //2. Đăng nhập với vai trò Staff / Manager
-            Optional<UserDTO> userOpt = userService.loginUser(username, password);
-            if (userOpt.isPresent()) {
-                UserDTO user = userOpt.get();
+            //2. Đăng nhập với vai trò Staff / Manager / Admin
+            try {
+                Optional<UserDTO> userOpt = userService.loginUser(username, password);
+                if (userOpt.isPresent()) {
+                    UserDTO user = userOpt.get();
 
-                HttpSession session = request.getSession(true);
-                setUserSession(session, user);
-                redirectByRole(response, request, user.getRoleName());
-                return;
+                    HttpSession session = request.getSession(true);
+                    setUserSession(session, user);
+                    redirectByRole(response, request, user.getRoleName());
+                    return;
+                }
+            } catch (ValidationException | BusinessException | DataAccessException e) {
+                // User login cũng thất bại, sẽ hiển thị lỗi ở dưới
             }
 
-            //3. Sai thông tin đăng nhập
+            //3. Cả customer và user đều login thất bại
             request.setAttribute("username", username);
-            request.setAttribute("errors", "Sai tên đăng nhập hoặc mật khẩu.");
+            request.setAttribute("errors", MessageUtil.getError("error.login.invalid"));
             request.getRequestDispatcher("auth/login.jsp").forward(request, response);
 
-        } catch (WebException.AppException ex) {
-            // Bắt WebException
-            ex.printStackTrace();
-            request.setAttribute("errors", "Đã xảy ra lỗi khi đăng nhập: " + ex.getMessage());
-            request.getRequestDispatcher("auth/login.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errors", "Đã xảy ra lỗi khi đăng nhập.");
+            request.setAttribute("errors", MessageUtil.getError("error.system.login"));
             request.getRequestDispatcher("auth/login.jsp").forward(request, response);
         }
     }

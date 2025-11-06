@@ -17,6 +17,7 @@ import service.CustomerService;
 import util.EmailUtil;
 import util.di.DIContainer;
 import util.MessageUtil;
+import util.exception.*;
 
 @WebServlet("/resend-code")
 public class ResendCodeServlet extends HttpServlet {
@@ -43,38 +44,47 @@ public class ResendCodeServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        try {
+            HttpSession session = req.getSession(false);
+            String username = (String) session.getAttribute("pendingUser");
+            String email = (session != null) ? (String) session.getAttribute("pendingEmail") : null;
 
-        HttpSession session = req.getSession(false);
-        String username = (String) session.getAttribute("pendingUser");
-        String email = (session != null) ? (String) session.getAttribute("pendingEmail") : null;
+            if (username != null && email != null) {
+                Optional<String> ocode = customerService.generateAndStoreVerificationCode(username);
+                if (ocode.isPresent()) {
+                    String code = ocode.get();
 
-        if (username != null && email != null) {
-            Optional<String> ocode = customerService.generateAndStoreVerificationCode(username);
-            if (ocode.isPresent()) {
-                String code = ocode.get();
+                    String baseUrl = req.getScheme() + "://" + req.getServerName()
+                            + (req.getServerPort() == 80 ? "" : ":" + req.getServerPort())
+                            + req.getContextPath();
 
-                String baseUrl = req.getScheme() + "://" + req.getServerName()
-                        + (req.getServerPort() == 80 ? "" : ":" + req.getServerPort())
-                        + req.getContextPath();
+                    String link = baseUrl + "/VerifyServlet?u=" + URLEncoder.encode(username, StandardCharsets.UTF_8)
+                            + "&code=" + code;
 
-                String link = baseUrl + "/VerifyServlet?u=" + URLEncoder.encode(username, StandardCharsets.UTF_8)
-                        + "&code=" + code;
+                    try {
+                        EmailUtil.send(email,
+                                "[CarGo] Mã xác minh mới",
+                                "<p>Mã mới: <b>" + code + "</b> (hết hạn 10 phút).</p>"
+                                        + "<p><a href='" + link + "'>Xác minh ngay</a></p>");
+                    } catch (MessagingException ex) {
+                        Logger.getLogger(ResendCodeServlet.class.getName()).log(Level.SEVERE, null, ex);
+                        throw new BusinessException("error.email.send.failed");
+                    }
 
-                try {
-                    EmailUtil.send(email,
-                            "[CarGo] Mã xác minh mới",
-                            "<p>Mã mới: <b>" + code + "</b> (hết hạn 10 phút).</p>"
-                                    + "<p><a href='" + link + "'>Xác minh ngay</a></p>");
-                } catch (MessagingException ex) {
-                    Logger.getLogger(ResendCodeServlet.class.getName()).log(Level.SEVERE, null, ex);
+                    req.setAttribute("infoMessage", MessageUtil.getMessage("resend.code.success"));
+                } else {
+                    throw new BusinessException("error.resend.code.failed");
                 }
-
-                req.setAttribute("infoMessage", MessageUtil.getMessage("resend.code.success"));
             } else {
-                req.setAttribute("errorMessage", MessageUtil.getError("error.resend.code.failed"));
+                throw new ValidationException("error.session.expired.verify");
             }
-        } else {
-            req.setAttribute("errorMessage", MessageUtil.getError("error.session.expired.verify"));
+            
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            req.setAttribute("errorMessage", MessageUtil.getErrorFromException(e));
+        } catch (Exception e) {
+            e.printStackTrace();
+            req.setAttribute("errorMessage", MessageUtil.getError("error.system"));
         }
         
         req.getRequestDispatcher("/auth/verify.jsp").forward(req, resp);

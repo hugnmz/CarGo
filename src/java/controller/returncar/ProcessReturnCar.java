@@ -1,5 +1,6 @@
 package controller.returncar;
 
+import constant.ConstractStatus;
 import dto.ContractDTO;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
@@ -139,6 +140,9 @@ public class ProcessReturnCar extends HttpServlet {
 
             //update note vào hợp đồng
             contractService.updateNote(note, contractId);
+            
+            //update trạng thái hợp đồng
+            contractService.updateContractStatus(contractId, ConstractStatus.RETURNED.name());
 
             // Dọn dẹp: bỏ khỏi whitelist theo phiên + hàng chờ service
             pendingMap.remove(contractId);

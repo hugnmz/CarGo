@@ -21,16 +21,13 @@ public interface ContractDetailsDAO {
 
     boolean deleteContractDetail(Integer contractDetailId);
 
+    boolean deleteContractDetailByContractId(Integer contractId);
+
     List<ContractDetails> getContractDetailsByVehicle(Integer vehicleId);
-    
+
     List<ContractDetails> getContractDetailsByContractId(Integer contractId);
 
     boolean checkVehicleAvailability(Integer vehicleId, LocalDateTime startDate, LocalDateTime endDate);
-    
-    /**
-     * Thêm contract detail mới
-     * @param contractDetail - Contract detail cần thêm
-     * @return boolean - true nếu thành công
-     */
+
     boolean addContractDetail(ContractDetails contractDetail);
 }

@@ -19,6 +19,7 @@ public class ContractDTO {
     private LocalDateTime createAt;  // Ngày tạo
     private BigDecimal totalAmount;  // Tổng tiền
     private BigDecimal depositAmount; // Tiền cọc
+    private String note; //ghi chú
     private List<ContractDetailDTO> contractDetails; // Chi tiết hợp đồng
     private List<PaymentDTO> payments; // Thanh toán
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy");
@@ -170,4 +171,13 @@ public class ContractDTO {
     public void setRejectionReason(String rejectionReason) {
         this.rejectionReason = rejectionReason;
     }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+    
 }

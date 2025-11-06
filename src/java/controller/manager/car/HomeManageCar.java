@@ -1,3 +1,4 @@
+
 package controller.manager.car;
 
 import dto.CarDTO;
@@ -9,11 +10,14 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import service.CarService;
 import service.VehicleService;
 import util.di.DIContainer;
+import util.MessageUtil;
+import util.exception.*;
 
 /**
  * HomeManageCar - Servlet quản lý danh sách xe
@@ -44,6 +48,13 @@ public class HomeManageCar extends HttpServlet {
             throws ServletException, IOException {
 
         response.setContentType("text/html;charset=UTF-8");
+        
+        //Kiểm tra quyền
+        HttpSession session = request.getSession(false);
+        if (session == null || !"MANAGER".equals(session.getAttribute("roleName"))) {
+            response.sendRedirect("LoginServlet");
+            return;
+        }
 
         try {
             // Lấy danh sách xe
@@ -63,9 +74,13 @@ public class HomeManageCar extends HttpServlet {
             //Chuyển tiếp sang JSP hiển thị
             request.getRequestDispatcher("manager/manage_cars.jsp").forward(request, response);
 
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
+            request.getRequestDispatcher("manager/manage_cars.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Không thể tải danh sách xe: " + e.getMessage());
+            request.setAttribute("error", MessageUtil.getError("error.car.load.failed"));
             request.getRequestDispatcher("manager/manage_cars.jsp").forward(request, response);
         }
     }

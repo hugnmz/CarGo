@@ -11,7 +11,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,9 +21,9 @@ import java.util.Optional;
 import model.RequestReturnCar;
 import service.ContractService;
 import service.ReturnCarService;
-import util.AuthUtil;
 import util.di.DIContainer;
-import util.exception.WebException;
+import util.MessageUtil;
+import util.exception.*;
 
 /**
  *
@@ -72,7 +71,6 @@ public class ReturnCar extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            HttpSession session = req.getSession();
             String contractIdParam = req.getParameter("contractId");
 
             // Xóa tất cả check - đã chuyển vào service
@@ -101,16 +99,13 @@ public class ReturnCar extends HttpServlet {
 
             // Redirect về trang khách để tránh submit lại khi F5
             resp.sendRedirect(req.getContextPath() + "/view-contract?contractId=" + id);
-        } catch (WebException.ValidationException ex) {
-            // Bắt WebException ValidationException
-            req.getSession().setAttribute("error", ex.getMessage());
-            req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
-        } catch (WebException.AppException ex) {
-            // Bắt các WebException khác
-            req.getSession().setAttribute("error", ex.getMessage());
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            req.getSession().setAttribute("error", MessageUtil.getErrorFromException(e));
             req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
         } catch (Exception e) {
-            req.getSession().setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+            e.printStackTrace();
+            req.getSession().setAttribute("error", MessageUtil.getError("error.system"));
             req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
         }
     }

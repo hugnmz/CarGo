@@ -19,8 +19,11 @@ import service.CustomerService;
 import util.VerificationUtil;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
-import util.exception.WebException;
 import util.MessageUtil;
+import util.exception.ApplicationException;
+import util.exception.DataAccessException;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
 
 /**
  *
@@ -42,32 +45,24 @@ public class CustomerServiceImpl implements CustomerService {
     public Optional<CustomerDTO> loginCustomer(String username, String password) {
 
         // Bước 1: Lấy thông tin khách hàng từ database theo username
-        try {
-            Optional<Customers> oc = customersDAO.getCustomerByUserName(username);
-            if (oc.isEmpty()) {
-                return Optional.empty(); // Username không tồn tại trong hệ thống
-            }
-
-            Customers customer = oc.get();
-
-            if (!customer.isIsVerified()) {
-                return Optional.empty();
-            }
-
-            // Bước 2: Xác thực mật khẩu (so sánh password nhập vào với hash trong DB)
-            boolean passwordValid = PasswordUtil.verifyPassword(password, customer.getPasswordHash(), customer.getPasswordSalt());
-            if (!passwordValid) {
-                return Optional.empty(); // Mật khẩu không đúng
-            }
-
-            // Buoc 3: Chuyen doi tu Model sang DTO de tra ve cho Controller
-            CustomerDTO customerDTO = customerMapper.toDTO(customer);
-
-            return Optional.of(customerDTO);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Optional.empty(); // Có lỗi xảy ra trong quá trình xử lý
+        Optional<Customers> oc = customersDAO.getCustomerByUserName(username);
+        if (oc.isEmpty()) {
+            throw new ValidationException(MessageUtil.getError("error.login.invalid"));
         }
+
+        Customers customer = oc.get();
+
+        if (!customer.isIsVerified()) {
+            throw new ValidationException(MessageUtil.getError("error.account.not.verified"));
+        }
+
+        boolean passwordValid = PasswordUtil.verifyPassword(password, customer.getPasswordHash(), customer.getPasswordSalt());
+        if (!passwordValid) {
+            throw new ValidationException(MessageUtil.getError("error.login.invalid"));
+        }
+
+        CustomerDTO customerDTO = customerMapper.toDTO(customer);
+        return Optional.of(customerDTO);
     }
 
     @Override
@@ -76,18 +71,20 @@ public class CustomerServiceImpl implements CustomerService {
         try {
             // Bước 1: Kiểm tra dữ liệu đầu vào
             if (customerDTO == null || password == null) {
-                throw new WebException().new ValidationException(MessageUtil.getError("error.validation.data.invalid"));
+                throw new ValidationException(MessageUtil.getError("error.validation.data.invalid"));
             }
 
             // Chuyển check trùng từ servlet vào đây - throw WebException nếu trùng
             if (customerDTO.getUsername() != null && customersDAO.existsUsername(customerDTO.getUsername())) {
-                throw new WebException().new ValidationException(MessageUtil.getError("error.username.exists"));
+                throw new ValidationException(MessageUtil.getError("error.username.exists"));
             }
             if (customerDTO.getEmail() != null && customersDAO.existEmail(customerDTO.getEmail())) {
-                throw new WebException().new ValidationException(MessageUtil.getError("error.email.exists"));
+                String emailError = MessageUtil.getError("error.email.exists").replace("{0}", customerDTO.getEmail());
+                throw new ValidationException(emailError);
             }
             if (customerDTO.getPhone() != null && customersDAO.existPhone(customerDTO.getPhone())) {
-                throw new WebException().new ValidationException(MessageUtil.getError("error.phone.exists"));
+                String phoneError = MessageUtil.getError("error.phone.exists").replace("{0}", customerDTO.getPhone());
+                throw new ValidationException(phoneError);
             }
 
             Integer locationId = null;
@@ -116,56 +113,41 @@ public class CustomerServiceImpl implements CustomerService {
 
             // Bước 6: Lưu khách hàng vào database
             return customersDAO.addCustomer(customer);
-        } catch (WebException.ValidationException e) {
-            // Re-throw WebException để controller bắt
+        } catch (ApplicationException e) {
             throw e;
         } catch (Exception e) {
-            throw new WebException().new DataAccessException(MessageUtil.getError("error.dataaccess.customer.register.failed"), e);
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.customer.register.failed"), e);
         }
     }
 
     @Override
     public Optional<CustomerDTO> getCustomerByUsername(String username) {
         // Lấy thông tin khách hàng theo username
-        try {
-            if (username == null) {
-                return Optional.empty(); // Username không hợp lệ
-            }
-
-            // Tìm khách hàng trong database
-            Optional<Customers> oc = customersDAO.getCustomerByUserName(username);
-            if (!oc.isPresent()) {
-                return Optional.empty(); // Không tìm thấy khách hàng
-            }
-
-            // Chuyen doi tu Model sang DTO va tra ve
-            return Optional.of(customerMapper.toDTO(oc.get()));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Optional.empty(); // Có lỗi xảy ra
+        if (username == null) {
+            throw new ValidationException(MessageUtil.getError("error.validation.data.invalid"));
         }
+
+        Optional<Customers> oc = customersDAO.getCustomerByUserName(username);
+        if (!oc.isPresent()) {
+            throw new ValidationException(MessageUtil.getError("error.validation.customer.not.found"));
+        }
+
+        return Optional.of(customerMapper.toDTO(oc.get()));
     }
 
     @Override
     public Optional<CustomerDTO> getCustomerById(Integer customerId) {
         // Lấy thông tin khách hàng theo ID
-        try {
-            if (customerId == null) {
-                return Optional.empty(); // ID không hợp lệ
-            }
-
-            // Tìm khách hàng trong database
-            Optional<Customers> oc = customersDAO.getCustomerById(customerId);
-            if (!oc.isPresent()) {
-                return Optional.empty(); // Không tìm thấy khách hàng
-            }
-
-            // Chuyen doi tu Model sang DTO va tra ve
-            return Optional.of(customerMapper.toDTO(oc.get()));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Optional.empty(); // Có lỗi xảy ra
+        if (customerId == null) {
+            throw new ValidationException(MessageUtil.getError("error.validation.data.invalid"));
         }
+
+        Optional<Customers> oc = customersDAO.getCustomerById(customerId);
+        if (!oc.isPresent()) {
+            throw new ValidationException(MessageUtil.getError("error.validation.customer.not.found"));
+        }
+
+        return Optional.of(customerMapper.toDTO(oc.get()));
     }
 
     @Override
@@ -182,9 +164,10 @@ public class CustomerServiceImpl implements CustomerService {
             }
 
             return dto; // Tra ve danh sach DTO
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            return null; // Có lỗi xảy ra
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.customer.list.failed"), e);
         }
     }
 
@@ -192,17 +175,22 @@ public class CustomerServiceImpl implements CustomerService {
     public boolean addCustomer(CustomerDTO customerDTO) {
         // Thêm khách hàng mới vào hệ thống
         if (customerDTO == null) {
-            return false; // Dữ liệu không hợp lệ
+            throw new ValidationException(MessageUtil.getError("error.validation.data.invalid"));
         }
 
         try {
             // Chuyển đổi DTO sang Model
             Customers customers = customerMapper.toUsers(customerDTO);
             // Lưu vào database
-            return customersDAO.addCustomer(customers);
+            boolean result = customersDAO.addCustomer(customers);
+            if (!result) {
+                throw new BusinessException(MessageUtil.getError("error.dataaccess.customer.add.failed"));
+            }
+            return true;
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false; // Có lỗi xảy ra
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.customer.register.failed"), e);
         }
     }
 
@@ -210,82 +198,78 @@ public class CustomerServiceImpl implements CustomerService {
     public boolean updateCustomer(CustomerDTO customerDTO) {
         // Cập nhật thông tin khách hàng
         if (customerDTO == null) {
-            throw new WebException().new ValidationException(MessageUtil.getError("error.validation.data.invalid"));
+            throw new ValidationException(MessageUtil.getError("error.validation.data.invalid"));
         }
-        try {
-            Optional<Customers> existingCustomer = customersDAO.getCustomerById(customerDTO.getCustomerId());
-            if (existingCustomer.isEmpty()) {
-                throw new WebException().new ValidationException(MessageUtil.getError("error.validation.customer.not.found"));
-            }
-
-            // Lấy customer hiện tại từ database
-            Customers existing = existingCustomer.get();
-
-            // Chỉ update các trường cần thiết
-            if (customerDTO.getFullName() != null) {
-                existing.setFullName(customerDTO.getFullName());
-            }
-            if (customerDTO.getEmail() != null) {
-                String newEmail = customerDTO.getEmail().trim();
-                // Chuyển check trùng từ servlet vào đây - throw WebException nếu trùng
-                if (!newEmail.equalsIgnoreCase(existing.getEmail())) {
-                    if (customersDAO.existEmail(newEmail)) {
-                        throw new WebException().new ValidationException(MessageUtil.getError("error.email.exists"));
-                    }
-                    existing.setEmail(newEmail);
-                }
-            }
-            if (customerDTO.getPhone() != null) {
-                String newPhone = customerDTO.getPhone().trim();
-                // Chuyển check trùng từ servlet vào đây - throw WebException nếu trùng
-                if (!newPhone.equals(existing.getPhone())) {
-                    if (customersDAO.existPhone(newPhone)) {
-                        throw new WebException().new ValidationException(MessageUtil.getError("error.phone.exists"));
-                    }
-                    existing.setPhone(newPhone);
-                }
-            }
-            if (customerDTO.getDateOfBirth() != null) {
-                existing.setDateOfBirth(customerDTO.getDateOfBirth());
-            }
-
-            // Chỉ update isVerified nếu có trong DTO
-            if (customerDTO.getIsVerified() != null) {
-                existing.setIsVerified(customerDTO.getIsVerified());
-            }
-
-            // Cập nhật locationId nếu có
-            if (customerDTO.getLocationId() != null) {
-                // Nếu có locationId (từ dropdown), sử dụng trực tiếp
-                existing.setLocationId(customerDTO.getLocationId());
-            } else if (customerDTO.getCity() != null) {
-                // Nếu chỉ có city (từ input text), tìm locationId
-                Integer locationId = locationsDAO.findIdByCity(customerDTO.getCity());
-                existing.setLocationId(locationId);
-            }
-
-            return customersDAO.updateCustomer(existing);
-        } catch (WebException.ValidationException e) {
-            // Re-throw WebException để controller bắt
-            throw e;
-        } catch (Exception e) {
-            throw new WebException().new DataAccessException(MessageUtil.getError("error.dataaccess.customer.update.failed"), e);
+        Optional<Customers> existingCustomer = customersDAO.getCustomerById(customerDTO.getCustomerId());
+        if (existingCustomer.isEmpty()) {
+            throw new ValidationException(MessageUtil.getError("error.validation.customer.not.found"));
         }
+
+        Customers existing = existingCustomer.get();
+
+        if (customerDTO.getFullName() != null) {
+            existing.setFullName(customerDTO.getFullName());
+        }
+        if (customerDTO.getEmail() != null) {
+            String newEmail = customerDTO.getEmail().trim();
+            if (!newEmail.equalsIgnoreCase(existing.getEmail())) {
+                if (customersDAO.existEmail(newEmail)) {
+                    String emailError = MessageUtil.getError("error.email.exists").replace("{0}", newEmail);
+                    throw new ValidationException(emailError);
+                }
+                existing.setEmail(newEmail);
+            }
+        }
+        if (customerDTO.getPhone() != null) {
+            String newPhone = customerDTO.getPhone().trim();
+            if (!newPhone.equals(existing.getPhone())) {
+                if (customersDAO.existPhone(newPhone)) {
+                   String phoneError = MessageUtil.getError("error.phone.exists").replace("{0}", newPhone);
+                   throw new ValidationException(phoneError);
+                }
+                existing.setPhone(newPhone);
+            }
+        }
+        if (customerDTO.getDateOfBirth() != null) {
+            existing.setDateOfBirth(customerDTO.getDateOfBirth());
+        }
+
+        if (customerDTO.getIsVerified() != null) {
+            existing.setIsVerified(customerDTO.getIsVerified());
+        }
+
+        if (customerDTO.getLocationId() != null) {
+            existing.setLocationId(customerDTO.getLocationId());
+        } else if (customerDTO.getCity() != null) {
+            Integer locationId = locationsDAO.findIdByCity(customerDTO.getCity());
+            existing.setLocationId(locationId);
+        }
+
+        boolean updated = customersDAO.updateCustomer(existing);
+        if (!updated) {
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.customer.update.failed"));
+        }
+        return true;
     }
 
     @Override
     public boolean deleteCustomer(Integer customerId) {
         // Xoa khach hang khoi he thong
         if (customerId == null) {
-            return false; // ID không hợp lệ
+            throw new ValidationException(MessageUtil.getError("error.validation.data.invalid"));
         }
 
         try {
             // Xóa khách hàng trong database
-            return customersDAO.deleteCustomer(customerId);
+            boolean result = customersDAO.deleteCustomer(customerId);
+            if (!result) {
+                throw new BusinessException(MessageUtil.getError("error.dataaccess.customer.delete.failed"));
+            }
+            return true;
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false; // Có lỗi xảy ra
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.customer.delete.failed"), e);
         }
     }
 
@@ -294,9 +278,10 @@ public class CustomerServiceImpl implements CustomerService {
         // Kiểm tra username đã tồn tại chưa
         try {
             return customersDAO.existsUsername(username);
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false; // Có lỗi xảy ra
+            throw new DataAccessException(MessageUtil.getError("error.system"), e);
         }
     }
 
@@ -305,9 +290,10 @@ public class CustomerServiceImpl implements CustomerService {
         // Kiểm tra email đã tồn tại chưa
         try {
             return customersDAO.existEmail(email);
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false; // Có lỗi xảy ra
+            throw new DataAccessException(MessageUtil.getError("error.system"), e);
         }
     }
 
@@ -316,9 +302,10 @@ public class CustomerServiceImpl implements CustomerService {
         // Kiểm tra số điện thoại đã tồn tại chưa
         try {
             return customersDAO.existPhone(phone);
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false; // Có lỗi xảy ra
+            throw new DataAccessException(MessageUtil.getError("error.system"), e);
         }
     }
 
@@ -327,13 +314,13 @@ public class CustomerServiceImpl implements CustomerService {
         // Thay đổi mật khẩu khách hàng
         try {
             if (oldPassword.equals(newPassword)) {
-                return false;
+                throw new ValidationException(MessageUtil.getError("error.password.change.failed"));
             }
 
             // Bước 1: Lấy thông tin khách hàng từ database
             Optional<Customers> oc = customersDAO.getCustomerById(customerId);
             if (!oc.isPresent()) {
-                return false; // Không tìm thấy khách hàng
+                throw new ValidationException(MessageUtil.getError("error.validation.customer.not.found"));
             }
 
             Customers customer = oc.get();
@@ -341,7 +328,7 @@ public class CustomerServiceImpl implements CustomerService {
             // Bước 2: Xác thực mật khẩu cũ
             if (!PasswordUtil.verifyPassword(oldPassword,
                     customer.getPasswordHash(), customer.getPasswordSalt())) {
-                return false; // Mật khẩu cũ không đúng
+                throw new ValidationException(MessageUtil.getError("error.password.change.failed"));
             }
 
             // Bước 3: Mã hóa mật khẩu mới
@@ -351,11 +338,16 @@ public class CustomerServiceImpl implements CustomerService {
             byte[] newPasswordSalt = newHash[1]; // Lấy salt
 
             // Bước 4: Cập nhật mật khẩu mới trong database
-            return customersDAO.changePassword(customer.getCustomerId(),
+            boolean result = customersDAO.changePassword(customer.getCustomerId(),
                     newPasswordHash, newPasswordSalt);
+            if (!result) {
+                throw new BusinessException(MessageUtil.getError("error.password.change.failed"));
+            }
+            return true;
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false; // Có lỗi xảy ra
+            throw new DataAccessException(MessageUtil.getError("error.password.change.failed"), e);
         }
     }
 
@@ -366,7 +358,7 @@ public class CustomerServiceImpl implements CustomerService {
             // Bước 1: Lấy thông tin khách hàng từ database theo username
             Optional<Customers> oc = customersDAO.getCustomerByUserName(username);
             if (!oc.isPresent()) {
-                return false; // Không tìm thấy khách hàng
+                throw new ValidationException(MessageUtil.getError("error.validation.customer.not.found"));
             }
 
             Customers customer = oc.get();
@@ -378,12 +370,17 @@ public class CustomerServiceImpl implements CustomerService {
             byte[] newPasswordSalt = newHash[1]; // Lấy salt
 
             // Bước 3: Cập nhật mật khẩu mới trong database
-            return customersDAO.changePassword(customer.getCustomerId(),
+            boolean result = customersDAO.changePassword(customer.getCustomerId(),
                     newPasswordHash, newPasswordSalt);
+            if (!result) {
+                throw new BusinessException(MessageUtil.getError("error.password.change.failed"));
+            }
+            return true;
 
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false; // Có lỗi xảy ra
+            throw new DataAccessException(MessageUtil.getError("error.password.change.failed"), e);
         }
     }
 
@@ -392,7 +389,7 @@ public class CustomerServiceImpl implements CustomerService {
         try {
             Optional<Customers> oc = customersDAO.getCustomerByUserName(username);
             if (oc.isEmpty()) {
-                return false;
+                throw new ValidationException(MessageUtil.getError("error.validation.customer.not.found"));
             }
 
             Customers c = oc.get();
@@ -408,13 +405,17 @@ public class CustomerServiceImpl implements CustomerService {
                 c.setVerifyCode(null);
                 c.setVerifyCodeExpire(null);
                 boolean updateResult = customersDAO.updateCustomer(c);
-                return updateResult;
+                if (!updateResult) {
+                    throw new BusinessException(MessageUtil.getError("error.verification.code.failed"));
+                }
+                return true;
             }
 
-            return false;
+            throw new ValidationException(MessageUtil.getError("error.verification.code.wrong"));
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new DataAccessException(MessageUtil.getError("error.verification.code.failed"), e);
         }
     }
 
@@ -443,9 +444,10 @@ public class CustomerServiceImpl implements CustomerService {
                 return Optional.empty();
             }
             return Optional.of(customerMapper.toDTO(oc.get()));
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            return Optional.empty();
+            throw new DataAccessException(MessageUtil.getError("error.system"), e);
         }
     }
 
@@ -467,10 +469,11 @@ public class CustomerServiceImpl implements CustomerService {
             if (customersDAO.updateCustomer(customer)) {
                 return Optional.of(code);
             }
-            return Optional.empty();
+            throw new BusinessException(MessageUtil.getError("error.forgot.password.code.generation.failed"));
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            return Optional.empty();
+            throw new DataAccessException(MessageUtil.getError("error.forgot.password.code.generation.failed"), e);
         }
     }
 
@@ -479,7 +482,7 @@ public class CustomerServiceImpl implements CustomerService {
         try {
             Optional<Customers> oc = customersDAO.getCustomerByUserName(username);
             if (!oc.isPresent()) {
-                return false;
+                throw new ValidationException(MessageUtil.getError("error.validation.customer.not.found"));
             }
 
             Customers customer = oc.get();
@@ -489,7 +492,7 @@ public class CustomerServiceImpl implements CustomerService {
                     || !customer.getVerifyCode().equals(code)
                     || customer.getVerifyCodeExpire() == null
                     || customer.getVerifyCodeExpire().isBefore(LocalDateTime.now())) {
-                return false;
+                throw new ValidationException(MessageUtil.getError("error.reset.password.code.expired"));
             }
 
             // Hash new password
@@ -507,12 +510,14 @@ public class CustomerServiceImpl implements CustomerService {
                 customer.setVerifyCode(null);
                 customer.setVerifyCodeExpire(null);
                 customersDAO.updateCustomer(customer);
+                return true;
             }
 
-            return success;
+            throw new BusinessException(MessageUtil.getError("error.password.change.failed"));
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new DataAccessException(MessageUtil.getError("error.reset.password.system.error"), e);
         }
     }
 
@@ -533,10 +538,10 @@ public class CustomerServiceImpl implements CustomerService {
                     })
                     .toList();
 
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            // Trả về danh sách rỗng nếu lỗi
-            return List.of();
+            throw new DataAccessException(MessageUtil.getError("error.system"), e);
         }
 
     }

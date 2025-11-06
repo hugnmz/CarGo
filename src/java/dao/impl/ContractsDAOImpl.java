@@ -150,4 +150,17 @@ public class ContractsDAOImpl implements ContractsDAO {
         Users u = JdbcTemplateUtil.queryOne(sql, model.Users.class);
         return (u != null) ? u.getUserId() : null;
     }
+    
+        @Override
+    public BigDecimal getTotalAmount(Integer contractId) {
+        String sql = "SELECT totalAmount FROM Contracts WHERE contractId = ?";
+        Contracts contract = JdbcTemplateUtil.queryOne(sql, Contracts.class, contractId);
+        return contract != null ? contract.getTotalAmount() : null;
+    }
+
+    @Override
+    public boolean addPaymentLog(Integer contractId, String message) {
+        String sql = "INSERT INTO paymentLogs (contractId, message, createdAt) VALUES (?, ?, NOW())";
+        return JdbcTemplateUtil.update(sql, contractId, message) > 0;
+    }
 }

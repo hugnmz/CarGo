@@ -13,7 +13,8 @@ import dto.ContractDetailDTO;
 import service.ContractService;
 import util.di.DIContainer;
 import util.AuthUtil;
-import util.exception.WebException;
+import util.MessageUtil;
+import util.exception.*;
 
 @WebServlet(name = "ViewContractServlet", urlPatterns = {"/view-contract"})
 public class ViewContractServlet extends HttpServlet {
@@ -65,15 +66,14 @@ public class ViewContractServlet extends HttpServlet {
                 // dat danh sach chi tiet hop dong vao request de truyen sang jsp
                 request.setAttribute("details", details);
             }
-        } catch (WebException.AppException ex) {
-            // Bắt WebException
-            request.setAttribute("error", ex.getMessage());
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
             request.getRequestDispatcher("/customer/contract-view.jsp").forward(request, response);
             return;
         } catch (Exception e) {
-            // Bắt exception khác
             e.printStackTrace();
-            request.setAttribute("error", "Lỗi khi tải thông tin hợp đồng");
+            request.setAttribute("error", MessageUtil.getError("error.system"));
             request.getRequestDispatcher("/customer/contract-view.jsp").forward(request, response);
             return;
         }

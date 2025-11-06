@@ -31,7 +31,7 @@ public class PaymentMethodMapper {
             // Tinh tong tien
             double totalAmount = 0.0;
             for (Payments payment : paymentMethod.getPayments()) {
-                if ("completed".equals(payment.getStatus())) {
+                if ("COMPLETED".equals(payment.getStatus())) {
                     totalAmount += payment.getAmount().doubleValue();
                 }
             }

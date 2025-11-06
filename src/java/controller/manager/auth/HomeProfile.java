@@ -1,3 +1,4 @@
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
@@ -43,25 +44,27 @@ public class HomeProfile extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        //Kiểm tra quyền
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+        if (session == null || session.getAttribute("userId") == null
+                || !"MANAGER".equals(session.getAttribute("roleName"))) {
+            response.sendRedirect("LoginServlet");
             return;
         }
-        // 🔹 Lấy ID người dùng từ session
+        //Lấy ID người dùng từ session
         Integer userId = (Integer) session.getAttribute("userId");
 
-        // 🔹 Lấy thông tin người dùng từ database qua service
+        //Lấy thông tin người dùng từ database qua service
         UserDTO user = userService.getUserById(userId);
-        
-        // 🔹 Lấy danh sách địa điểm (thành phố)
+
+        //Lấy danh sách địa điểm (thành phố)
         List<LocationDTO> locationList = userService.getAllLocation();
-        
+
         if (user == null) {
             request.setAttribute("errorMessage", "Không tìm thấy thông tin người dùng.");
             return;
         }
-        
+
         // 🔹 Gửi dữ liệu user sang JSP
         request.setAttribute("user", user);
         request.setAttribute("locations", locationList);

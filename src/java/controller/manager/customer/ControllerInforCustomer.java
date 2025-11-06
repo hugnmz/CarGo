@@ -19,7 +19,8 @@ import java.util.Optional;
 import service.ContractService;
 import util.di.DIContainer;
 import service.CustomerService;
-import util.exception.WebException;
+import util.MessageUtil;
+import util.exception.*;
 
 /**
  *
@@ -63,14 +64,13 @@ public class ControllerInforCustomer extends HttpServlet {
             // Forward đến trang profile
             request.getRequestDispatcher("/manager/manage_detail_cus.jsp").forward(request, response);
 
-        } catch (WebException.AppException ex) {
-            // Bắt WebException
-            ex.printStackTrace();
-            request.setAttribute("error", ex.getMessage());
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
             request.getRequestDispatcher("/manager/manage_detail_cus.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
-            // Vẫn forward đến profile, sử dụng session data
+            request.setAttribute("error", MessageUtil.getError("error.system"));
             request.getRequestDispatcher("/manager/manage_detail_cus.jsp").forward(request, response);
         }
     }
@@ -95,9 +95,13 @@ public class ControllerInforCustomer extends HttpServlet {
             // Forward đến trang profile
             request.getRequestDispatcher("/manager/editcustomer.jsp").forward(request, response);
 
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
+            request.getRequestDispatcher("/manager/editcustomer.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
-            // Vẫn forward đến profile, sử dụng session data
+            request.setAttribute("error", MessageUtil.getError("error.system"));
             request.getRequestDispatcher("/manager/editcustomer.jsp").forward(request, response);
         }
     }
@@ -138,18 +142,14 @@ public class ControllerInforCustomer extends HttpServlet {
             // Gọi service - service sẽ check và throw WebException
             customerService.updateCustomer(customerDTO);
 
-            request.setAttribute("message", "Cập nhật khách hàng thành công!");
+            request.setAttribute("message", MessageUtil.getError("error.user.update.success"));
 
-        } catch (WebException.ValidationException ex) {
-            // Bắt WebException ValidationException
-            request.setAttribute("error", ex.getMessage());
-        } catch (WebException.AppException ex) {
-            // Bắt các WebException khác
-            request.setAttribute("error", ex.getMessage());
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
         } catch (Exception e) {
             e.printStackTrace();
-            // Đẩy lỗi ra
-            request.setAttribute("error", "Thêm thất bại: " + e.getMessage());
+            request.setAttribute("error", MessageUtil.getError("error.user.update.error"));
         }
         // Forward về trang quản lý để hiển thị thông báo
         request.getRequestDispatcher("managecus").forward(request, response);
@@ -166,20 +166,17 @@ public class ControllerInforCustomer extends HttpServlet {
             boolean deleted = customerService.deleteCustomer(customerId);
 
             if (deleted) {
-                request.setAttribute("message", "Xóa khách hàng thành công!");
+                request.setAttribute("message", MessageUtil.getError("error.user.delete.success"));
             } else {
-                request.setAttribute("error", "Không tìm thấy khách hàng để xóa!");
+                throw new BusinessException("error.user.not.found");
             }
 
-        } catch (WebException.ValidationException ex) {
-            // Bắt WebException ValidationException
-            request.setAttribute("error", ex.getMessage());
-        } catch (WebException.AppException ex) {
-            // Bắt các WebException khác
-            request.setAttribute("error", ex.getMessage());
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Xóa thất bại: " + e.getMessage());
+            request.setAttribute("error", MessageUtil.getError("error.user.delete.error"));
         }
 
         // Quay lại danh sách sau khi xóa

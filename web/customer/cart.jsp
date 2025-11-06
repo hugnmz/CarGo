@@ -34,7 +34,6 @@ contentType="text/html; charset=UTF-8" language="java" %>
     <c:choose>
       <c:when test="${not empty cartItems}">
         
-        <%-- Đếm số nhóm ngày khác nhau --%>
         <%
             java.util.Set<String> uniqueDates = new java.util.LinkedHashSet<>();
             java.util.Map<String, java.util.List> dateGroupsMap = new java.util.LinkedHashMap<>();
@@ -43,6 +42,7 @@ contentType="text/html; charset=UTF-8" language="java" %>
             if (cartItems != null) {
                 for (Object obj : cartItems) {
                     try {
+                    
                         // Sử dụng reflection để lấy rentStartDate và rentEndDate
                         java.lang.reflect.Method getStart = obj.getClass().getMethod("getRentStartDate");
                         java.lang.reflect.Method getEnd = obj.getClass().getMethod("getRentEndDate");

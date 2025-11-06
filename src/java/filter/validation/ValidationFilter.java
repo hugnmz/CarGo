@@ -97,12 +97,12 @@ public class ValidationFilter implements Filter {
         switch (type) {
             case EMAIL:
                 if (!emailValidator.isValid(value)) {
-                    return MessageUtil.getError("error.email.invalid");
+                    return MessageUtil.getError("error.email.invalid").replace("{0}", value);
                 }
                 break;
             case PHONE:
                 if (!phoneValidator.isValid(value)) {
-                    return MessageUtil.getError("error.phone.invalid");
+                    return MessageUtil.getError("error.phone.invalid").replace("{0}", value);
                 }
                 break;
             case DECIMAL:

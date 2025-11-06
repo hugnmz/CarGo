@@ -6,7 +6,10 @@ import mapper.FeedbackMapper;
 import model.Feedbacks;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
-import util.exception.WebException;
+import util.exception.ApplicationException;
+import util.exception.DataAccessException;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
 import util.MessageUtil;
 
 import java.time.LocalDateTime;
@@ -30,23 +33,23 @@ public class FeedbackServiceImpl implements service.FeedbackService {
         try {
             List<Feedbacks> list = feedbacksDAO.getRecentFeedbacksPaged(safeOffset, safeLimit);
             return list.stream().map(feedbackMapper::toDTO).collect(Collectors.toList());
-        } catch (WebException.AppException e) {
+        } catch (ApplicationException e) {
             throw e;
         } catch (Exception e) {
-            throw new WebException().new DataAccessException(MessageUtil.getError("error.dataaccess.feedback.list.failed"), e);
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.feedback.list.failed"), e);
         }
     }
 
     @Override
     public FeedbackDTO create(Integer customerId, String comment, Integer vehicleId) {
         if (customerId == null) {
-            throw new WebException().new ValidationException(MessageUtil.getError("error.validation.not.logged.in"));
+            throw new ValidationException(MessageUtil.getError("error.validation.not.logged.in"));
         }
         if (comment == null || comment.trim().isEmpty()) {
-            throw new WebException().new ValidationException(MessageUtil.getError("error.validation.comment.required"));
+            throw new ValidationException(MessageUtil.getError("error.validation.comment.required"));
         }
         if (comment.length() > 255) {
-            throw new WebException().new ValidationException(MessageUtil.getError("error.validation.comment.too.long"));
+            throw new ValidationException(MessageUtil.getError("error.validation.comment.too.long"));
         }
 
         try {
@@ -59,13 +62,13 @@ public class FeedbackServiceImpl implements service.FeedbackService {
 
             boolean ok = feedbacksDAO.addFeedback(f);
             if (!ok) {
-                throw new WebException().new BusinessException(MessageUtil.getError("error.business.feedback.save.failed"));
+                throw new BusinessException(MessageUtil.getError("error.business.feedback.save.failed"));
             }
             return feedbackMapper.toDTO(f);
-        } catch (WebException.AppException e) {
+        } catch (ApplicationException e) {
             throw e;
         } catch (Exception e) {
-            throw new WebException().new DataAccessException(MessageUtil.getError("error.dataaccess.feedback.create.failed"), e);
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.feedback.create.failed"), e);
         }
     }
 }

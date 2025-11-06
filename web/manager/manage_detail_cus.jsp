@@ -1,3 +1,4 @@
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -9,7 +10,7 @@
 
     String role = (String) session.getAttribute("roleName");
     if (role == null || !"MANAGER".equalsIgnoreCase(role)) {
-        response.sendRedirect("auth/login.jsp");
+        response.sendRedirect("LoginServlet");
         return;
     }
 %>

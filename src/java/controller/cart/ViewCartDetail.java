@@ -1,5 +1,6 @@
 package controller.cart;
 
+import dto.CustomerDTO;
 import dto.OrderDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -65,13 +66,11 @@ public class ViewCartDetail extends HttpServlet {
             throws ServletException, IOException {
         // kiem tra session va customer id, neu khong co thi chuyen den trang dang nhap
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("customerId") == null) {
-            response.sendRedirect(request.getContextPath() + "/auth/login.jsp");
-            return;
-        }
+        CustomerDTO dto = (CustomerDTO)session.getAttribute("c");
+        
         
         // lay thong tin customer tu session
-        Integer customerId = (Integer) session.getAttribute("customerId");
+        Integer customerId = dto.getCustomerId();
         // lay tham so action de xac dinh hanh dong can thuc hien
         String action = request.getParameter("action");
         // lay danh sach id cac san pham duoc chon de xoa

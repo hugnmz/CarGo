@@ -1,3 +1,4 @@
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
@@ -9,7 +10,7 @@
 
     String role = (String) session.getAttribute("roleName");
     if (role == null || !"MANAGER".equalsIgnoreCase(role)) {
-        response.sendRedirect("auth/login.jsp");
+        response.sendRedirect("LoginServlet");
         return;
     }
 %>

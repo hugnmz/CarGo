@@ -1,6 +1,7 @@
 package controller.contract;
 
 import dto.ContractDTO;
+import dto.ContractDetailDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -8,13 +9,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.ContractService;
 import util.di.DIContainer;
-import util.exception.WebException;
+import util.MessageUtil;
+import util.exception.BusinessException;
+import util.exception.DataAccessException;
+import util.exception.ValidationException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import dto.ContractDetailDTO;
 
 @WebServlet("/ContractServlet")
 public class ContractServlet extends HttpServlet {
@@ -131,11 +134,12 @@ public class ContractServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/staff?error=contract_creation_failed");
             }
 
-        } catch (WebException.AppException ex) {
-            // Bắt WebException
-            throw ex;
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("error.system", e);
+            e.printStackTrace();
+            throw new RuntimeException(MessageUtil.getError("error.system"), e);
         }
     }
 
@@ -154,11 +158,12 @@ public class ContractServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/staff?error=status_update_failed&contractId=" + contractId + "&status=" + status);
             }
 
-        } catch (WebException.AppException ex) {
-            // Bắt WebException
-            throw ex;
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("error.system", e);
+            e.printStackTrace();
+            throw new RuntimeException(MessageUtil.getError("error.system"), e);
         }
     }
 
@@ -201,11 +206,12 @@ public class ContractServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/customer/payment-failed.jsp");
             }
 
-        } catch (WebException.AppException ex) {
-            // Bắt WebException
-            throw ex;
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("error.system", e);
+            e.printStackTrace();
+            throw new RuntimeException(MessageUtil.getError("error.system"), e);
         }
     }
 

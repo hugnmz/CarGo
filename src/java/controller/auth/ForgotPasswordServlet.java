@@ -12,6 +12,9 @@ import service.CustomerService;
 import util.EmailUtil;
 import util.MessageUtil;
 import util.di.DIContainer;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
+import util.exception.DataAccessException;
 import dto.CustomerDTO;
 
 @WebServlet("/ForgotPasswordServlet")
@@ -25,7 +28,7 @@ public class ForgotPasswordServlet extends HttpServlet {
         try {
             customerService = DIContainer.get(CustomerService.class);
         } catch (Exception e) {
-            throw new RuntimeException("Dependency injection error", e);
+            throw new ServletException(MessageUtil.getError("error.system"), e);
         }
     }
     
@@ -84,6 +87,12 @@ public class ForgotPasswordServlet extends HttpServlet {
             request.setAttribute("success", successMsg);
             request.getRequestDispatcher("/auth/reset-password.jsp").forward(request, response);
             
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
+            request.setAttribute("username", username);
+            request.setAttribute("email", email);
+            request.getRequestDispatcher("/auth/forgot-password.jsp").forward(request, response);
         } catch (MessagingException e) {
             e.printStackTrace();
             request.setAttribute("error", MessageUtil.getError("error.forgot.password.email.send.failed"));

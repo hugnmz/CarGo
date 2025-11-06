@@ -1,3 +1,4 @@
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
@@ -11,6 +12,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import service.RoleService;
 import util.di.DIContainer;
 import service.UserService;
@@ -36,6 +38,14 @@ public class ChangePassword extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        //Kiểm tra quyền truy cập
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null ||
+                !"MANAGER".equals(session.getAttribute("roleName"))) {
+            response.sendRedirect("LoginServlet");
+            return;
+        }
         // Chuyển hướng về trang profile hoặc trang đổi mật khẩu
         request.getRequestDispatcher("/manager/user_profile.jsp").forward(request, response);
     }

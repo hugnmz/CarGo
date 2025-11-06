@@ -17,9 +17,10 @@ import mapper.*;
 import model.CarPrices;
 import model.Cars;
 import service.CarService;
+import util.MessageUtil;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
-
+import util.exception.ValidationException;
 
 @Service
 public class CarServiceImpl implements CarService {
@@ -92,6 +93,15 @@ public class CarServiceImpl implements CarService {
             return false;
         }
         try {
+
+            Optional<Cars> existing = carsDAO.findByNameAndYear(carDTO.getName(), carDTO.getYear());
+            if (existing.isPresent()) {
+                throw new ValidationException(
+                        String.format("Xe %s (%d) đã tồn tại trong hệ thống.",
+                                carDTO.getName(), carDTO.getYear())
+                );
+            }
+
             Cars cars = carMapper.toModel(carDTO);
             return carsDAO.addCar(cars);
         } catch (Exception e) {
@@ -118,6 +128,14 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public int addCarAndGetId(CarDTO carDTO) {
+        Optional<Cars> existing = carsDAO.findByNameAndYear(carDTO.getName(), carDTO.getYear());
+        if (existing.isPresent()) {
+            throw new ValidationException(
+                    String.format("Xe %s (%d) đã tồn tại trong hệ thống.",
+                            carDTO.getName(), carDTO.getYear())
+            );
+        }
+
         Cars car = carMapper.toModel(carDTO);
         return carsDAO.addCarAndReturnId(car);
     }
@@ -128,6 +146,13 @@ public class CarServiceImpl implements CarService {
             return false;
         }
         try {
+            Optional<Cars> existing = carsDAO.findByNameAndYear(carDTO.getName(), carDTO.getYear());
+            if (existing.isPresent() && !existing.get().getCarId().equals(carDTO.getCarId())) {
+                throw new ValidationException(
+                        String.format("Xe %s (%d) đã tồn tại trong hệ thống.", carDTO.getName(), carDTO.getYear())
+                );
+            }
+
             Cars cars = carMapper.toModel(carDTO);
             boolean updatedCar = carsDAO.updateCar(cars);
             if (!updatedCar) {
@@ -168,25 +193,13 @@ public class CarServiceImpl implements CarService {
             }
 
             return true;
+        } catch (ValidationException ve) {
+            throw ve;
         } catch (Exception e) {
             throw new RuntimeException("error.system", e);
         }
     }
 
-    /*
-    @Override
-    public boolean updateCar(CarDTO carDTO) {
-        if (carDTO == null) {
-            return false;
-        }
-        try {
-            Cars cars = carMapper.toModel(carDTO);
-            return carsDAO.updateCar(cars);
-        } catch (Exception e) {
-            throw new RuntimeException("error.system", e);
-        }
-    }
-     */
     @Override
     public boolean deleteCar(Integer carId) {
         if (carId == null) {
@@ -209,7 +222,7 @@ public class CarServiceImpl implements CarService {
 
             return deletedCar;
         } catch (Exception e) {
-            
+
             e.printStackTrace();
             return false;
         }
@@ -286,7 +299,7 @@ public class CarServiceImpl implements CarService {
         }
     }
 
-     @Override
+    @Override
     public List<CarDTO> searchCars(Integer locationId, String name, Integer categoryId, Double price) {
         // lay danh sach tat ca xe
         List<Cars> cars = carsDAO.searchCars(locationId, name, categoryId, price);
@@ -294,7 +307,7 @@ public class CarServiceImpl implements CarService {
 
         for (Cars car : cars) {
             CarDTO dto = carMapper.toDTO(car);
-            
+
             // Set locationCity from Vehicles if available
             if (car.getVehicles() != null && !car.getVehicles().isEmpty()) {
                 var firstVehicle = car.getVehicles().get(0);
@@ -302,7 +315,7 @@ public class CarServiceImpl implements CarService {
                     dto.setLocationCity(firstVehicle.getLocation().getCity());
                 }
             }
-            
+
             carDTOs.add(dto);
         }
 

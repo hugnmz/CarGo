@@ -16,7 +16,10 @@ import jakarta.servlet.http.HttpSession;
 import service.RoleService;
 import util.di.DIContainer;
 import service.UserService;
-import util.exception.WebException;
+import util.MessageUtil;
+import util.exception.BusinessException;
+import util.exception.DataAccessException;
+import util.exception.ValidationException;
 
 /**
  *
@@ -33,7 +36,7 @@ public class UpdateInfor extends HttpServlet {
             userService = DIContainer.get(UserService.class);
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ServletException(MessageUtil.getError("error.system"), e);
         }
     }
 
@@ -62,19 +65,15 @@ public class UpdateInfor extends HttpServlet {
             userService.updateUser(user);
 
             //Truyền dữ liệu về server
-            request.setAttribute("message", "Cập nhật user thành công!");
+            request.setAttribute("message", MessageUtil.getError("error.user.update.success"));
             request.getRequestDispatcher("profile").forward(request, response);
-        } catch (WebException.ValidationException ex) {
-            // Bắt WebException ValidationException
-            request.setAttribute("error", ex.getMessage());
-            request.getRequestDispatcher("profile").forward(request, response);
-        } catch (WebException.AppException ex) {
-            // Bắt các WebException khác
-            request.setAttribute("error", ex.getMessage());
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
             request.getRequestDispatcher("profile").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Lỗi khi cập nhật user: " + e.getMessage());
+            request.setAttribute("error", MessageUtil.getError("error.user.update.error"));
             request.getRequestDispatcher("profile").forward(request, response);
         }
     }

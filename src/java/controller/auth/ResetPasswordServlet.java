@@ -9,7 +9,9 @@ import java.io.IOException;
 import service.CustomerService;
 import util.MessageUtil;
 import util.di.DIContainer;
-import util.exception.WebException;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
+import util.exception.DataAccessException;
 
 @WebServlet("/ResetPasswordServlet")
 public class ResetPasswordServlet extends HttpServlet {
@@ -65,15 +67,9 @@ public class ResetPasswordServlet extends HttpServlet {
                 request.setAttribute("code", code);
                 request.getRequestDispatcher("/auth/reset-password.jsp").forward(request, response);
             }
-        } catch (WebException.ValidationException ex) {
-            // Bắt WebException ValidationException
-            request.setAttribute("error", ex.getMessage());
-            request.setAttribute("username", username);
-            request.setAttribute("code", code);
-            request.getRequestDispatcher("/auth/reset-password.jsp").forward(request, response);
-        } catch (WebException.AppException ex) {
-            // Bắt các WebException khác
-            request.setAttribute("error", ex.getMessage());
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
             request.setAttribute("username", username);
             request.setAttribute("code", code);
             request.getRequestDispatcher("/auth/reset-password.jsp").forward(request, response);

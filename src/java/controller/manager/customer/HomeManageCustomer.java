@@ -1,8 +1,8 @@
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 package controller.manager.customer;
 
 import dto.CustomerDTO;
@@ -14,6 +14,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import util.di.DIContainer;
 import service.CustomerService;
@@ -23,11 +24,11 @@ import service.UserService;
  *
  * @author DELL
  */
-@WebServlet(name="ControllerInfoCustomer", urlPatterns={"/managecus"})
+@WebServlet(name = "ControllerInfoCustomer", urlPatterns = {"/managecus"})
 public class HomeManageCustomer extends HttpServlet {
-   
+
     private CustomerService customerService;
-    
+
     @Override
     public void init() throws ServletException {
         super.init();
@@ -37,9 +38,15 @@ public class HomeManageCustomer extends HttpServlet {
             throw new RuntimeException("Dependency injection error", e);
         }
     }
-    
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
+        //Kiểm tra quyền
+        HttpSession session = request.getSession(false);
+        if (session == null || !"MANAGER".equals(session.getAttribute("roleName"))) {
+            response.sendRedirect("LoginServlet");
+            return;
+        }
         try {
             List<CustomerDTO> customer = customerService.getAllCustomers();
             List<LocationDTO> location = customerService.getAllLocation();
@@ -48,21 +55,18 @@ public class HomeManageCustomer extends HttpServlet {
             request.getRequestDispatcher("manager/manage_customers.jsp").forward(request, response);
         } catch (Exception e) {
         }
-    } 
+    }
 
-    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        processRequest(request, response);
-    } 
-
-    
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         processRequest(request, response);
     }
 
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
 
 }

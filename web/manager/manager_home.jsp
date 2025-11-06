@@ -1,3 +1,4 @@
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
@@ -15,7 +16,7 @@
     }
     if (!"MANAGER".equalsIgnoreCase(role)) {
         request.setAttribute("errors", "Bạn không có quyền truy cập trang này!");
-        request.getRequestDispatcher("auth/login.jsp").forward(request, response);
+        request.getRequestDispatcher("LoginServlet").forward(request, response);
         return;
     }
 %>

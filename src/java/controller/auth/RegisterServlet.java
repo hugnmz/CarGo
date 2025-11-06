@@ -18,7 +18,10 @@ import dto.LocationDTO;
 import java.time.LocalDate;
 import util.EmailUtil;
 import util.di.DIContainer;
-import util.exception.WebException;
+import util.exception.ApplicationException;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
+import util.exception.DataAccessException;
 
 @WebServlet("/RegisterServlet")
 public class RegisterServlet extends HttpServlet {
@@ -36,8 +39,7 @@ public class RegisterServlet extends HttpServlet {
             // khoi tao location service tu di container
             locationService = DIContainer.get(LocationService.class);
         } catch (Exception e) {
-            // nem loi neu khoi tao service that bai
-            throw new RuntimeException(e);
+            throw new ServletException(MessageUtil.getError("error.system"), e);
         }
     }
 
@@ -51,8 +53,10 @@ public class RegisterServlet extends HttpServlet {
 
             // chuyen huong den trang dang ky
             request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("error.system.register", e);
+            throw new ServletException(MessageUtil.getError("error.system.register"), e);
         }
     }
 
@@ -73,8 +77,6 @@ public class RegisterServlet extends HttpServlet {
         List<String> errors = new ArrayList<>();
 
         try {
-            // Xóa tất cả check - đã chuyển vào service
-
             // tao doi tuong customer dto de luu thong tin dang ky
             CustomerDTO customerDTO = new CustomerDTO();
             customerDTO.setUsername(username.trim());
@@ -123,22 +125,15 @@ public class RegisterServlet extends HttpServlet {
                 setFormData(request, fullname, phone, email, city, username);
                 request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
             }
-        } catch (WebException.ValidationException ex) {
-            // Bắt WebException ValidationException - lỗi check trùng
-            errors.add(ex.getMessage());
-            request.setAttribute("errors", errors);
-            setFormData(request, fullname, phone, email, city, username);
-            request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
-        } catch (WebException.AppException ex) {
-            // Bắt các WebException khác
-            errors.add(ex.getMessage());
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            errors.add(MessageUtil.getErrorFromException(e));
             request.setAttribute("errors", errors);
             setFormData(request, fullname, phone, email, city, username);
             request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
         } catch (Exception e) {
-            // log loi ra console
             e.printStackTrace();
-            errors.add("Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.");
+            errors.add(MessageUtil.getError("error.system.register"));
             request.setAttribute("errors", errors);
             setFormData(request, fullname, phone, email, city, username);
             request.getRequestDispatcher("/auth/register.jsp").forward(request, response);

@@ -1,3 +1,4 @@
+
 package controller.manager.car;
 
 import dto.VehicleDTO;
@@ -10,6 +11,8 @@ import java.util.Optional;
 import service.VehicleService;
 import service.CarService;
 import util.di.DIContainer;
+import util.MessageUtil;
+import util.exception.*;
 
 @WebServlet(name = "VehicleController", urlPatterns = {"/vehiclecontroller"})
 public class VehicleController extends HttpServlet {
@@ -44,12 +47,14 @@ public class VehicleController extends HttpServlet {
 
             vehicleService.addVehicle(v);
 
-            request.setAttribute("message", "Thêm vehicle thành công!");
+            request.setAttribute("message", MessageUtil.getError("error.vehicle.add.success"));
 
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
         } catch (Exception e) {
             e.printStackTrace();
-            // Đẩy lỗi chi tiết ra JSP
-            request.setAttribute("error", "Thêm thất bại: " + e.getMessage());
+            request.setAttribute("error", MessageUtil.getError("error.vehicle.add.failed"));
         }
         request.getRequestDispatcher("controllerinformationcar?action=detail&carId="
                 + Integer.parseInt(request.getParameter("carId")))
@@ -76,12 +81,14 @@ public class VehicleController extends HttpServlet {
             // Gọi service có ném Exception
             vehicleService.updateVehicle(v);
 
-            request.setAttribute("message", "Cập nhật vehicle thành công!");
+            request.setAttribute("message", MessageUtil.getError("error.vehicle.update.success"));
 
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
         } catch (Exception e) {
             e.printStackTrace();
-            // Đẩy lỗi chi tiết ra JSP
-            request.setAttribute("error", "Cập nhật thất bại: " + e.getMessage());
+            request.setAttribute("error", MessageUtil.getError("error.vehicle.update.failed"));
         }
 
         request.getRequestDispatcher("controllerinformationcar?action=detail&carId="
@@ -98,20 +105,36 @@ public class VehicleController extends HttpServlet {
 
             boolean deleted = vehicleService.deleteVehicle(vehicleId);
             if (deleted) {
-                request.setAttribute("message", "Xóa vehicle thành công!");
+                request.setAttribute("message", MessageUtil.getError("error.vehicle.delete.success"));
             } else {
-                request.setAttribute("error", "Xóa vehicle thất bại!");
+                throw new BusinessException("error.vehicle.delete.failed");
             }
 
             request.getRequestDispatcher("controllerinformationcar?action=detail&carId=" + carId)
                     .forward(request, response);
 
-        } catch (Exception e) {
+        } catch (ValidationException | BusinessException | DataAccessException e) {
             e.printStackTrace();
-            request.setAttribute("error", "Lỗi khi xóa vehicle: " + e.getMessage());
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
             request.getRequestDispatcher("controllerinformationcar?action=detail&carId="
                     + Integer.parseInt(request.getParameter("carId")))
                     .forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", MessageUtil.getError("error.vehicle.delete.error"));
+            request.getRequestDispatcher("controllerinformationcar?action=detail&carId="
+                    + Integer.parseInt(request.getParameter("carId")))
+                    .forward(request, response);
+        }
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //Kiểm tra quyền
+        HttpSession session = request.getSession(false);
+        if (session == null || !"MANAGER".equals(session.getAttribute("roleName"))) {
+            response.sendRedirect("LoginServlet");
+            return;
         }
     }
 
@@ -127,7 +150,7 @@ public class VehicleController extends HttpServlet {
         } else if ("delete".equalsIgnoreCase(action)) {
             deleteVehicle(request, response);
         } else {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Hành động không hợp lệ!");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, MessageUtil.getError("error.action.invalid"));
         }
     }
 }

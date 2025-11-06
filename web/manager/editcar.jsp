@@ -1,3 +1,4 @@
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -9,7 +10,7 @@
 
     String role = (String) session.getAttribute("roleName");
     if (role == null || !"MANAGER".equalsIgnoreCase(role)) {
-        response.sendRedirect("auth/login.jsp");
+        response.sendRedirect("LoginServlet");
         return;
     }
 %>
@@ -125,7 +126,7 @@
                         <div class="mb-3">
                             <label class="form-label">Danh mục</label>
                             <select name="categoryId" class="form-select" required>
-                                <option value="">-- Chọn danh mục --</option>
+                            
                                 <c:forEach var="cat" items="${categories}">
                                     <option value="${cat.categoryId}" <c:if test="${cat.categoryId == car.categoryId}">selected</c:if>>
                                         ${cat.categoryName}
@@ -138,7 +139,7 @@
                         <div class="mb-3">
                             <label class="form-label">Loại nhiên liệu</label>
                             <select name="fuelId" class="form-select" required>
-                                <option value="">-- Chọn loại nhiên liệu --</option>
+                            
                                 <c:forEach var="f" items="${fuels}">
                                     <option value="${f.fuelId}" <c:if test="${f.fuelId == car.fuelId}">selected</c:if>>
                                         ${f.fuelType}
@@ -151,7 +152,7 @@
                         <div class="mb-3">
                             <label class="form-label">Số chỗ ngồi</label>
                             <select name="seatingId" class="form-select" required>
-                                <option value="">-- Chọn số chỗ ngồi --</option>
+                                
                                 <c:forEach var="s" items="${seatings}">
                                     <option value="${s.seatingId}" <c:if test="${s.seatingId == car.seatingId}">selected</c:if>>
                                         ${s.seatingType}

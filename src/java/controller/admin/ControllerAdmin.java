@@ -1,3 +1,4 @@
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
@@ -14,11 +15,17 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import model.Users;
 import service.RoleService;
 import util.di.DIContainer;
 import util.EmailUtil;
+import util.MessageUtil;
+import util.exception.ApplicationException;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
+import util.exception.DataAccessException;
 import service.UserService;
 
 /**
@@ -37,7 +44,7 @@ public class ControllerAdmin extends HttpServlet {
             userService = DIContainer.get(UserService.class);
             roleService = DIContainer.get(RoleService.class);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ServletException(MessageUtil.getError("error.system"), e);
         }
     }
 
@@ -46,6 +53,15 @@ public class ControllerAdmin extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
+
+        HttpSession session = request.getSession(false);
+
+        //Kiểm tra quyền truy cập
+        if (session == null || !"ADMIN".equals(session.getAttribute("roleName"))) {
+            request.setAttribute("errors", "Bạn không có quyền truy cập trang này!");
+            request.getRequestDispatcher("auth/login.jsp").forward(request, response);
+            return;
+        }
 
         //Lấy action từ server
         String action = request.getParameter("action");
@@ -107,19 +123,23 @@ public class ControllerAdmin extends HttpServlet {
                 }
 
                 if (email != null && !email.isEmpty()) {
-                    util.EmailUtil.sendCredentials(email, fullname ,username, password, roleName);
+                    util.EmailUtil.sendCredentials(email, fullname, username, password, roleName);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                request.setAttribute("error", "Thêm user thành công nhưng lỗi gửi email: " + e.getMessage());
+                request.setAttribute("error", MessageUtil.getError("error.user.add.email.error"));
             }
 
-            request.setAttribute("message", "Thêm user thành công!");
+            request.setAttribute("message", MessageUtil.getError("error.user.add.success"));
             request.getRequestDispatcher("HomeAdmin").forward(request, response);
 
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
+            request.getRequestDispatcher("HomeAdmin").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Lỗi khi thêm user: " + e.getMessage());
+            request.setAttribute("error", MessageUtil.getError("error.user.add.error"));
             request.getRequestDispatcher("HomeAdmin").forward(request, response);
         }
     }
@@ -157,11 +177,15 @@ public class ControllerAdmin extends HttpServlet {
             userService.updateUser(user);
 
             //Truyền dữ liệu về server
-            request.setAttribute("message", "Cập nhật user thành công!");
+            request.setAttribute("message", MessageUtil.getError("error.user.update.success"));
+            request.getRequestDispatcher("HomeAdmin").forward(request, response);
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
             request.getRequestDispatcher("HomeAdmin").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Lỗi khi cập nhật user: " + e.getMessage());
+            request.setAttribute("error", MessageUtil.getError("error.user.update.error"));
             request.getRequestDispatcher("HomeAdmin").forward(request, response);
         }
     }
@@ -169,13 +193,21 @@ public class ControllerAdmin extends HttpServlet {
     // Xóa user
     private void deleteUser(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //Lấy parameter từ server
-        String userIdStr = request.getParameter("userId");
-        //Xóa thông tin user
-        if (userIdStr != null && !userIdStr.isEmpty()) {
-            Integer userId = Integer.parseInt(userIdStr);
-            userService.deleteUser(userId);
-            request.setAttribute("message", "Xóa user thành công!");
+        try {
+            //Lấy parameter từ server
+            String userIdStr = request.getParameter("userId");
+            //Xóa thông tin user
+            if (userIdStr != null && !userIdStr.isEmpty()) {
+                Integer userId = Integer.parseInt(userIdStr);
+                userService.deleteUser(userId);
+                request.setAttribute("message", MessageUtil.getError("error.user.delete.success"));
+            }
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", MessageUtil.getError("error.user.delete.error"));
         }
         //Gửi dữ liệu về home admin
         request.getRequestDispatcher("HomeAdmin").forward(request, response);

@@ -191,7 +191,6 @@ public class CarsDAOImpl implements CarsDAO {
             cat.categoryName,
             f.fuelType,
             s.seatingType,
-            l.city,
             cp.priceId AS cp_priceId,
             cp.dailyPrice AS cp_dailyPrice,
             cp.depositAmount AS cp_depositAmount,
@@ -199,8 +198,6 @@ public class CarsDAOImpl implements CarsDAO {
             cp.endDate AS cp_endDate,
             cp.createAt AS cp_createAt
         FROM dbo.Cars c
-        JOIN dbo.Vehicles v ON v.carId = c.carId
-        JOIN dbo.Locations l ON l.locationId = v.locationId
         JOIN dbo.CarPrices cp ON cp.priceId = (
             SELECT TOP 1 priceId
             FROM dbo.CarPrices
@@ -214,4 +211,10 @@ public class CarsDAOImpl implements CarsDAO {
         return JdbcTemplateUtil.query(sql, Cars.class);
     }
 
+    @Override
+    public Optional<Cars> findByNameAndYear(String name, int year) {
+        String sql = "SELECT * FROM dbo.Cars WHERE name = ? AND year = ?";
+        Cars car = JdbcTemplateUtil.queryOne(sql, Cars.class, name, year);
+        return Optional.ofNullable(car);
+    }
 }

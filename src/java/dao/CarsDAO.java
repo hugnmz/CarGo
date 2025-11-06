@@ -40,4 +40,7 @@ public interface CarsDAO {
     List<Cars> getCarWithCurrentPrice(BigDecimal minPrice, BigDecimal maxPrice);
 
     int addCarAndReturnId(Cars car);
+    
+    Optional<Cars> findByNameAndYear(String name, int year);
+
 }

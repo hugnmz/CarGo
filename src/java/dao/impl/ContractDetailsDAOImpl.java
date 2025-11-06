@@ -66,4 +66,13 @@ public class ContractDetailsDAOImpl implements ContractDetailsDAO {
                 contractDetail.getNote());
         return result > 0;
     }
+
+    @Override
+    public boolean deleteContractDetailByContractId(Integer contractId) {
+        String sql = "DELETE FROM dbo.ContractDetails WHERE contractId = ?";
+        int result = JdbcTemplateUtil.update(sql, contractId);
+        return result > 0;
+
+    }
+    
 }

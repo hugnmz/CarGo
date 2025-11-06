@@ -26,6 +26,11 @@ import model.Vehicles;
 import service.CartService;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
+import util.MessageUtil;
+import util.exception.ApplicationException;
+import util.exception.DataAccessException;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
 
 /**
  *
@@ -58,22 +63,22 @@ public class CartServiceImpl implements CartService {
         try {
             // (1) Validate thời gian - SỬA: Theo ngày thay vì giờ
             if (rentStartDate == null || rentEndDate == null) {
-                return false;
+                throw new ValidationException(MessageUtil.getError("error.validation.data.invalid"));
             }
             if (!rentEndDate.isAfter(rentStartDate)) {
-                return false;
+                throw new ValidationException(MessageUtil.getError("error.date.format.invalid"));
             }
             
             // Kiểm tra tối thiểu 1 ngày (thay vì 60 phút)
             LocalDate startDate = rentStartDate.toLocalDate();
             LocalDate endDate = rentEndDate.toLocalDate();
             if (startDate.isAfter(endDate) || startDate.isEqual(endDate)) {
-                return false; // Phải ít nhất 1 ngày
+                throw new ValidationException(MessageUtil.getError("error.rental.minimum"));
             }
 
             // (2) Kiểm tra vehicle có rảnh theo hợp đồng
             if (!vehiclesDAO.isVehicleAvailable(vehicleId, rentStartDate, rentEndDate)) {
-                return false;
+                throw new BusinessException(MessageUtil.getError("error.vehicle.unavailable"));
             }
 
             // (3) Lấy giỏ hàng
@@ -82,11 +87,11 @@ public class CartServiceImpl implements CartService {
             if (cOpt.isEmpty()) {
                 boolean created = cartsDAO.createCart(customerId);
                 if (!created) {
-                    return false;
+                    throw new BusinessException(MessageUtil.getError("error.dataaccess.cart.get.failed"));
                 }
                 cart = cartsDAO.getCartByCustomer(customerId).orElse(null);
                 if (cart == null) {
-                    return false;
+                    throw new BusinessException(MessageUtil.getError("error.dataaccess.cart.get.failed"));
                 }
             } else {
                 cart = cOpt.get();
@@ -106,13 +111,13 @@ public class CartServiceImpl implements CartService {
                 }
             }
             if (overlapInCart) {
-                return false;
+                throw new BusinessException(MessageUtil.getError("error.vehicle.unavailable"));
             }
 
             // (5) Tính giá từng vehicle
             BigDecimal price = calculateRentalPrice(vehicleId, rentStartDate, rentEndDate);
             if (price == null || price.signum() <= 0) {
-                return false;
+                throw new BusinessException(MessageUtil.getError("error.validation.data.invalid"));
             }
 
             // (6) Lưu Order
@@ -123,11 +128,16 @@ public class CartServiceImpl implements CartService {
             order.setRentEndDate(rentEndDate);
             order.setPrice(price);
 
-            return ordersDAO.addOrder(order);
+            boolean result = ordersDAO.addOrder(order);
+            if (!result) {
+                throw new BusinessException(MessageUtil.getError("error.dataaccess.cart.add.failed"));
+            }
+            return true;
 
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception ex) {
-            ex.printStackTrace();
-            return false;
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.cart.add.failed"), ex);
         }
     }
 
@@ -138,21 +148,26 @@ public class CartServiceImpl implements CartService {
             // kiem tra don hang co ton tai hay khong
             Optional<Orders> o = ordersDAO.getOrderById(cartDetailId);
             if (o.isEmpty()) {
-                return false;
+                throw new ValidationException(MessageUtil.getError("error.validation.data.invalid"));
             }
 
             // kiem tra xem don hang co thuoc ve gio hang cua khach hang nay khong
             Orders order = o.get();
             Optional<Carts> c = cartsDAO.getCartByCustomer(customerId);
             if (c.isEmpty() || !c.get().getCartId().equals(order.getCartId())) {
-                return false;
+                throw new ValidationException(MessageUtil.getError("error.validation.data.invalid"));
             }
 
             // xoa don hang
-            return ordersDAO.deleteOrder(cartDetailId);
+            boolean result = ordersDAO.deleteOrder(cartDetailId);
+            if (!result) {
+                throw new BusinessException(MessageUtil.getError("error.dataaccess.cart.remove.failed"));
+            }
+            return true;
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.cart.remove.failed"), e);
         }
 
     }
@@ -165,10 +180,15 @@ public class CartServiceImpl implements CartService {
                 return true; // gio hang trong
             }
 
-            return cartsDAO.clearCart(customerId);
+            boolean result = cartsDAO.clearCart(customerId);
+            if (!result) {
+                throw new BusinessException(MessageUtil.getError("error.dataaccess.cart.clear.failed"));
+            }
+            return true;
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.cart.clear.failed"), e);
         }
     }
 
@@ -183,9 +203,10 @@ public class CartServiceImpl implements CartService {
             // chuyen doi tu Model sang DTO
             CartDTO dto = cartMapper.toDTO(cartOptional.get());
             return Optional.of(dto);
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            return Optional.empty();
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.cart.get.failed"), e);
         }
     }
 
@@ -207,9 +228,10 @@ public class CartServiceImpl implements CartService {
             }
 
             return listDTO;
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList<>();
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.cart.get.failed"), e);
         }
 
     }
@@ -219,38 +241,27 @@ public class CartServiceImpl implements CartService {
         try {
             // kiem tra thoi gian co phu hop hay khong
             if (startDate.isAfter(endDate) || endDate.isBefore(startDate)) {
-                return false;
+                throw new ValidationException(MessageUtil.getError("error.date.format.invalid"));
             }
 
             Optional<Vehicles> v = vehiclesDAO.getVehicleById(vehicleId);
             if (v.isEmpty()) {
-                return false; // xe khong ton tai
+                throw new ValidationException(MessageUtil.getError("error.vehicle.info.missing"));
             }
 
             Vehicles vehicle = v.get();
 
             // kiem tra xe co active khong
             if (!vehicle.getIsActive()) {
-                return false;
+                throw new BusinessException(MessageUtil.getError("error.vehicle.unavailable"));
             }
 
-//            // kiem tra xe co bi thue trong khoang thoi gian nay khong
-//            // su dung method co san trong VehiclesDAO
-//            List<Vehicles> availableVehicles = vehiclesDAO.getAvailableVehiclesByCar(
-//                    vehicleId, startDate, endDate);
-//
-//            // kiem tra xem vehicleId co trong danh sach xe available khong
-//            for (Vehicles vh : availableVehicles) {
-//                if (vh.getVehicleId().equals(vehicleId)) {
-//                    return true;
-//                }
-//            }
-//            return false;
             return vehiclesDAO.isVehicleAvailable(vehicleId, startDate, endDate);
 
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new DataAccessException(MessageUtil.getError("error.system"), e);
         }
     }
 
@@ -260,7 +271,7 @@ public class CartServiceImpl implements CartService {
             // 1. lay thong tin xe
             Optional<Vehicles> vehicleOpt = vehiclesDAO.getVehicleById(vehicleId);
             if (vehicleOpt.isEmpty()) {
-                return null; // xe khong ton tai
+                throw new ValidationException(MessageUtil.getError("error.vehicle.info.missing"));
             }
 
             Vehicles vehicle = vehicleOpt.get();
@@ -269,7 +280,7 @@ public class CartServiceImpl implements CartService {
             // 2. lay gia hien tai cua model xe
             Optional<BigDecimal> dailyPriceOpt = carPricesDAO.getCurrentDailyPrice(carId);
             if (dailyPriceOpt.isEmpty()) {
-                return null; // khong co gia
+                throw new BusinessException(MessageUtil.getError("error.validation.data.invalid"));
             }
 
             BigDecimal dailyPrice = dailyPriceOpt.get();
@@ -297,9 +308,10 @@ public class CartServiceImpl implements CartService {
 
             return totalPrice;
 
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new DataAccessException(MessageUtil.getError("error.system"), e);
         }
     }
 

@@ -139,6 +139,9 @@
                                             <c:when test="${c.status == 'REJECTED'}">
                                                 Từ chối
                                             </c:when>
+                                                 <c:when test="${c.status == 'RETURNED'}">
+                                                Đã trả xe
+                                            </c:when>
                                             <c:otherwise>
                                                 Không xác định
                                             </c:otherwise>

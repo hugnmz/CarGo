@@ -11,9 +11,12 @@ import model.Users;
 import service.UserService;
 import util.PasswordUtil;
 import util.MessageUtil;
-import util.exception.WebException;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
+import util.exception.ApplicationException;
+import util.exception.DataAccessException;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -29,36 +32,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<UserDTO> loginUser(String username, String password) {
-        try {
-            // Tìm user theo username
-            Optional<Users> userOpt = usersDAO.getUserByUsername(username);
-            if (userOpt.isEmpty()) {
-                return Optional.empty();
-            }
-
-            Users user = userOpt.get();
-
-            // Kiểm tra mật khẩu
-            boolean valid = PasswordUtil.verifyPassword(
-                    password,
-                    user.getPasswordHash(),
-                    user.getPasswordSalt()
-            );
-
-            if (!valid) {
-                return Optional.empty();
-            }
-
-            // Chuyển sang DTO
-            UserDTO dto = userMapper.toDTO(user);
-
-            // Nếu bạn chỉ muốn đăng nhập admin:
-            // if (!hasAdminRole(user.getUserId())) return Optional.empty();
-            return Optional.of(dto);
-
-        } catch (Exception e) {
-            return Optional.empty();
+        Optional<Users> userOpt = usersDAO.getUserByUsername(username);
+        if (userOpt.isEmpty()) {
+            throw new ValidationException(MessageUtil.getError("error.login.invalid"));
         }
+
+        Users user = userOpt.get();
+
+        boolean valid = PasswordUtil.verifyPassword(
+                password,
+                user.getPasswordHash(),
+                user.getPasswordSalt()
+        );
+
+        if (!valid) {
+            throw new ValidationException(MessageUtil.getError("error.login.invalid"));
+        }
+
+        UserDTO dto = userMapper.toDTO(user);
+        return Optional.of(dto);
     }
 
     // Nếu bạn cần kiểm tra quyền admin
@@ -83,15 +75,17 @@ public class UserServiceImpl implements UserService {
         try {
             // Kiểm tra trùng username
             if (usersDAO.getUserByUsername(userDTO.getUsername()).isPresent()) {
-                throw new WebException().new ValidationException(MessageUtil.getError("error.username.exists"));
+                throw new ValidationException(MessageUtil.getError("error.username.exists"));
             }
             // Kiểm tra trùng email
             if (usersDAO.existsEmail(userDTO.getEmail())) {
-                throw new WebException().new ValidationException(MessageUtil.getError("error.email.exists"));
+                String emailError = MessageUtil.getError("error.email.exists").replace("{0}", userDTO.getEmail());
+                throw new ValidationException(emailError);
             }
             // Kiểm tra trùng phone
             if (usersDAO.existsPhone(userDTO.getPhone())) {
-                throw new WebException().new ValidationException(MessageUtil.getError("error.phone.exists"));
+                String phoneError = MessageUtil.getError("error.phone.exists").replace("{0}", userDTO.getPhone());
+                throw new ValidationException(phoneError);
             }
 
             // 2️⃣ Xử lý locationId
@@ -114,14 +108,13 @@ public class UserServiceImpl implements UserService {
 
             boolean created = usersDAO.createUser(user);
             if (!created) {
-                throw new WebException().new BusinessException(MessageUtil.getError("error.dataaccess.user.add.failed"));
+                throw new BusinessException(MessageUtil.getError("error.dataaccess.user.add.failed"));
             }
 
-        } catch (WebException.AppException e) {
-            // Re-throw WebException để controller bắt
+        } catch (ApplicationException e) {
             throw e;
         } catch (Exception e) {
-            throw new WebException().new DataAccessException(MessageUtil.getError("error.dataaccess.user.add.error"), e);
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.user.add.error"), e);
         }
     }
 
@@ -131,7 +124,7 @@ public class UserServiceImpl implements UserService {
             // Kiểm tra người dùng có tồn tại chưa
             Optional<Users> existingUser = usersDAO.getUserById(userDTO.getUserId());
             if (existingUser.isEmpty()) {
-                throw new WebException().new ValidationException(MessageUtil.getError("error.validation.user.not.found"));
+                throw new ValidationException(MessageUtil.getError("error.validation.user.not.found"));
             }
 
             // Kiểm tra email, phone (nếu có thay đổi)
@@ -140,12 +133,14 @@ public class UserServiceImpl implements UserService {
             // Kiểm tra trùng email nếu có thay đổi
             if (!oldUser.getEmail().equals(userDTO.getEmail())
                     && usersDAO.existsEmail(userDTO.getEmail())) {
-                throw new WebException().new ValidationException(MessageUtil.getError("error.email.exists"));
+                String emailError = MessageUtil.getError("error.email.exists").replace("{0}", userDTO.getEmail());
+                throw new ValidationException(emailError);
             }
             // Kiểm tra trùng phone nếu có thay đổi
             if (!oldUser.getPhone().equals(userDTO.getPhone())
                     && usersDAO.existsPhone(userDTO.getPhone())) {
-                throw new WebException().new ValidationException(MessageUtil.getError("error.phone.exists"));
+                String phoneError = MessageUtil.getError("error.phone.exists").replace("{0}", userDTO.getPhone());
+                throw new ValidationException(phoneError);
             }
 
             // Resolve locationId
@@ -160,16 +155,13 @@ public class UserServiceImpl implements UserService {
 
             boolean success = usersDAO.updateUser(user);
             if (!success) {
-                throw new WebException().new BusinessException(MessageUtil.getError("error.dataaccess.user.update.failed"));
+                throw new BusinessException(MessageUtil.getError("error.dataaccess.user.update.failed"));
             }
 
-            System.out.println("Cập nhật user thành công: " + user.getUsername());
-
-        } catch (WebException.AppException e) {
-            // Re-throw WebException để controller bắt
+        } catch (ApplicationException e) {
             throw e;
         } catch (Exception e) {
-            throw new WebException().new DataAccessException(MessageUtil.getError("error.dataaccess.user.update.error"), e);
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.user.update.error"), e);
         }
     }
 
@@ -178,13 +170,12 @@ public class UserServiceImpl implements UserService {
         try {
             boolean success = usersDAO.deleteUser(userId);
             if (!success) {
-                throw new WebException().new BusinessException(MessageUtil.getError("error.dataaccess.user.delete.failed"));
+                throw new BusinessException(MessageUtil.getError("error.dataaccess.user.delete.failed"));
             }
-        } catch (WebException.AppException e) {
-            // Re-throw WebException để controller bắt
+        } catch (ApplicationException e) {
             throw e;
         } catch (Exception e) {
-            throw new WebException().new DataAccessException(MessageUtil.getError("error.dataaccess.user.delete.error"), e);
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.user.delete.error"), e);
         }
     }
 
@@ -205,34 +196,41 @@ public class UserServiceImpl implements UserService {
                     })
                     .toList();
 
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            // Trả về danh sách rỗng nếu lỗi
-            return List.of();
+            throw new DataAccessException(MessageUtil.getError("error.system"), e);
         }
 
     }
 
     @Override
     public UserDTO getUserById(Integer userId) {
-        Optional<Users> optionalUser = usersDAO.getUserById(userId);
-        if (optionalUser.isEmpty()) {
-            return null;
+        try {
+            Optional<Users> optionalUser = usersDAO.getUserById(userId);
+            if (optionalUser.isEmpty()) {
+                throw new ValidationException(MessageUtil.getError("error.validation.user.not.found"));
+            }
+
+            Users user = optionalUser.get();
+            UserDTO dto = new UserDTO();
+
+            dto.setUserId(user.getUserId());
+            dto.setUsername(user.getUsername());
+            dto.setFullName(user.getFullName());
+            dto.setPhone(user.getPhone());
+            dto.setEmail(user.getEmail());
+            dto.setDateOfBirth(user.getDateOfBirth());
+            dto.setCreateAt(user.getCreateAt());
+            dto.setRoleId(user.getRoleId());
+            dto.setLocationId(user.getLocationId());
+
+            return dto;
+        } catch (ApplicationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new DataAccessException(MessageUtil.getError("error.system"), e);
         }
-
-        Users user = optionalUser.get();
-        UserDTO dto = new UserDTO();
-
-        dto.setUserId(user.getUserId());
-        dto.setUsername(user.getUsername());
-        dto.setFullName(user.getFullName());
-        dto.setPhone(user.getPhone());
-        dto.setEmail(user.getEmail());
-        dto.setDateOfBirth(user.getDateOfBirth());
-        dto.setCreateAt(user.getCreateAt());
-        dto.setRoleId(user.getRoleId());
-        dto.setLocationId(user.getLocationId());
-
-        return dto;
     }
 
     @Override
@@ -240,14 +238,13 @@ public class UserServiceImpl implements UserService {
         try {
             // Không cho phép đặt mật khẩu mới giống mật khẩu cũ
             if (oldPassword.equals(newPassword)) {
-                return false;
+                throw new ValidationException(MessageUtil.getError("error.password.change.failed"));
             }
 
             // Lấy thông tin user từ database
             Optional<Users> ou = usersDAO.getUserById(userId);
             if (!ou.isPresent()) {
-                // Không tìm thấy user
-                return false;
+                throw new ValidationException(MessageUtil.getError("error.validation.user.not.found"));
             }
 
             Users user = ou.get();
@@ -255,8 +252,7 @@ public class UserServiceImpl implements UserService {
             // Xác thực mật khẩu cũ
             if (!PasswordUtil.verifyPassword(oldPassword,
                     user.getPasswordHash(), user.getPasswordSalt())) {
-                // Mật khẩu cũ không đúng
-                return false;
+                throw new ValidationException(MessageUtil.getError("error.password.change.failed"));
             }
 
             // Tạo salt mới và hash mật khẩu mới
@@ -266,12 +262,16 @@ public class UserServiceImpl implements UserService {
             byte[] newPasswordSalt = newHash[1]; // Lấy salt
 
             // Cập nhật mật khẩu mới trong database
-            return usersDAO.changePassword(user.getUserId(), newPasswordHash, newPasswordSalt);
+            boolean result = usersDAO.changePassword(user.getUserId(), newPasswordHash, newPasswordSalt);
+            if (!result) {
+                throw new BusinessException(MessageUtil.getError("error.password.change.failed"));
+            }
+            return true;
 
+        } catch (ApplicationException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            // Có lỗi xảy ra
-            return false;
+            throw new DataAccessException(MessageUtil.getError("error.password.change.failed"), e);
         }
     }
 

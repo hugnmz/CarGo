@@ -66,9 +66,7 @@ public class PasswordUtil {
             // so sanh hash
             return Arrays.equals(hash, passwordHash);
         } catch (Exception e) {
-            // log loi neu co
-            e.printStackTrace();
-            return false;
+            throw new util.exception.ApplicationException(util.MessageUtil.getError("error.system"), e);
         }
     }
 

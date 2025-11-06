@@ -47,6 +47,10 @@ public interface ContractsDAO {
     boolean updateContractStatus(Integer contractId, String status, String reason);
 
     int countContract();
-    
+
     Integer findLeastLoadedStaffId();
+
+    BigDecimal getTotalAmount(Integer contractId);
+
+    boolean addPaymentLog(Integer contractId, String message);
 }

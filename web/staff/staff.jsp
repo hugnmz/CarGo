@@ -265,6 +265,9 @@
                                             <c:when test="${contract.status == 'ACCEPTED'}">
                                                 <span class="status-badge status-accepted">Đã chấp nhận</span>
                                             </c:when>
+                                                <c:when test="${contract.status == 'RETURNED'}">
+                                                <span class="status-badge status-accepted">Đã trả xe</span>
+                                            </c:when>
                                             <c:otherwise>
                                                 <span class="status-badge status-rejected">Từ chối</span>
                                             </c:otherwise>
@@ -303,7 +306,7 @@
                                             </button>
 
                                             <button type="button" class="btn btn-info btn-action btn-sm mb-1"
-                                                    onclick="window.location.href = '${pageContext.request.contextPath}/PaymentServlet?action=by_contract&contractId=${contract.contractId}'">
+                                                    onclick="window.location.href = '${pageContext.request.contextPath}/paymentServlet?contractId=${contract.contractId}'">
                                                 <i class="fas fa-money-check"></i> Thanh toán
                                             </button>
                                             <c:if test="${contract.status == 'PENDING'}">

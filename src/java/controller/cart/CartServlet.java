@@ -13,7 +13,8 @@ import java.util.ArrayList;
 import service.CartService;
 import util.di.DIContainer;
 import util.AuthUtil;
-import util.exception.WebException;
+import util.MessageUtil;
+import util.exception.*;
 
 
 @WebServlet(name = "CartServlet", urlPatterns = {"/Cart"})
@@ -82,10 +83,10 @@ public class CartServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/car-detail?carId=" + carId + "&vehicleId=" + vehicleId + "&error=add_failed");
             }
 
-        } catch (WebException.AppException ex) {
-            // Bắt WebException
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
             List<String> errors = new ArrayList<>();
-            errors.add(ex.getMessage());
+            errors.add(MessageUtil.getErrorFromException(e));
             request.setAttribute("errors", errors);
             request.setAttribute("startDate", request.getParameter("startDate"));
             request.setAttribute("endDate", request.getParameter("endDate"));
@@ -93,8 +94,8 @@ public class CartServlet extends HttpServlet {
             request.setAttribute("returnLocation", request.getParameter("returnLocation"));
             request.getRequestDispatcher("/customer/booking-form.jsp").forward(request, response);
         } catch (Exception e) {
-            // xu ly loi he thong
-            throw new RuntimeException("error.system.cart", e);
+            e.printStackTrace();
+            throw new RuntimeException(MessageUtil.getError("error.system.cart"), e);
         }
     }
 

@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface PaymentsDAO {
-    
+  
     // Lấy tất cả thanh toán
     List<Payments> getAllPayments();
     
@@ -41,4 +41,7 @@ public interface PaymentsDAO {
     
     // Kiểm tra thanh toán có thành công không
     boolean isPaymentCompleted(Integer paymentId);
+    public Payments findPendingPayment(Integer contractId, BigDecimal amount);
+    Payments findPendingPaymentByCode(Integer contractId, BigDecimal amount);
+    public boolean completePaymentById(Integer paymentId);
 }

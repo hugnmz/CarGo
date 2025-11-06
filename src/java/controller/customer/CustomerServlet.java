@@ -22,7 +22,10 @@ import service.ContractService;
 import service.CustomerService;
 import service.LocationService;
 import util.di.DIContainer;
-import util.exception.WebException;
+import util.MessageUtil;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
+import util.exception.DataAccessException;
 
 @WebServlet(name = "CustomerServlet", urlPatterns = {"/CustomerServlet"})
 public class CustomerServlet extends HttpServlet {
@@ -89,13 +92,15 @@ public class CustomerServlet extends HttpServlet {
             // chuyen huong den trang profile.jsp
             request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
 
-        } catch (Exception e) {
-
-            // dat thong bao loi cho nguoi dung
-            request.setAttribute("error", "Có lỗi xảy ra khi tải thông tin. Vui lòng thử lại sau.");
-            // dat danh sach hop dong rong neu co loi
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
             request.setAttribute("listContract", new ArrayList<>());
-            // van chuyen den trang profile de hien thi thong bao loi
+            request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", MessageUtil.getError("error.system"));
+            request.setAttribute("listContract", new ArrayList<>());
             request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
         }
 
@@ -164,23 +169,15 @@ public class CustomerServlet extends HttpServlet {
                 request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
             }
 
-        } catch (WebException.ValidationException ex) {
-            // Bắt WebException ValidationException - lỗi check trùng
-            errors.add(ex.getMessage());
-            request.setAttribute("errors", errors);
-            request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
-        } catch (WebException.AppException ex) {
-            // Bắt các WebException khác
-            errors.add(ex.getMessage());
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            errors.add(MessageUtil.getErrorFromException(e));
             request.setAttribute("errors", errors);
             request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
         } catch (Exception e) {
-            // log loi ra console
             e.printStackTrace();
-            // them loi vao danh sach
-            errors.add("Có lỗi xảy ra khi xử lý yêu cầu. Vui lòng thử lại.");
+            errors.add(MessageUtil.getError("error.system"));
             request.setAttribute("errors", errors);
-            // hien thi lai trang profile voi thong bao loi
             request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
         }
     }

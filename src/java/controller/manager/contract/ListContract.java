@@ -16,7 +16,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import service.ContractService;
 import util.di.DIContainer;
-import util.exception.WebException;
+import util.MessageUtil;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
+import util.exception.DataAccessException;
 
 /**
  *
@@ -65,21 +68,12 @@ public class ListContract extends HttpServlet {
             } else {
                 request.getSession().setAttribute("flash_error", "Không tìm thấy hợp đồng để xóa!");
             }
-        } catch (WebException.ValidationException ex) {
-            // Bắt WebException ValidationException
-            ex.printStackTrace();
-            request.getSession().setAttribute("flash_error", "Xoá không thành công: " + ex.getMessage());
-        } catch (WebException.AppException ex) {
-            // Bắt các WebException khác
-            ex.printStackTrace();
-            request.getSession().setAttribute("flash_error", "Xoá không thành công: " + ex.getMessage());
-        } catch (IllegalArgumentException ex) {
-            // Giữ lại để tương thích
-            ex.printStackTrace();
-            request.getSession().setAttribute("flash_error", "Xoá không thành công: " + ex.getMessage());
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            e.printStackTrace();
+            request.getSession().setAttribute("flash_error", MessageUtil.getErrorFromException(e));
         } catch (Exception e) {
             e.printStackTrace();
-            request.getSession().setAttribute("flash_error", "Xoá không thành công: " + e.getMessage());
+            request.getSession().setAttribute("flash_error", MessageUtil.getError("error.system"));
         }
 
         response.sendRedirect(request.getContextPath() + "/listcontract");

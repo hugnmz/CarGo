@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import service.ContractService;
 import service.VehicleService;
 import util.di.DIContainer;
 import service.CustomerService;
@@ -26,12 +27,14 @@ public class HomeManage extends HttpServlet {
 
     private VehicleService vehiclesService;
     private CustomerService customerService;
+    private ContractService contractService;
 
     @Override
     public void init() throws ServletException {
         try {
             vehiclesService = DIContainer.get(VehicleService.class);
             customerService = DIContainer.get(CustomerService.class);
+            contractService = DIContainer.get(ContractService.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -40,28 +43,21 @@ public class HomeManage extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Kiểm tra đăng nhập
-//        HttpSession session = request.getSession(false);
-//        if (session == null || session.getAttribute("roleName") == null) {
-//            response.sendRedirect("LoginServlet");
-//            return;
-//        }
-//
-//        // Kiểm tra quyền truy cập
-//        String role = (String) session.getAttribute("roleName");
-//        if (!"MANAGER".equalsIgnoreCase(role)) {
-//            request.setAttribute("errors", "Bạn không có quyền truy cập trang quản lý!");
-//            request.getRequestDispatcher("auth/login.jsp").forward(request, response);
-//            return;
-//        }
+        //Kiểm tra quyền
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null
+                || !"MANAGER".equals(session.getAttribute("roleName"))) {
+            response.sendRedirect("LoginServlet");
+            return;
+        }
 
         int totalVehicles = vehiclesService.countVehical();
         int totalCustomers = customerService.countCustomer();
-//        int totalContracts = contractService.getTotalActiveContracts();
+        int totalContracts = contractService.countContract();
 
         request.setAttribute("totalCars", totalVehicles);
         request.setAttribute("totalCustomers", totalCustomers);
-//        request.setAttribute("totalContracts", totalContracts);
+        request.setAttribute("totalContracts", totalContracts);
 
         request.getRequestDispatcher("manager/manager_home.jsp").forward(request, response);
 
