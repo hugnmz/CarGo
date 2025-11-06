@@ -45,6 +45,10 @@
                                 <a class="btn btn-back" href="${backUrl}">
                                     <i class="fas fa-arrow-left me-2"></i>Danh sách HĐ
                                 </a>
+                                <form action="${pageContext.request.contextPath}/returncar" method="post">  
+                                    <input type="hidden" name="contractId" value="${contract.contractId}" />
+                                    <button type="submit" class="btn btn-back">Gửi yêu cầu trả xe</button>
+                                </form>
                                 <a
                                     class="btn btn-back"
                                     href="${pageContext.request.contextPath}/home"
