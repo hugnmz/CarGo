@@ -8,13 +8,8 @@
     response.setDateHeader("Expires", 0);
 
     String role = (String) session.getAttribute("roleName");
-    if (role == null) {
-        response.sendRedirect("LoginServlet");
-        return;
-    }
-    if (!"MANAGER".equalsIgnoreCase(role)) {
-        request.setAttribute("errors", "Bạn không có quyền truy cập trang này!");
-        request.getRequestDispatcher("LoginServlet").forward(request, response);
+    if (role == null || !"MANAGER".equalsIgnoreCase(role)) {
+        response.sendRedirect("auth/login.jsp");
         return;
     }
 %>
@@ -86,7 +81,7 @@
             <a href="profile" class="active"><i class="fa-solid fa-user-gear"></i> Thông tin cá nhân</a>
             <a href="managecus"><i class="fa-solid fa-users"></i> Quản lý khách hàng</a>
             <a href="managecar"><i class="fa-solid fa-car-side"></i> Quản lý xe</a>
-            <a href="listcontract"><i class="fa-solid fa-file-contract"></i> Hợp đồng</a>
+            <a href="#"><i class="fa-solid fa-file-contract"></i> Hợp đồng</a>
             <a href="${pageContext.request.contextPath}/LogoutServlet">
                 <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
             </a>
@@ -112,6 +107,18 @@
             </c:if>
             <c:if test="${not empty errorMess}">
                 <div class="alert alert-danger">${errorMess}</div>
+            </c:if>
+
+            <c:if test="${not empty errors}">
+                <div class="alert alert-danger mt-2">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Có lỗi xảy ra:</strong>
+                    <ul class="mb-0 mt-2">
+                        <c:forEach var="error" items="${errors}">
+                            <li>${error}</li>
+                            </c:forEach>
+                    </ul>
+                </div>
             </c:if>
 
             <!-- Thẻ thông tin -->
@@ -193,7 +200,7 @@
                     <h5><i class="fa-solid fa-pen-to-square"></i> Chỉnh sửa thông tin cá nhân</h5>
 
                     <form action="${pageContext.request.contextPath}/updateinfor" method="post">
-                        <input type="hidden" name="_back" value="/manager/user_profile.jsp" />
+                        <input type="hidden" name="_back" value="/profile" />
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">Họ và tên</label>
@@ -240,7 +247,6 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <form action="${pageContext.request.contextPath}/changepass" method="post">
-                            <input type="hidden" name="_back" value="/manager/user_profile.jsp" />
                             <div class="modal-header">
                                 <h5 class="modal-title" id="changePasswordModalLabel">
                                     <i class="fa-solid fa-key"></i> Đổi mật khẩu

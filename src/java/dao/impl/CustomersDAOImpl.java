@@ -21,7 +21,7 @@ public class CustomersDAOImpl implements CustomersDAO {
 
     @Override
     public List<Customers> getAllCustomers() {
-        String sql = "select * from Customers";
+        String sql = "select * from Customers c JOIN Locations l ON c.locationId = l.locationId";
         return JdbcTemplateUtil.query(sql, Customers.class);
     }
 
@@ -137,7 +137,7 @@ public class CustomersDAOImpl implements CustomersDAO {
         return Optional.ofNullable(one);
     }
 
-     @Override
+    @Override
     public int countCustomer() {
         String sql = "SELECT COUNT(*) FROM dbo.Customers";
         return JdbcTemplateUtil.count(sql);

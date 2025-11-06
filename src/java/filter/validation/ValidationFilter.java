@@ -49,7 +49,6 @@ public class ValidationFilter implements Filter {
             throws IOException, ServletException {
 
         HttpServletRequest request = (HttpServletRequest) sr;
-
         List<String> errors = new ArrayList<>();
 
         for (String name : request.getParameterMap().keySet()) {
@@ -124,7 +123,5 @@ public class ValidationFilter implements Filter {
         }
         return null;
     }
-
-
 
 }

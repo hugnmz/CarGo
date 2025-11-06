@@ -38,12 +38,13 @@ contentType="text/html; charset=UTF-8" language="java" %>
             <p class="mb-0 opacity-75">Chi tiết đầy đủ về hợp đồng thuê xe</p>
           </div>
           <div class="d-flex gap-2 mt-3 mt-md-0 toolbar">
-            <a
-              class="btn btn-back"
-              href="${pageContext.request.contextPath}/my-contracts"
-            >
-              <i class="fas fa-arrow-left me-2"></i>Danh sách HĐ
-            </a>
+            <c:set var="backUrl" value="${pageContext.request.contextPath}/my-contracts" />
+<c:if test="${sessionScope.roleName == 'STAFF' || sessionScope.userType == 'STAFF'}">
+  <c:set var="backUrl" value="${pageContext.request.contextPath}/staff" />
+</c:if>
+<a class="btn btn-back" href="${backUrl}">
+  <i class="fas fa-arrow-left me-2"></i>Danh sách HĐ
+</a>
             <form
               action="${pageContext.request.contextPath}/returncar"
               method="post"

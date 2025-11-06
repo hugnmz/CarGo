@@ -10,6 +10,8 @@ import mapper.UserMapper;
 import model.Users;
 import service.UserService;
 import util.PasswordUtil;
+import util.MessageUtil;
+import util.exception.WebException;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
 
@@ -79,16 +81,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public void addUser(UserDTO userDTO, String password) {
         try {
-            // 
+            // Kiểm tra trùng username
             if (usersDAO.getUserByUsername(userDTO.getUsername()).isPresent()) {
-                throw new IllegalArgumentException("Tên đăng nhập '" + userDTO.getUsername() + "' đã tồn tại!");
+                throw new WebException().new ValidationException(MessageUtil.getError("error.username.exists"));
             }
+            // Kiểm tra trùng email
             if (usersDAO.existsEmail(userDTO.getEmail())) {
-                throw new IllegalArgumentException("Email '" + userDTO.getEmail() + "' đã tồn tại!");
+                throw new WebException().new ValidationException(MessageUtil.getError("error.email.exists"));
             }
-
+            // Kiểm tra trùng phone
             if (usersDAO.existsPhone(userDTO.getPhone())) {
-                throw new IllegalArgumentException("Phone '" + userDTO.getPhone() + "' đã tồn tại!");
+                throw new WebException().new ValidationException(MessageUtil.getError("error.phone.exists"));
             }
 
             // 2️⃣ Xử lý locationId
@@ -111,15 +114,14 @@ public class UserServiceImpl implements UserService {
 
             boolean created = usersDAO.createUser(user);
             if (!created) {
-                throw new RuntimeException("Không thể thêm người dùng vào cơ sở dữ liệu.");
+                throw new WebException().new BusinessException(MessageUtil.getError("error.dataaccess.user.add.failed"));
             }
 
-            
-
-        } catch (IllegalArgumentException e) {
+        } catch (WebException.AppException e) {
+            // Re-throw WebException để controller bắt
             throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Đã xảy ra lỗi khi thêm người dùng.", e);
+            throw new WebException().new DataAccessException(MessageUtil.getError("error.dataaccess.user.add.error"), e);
         }
     }
 
@@ -129,20 +131,21 @@ public class UserServiceImpl implements UserService {
             // Kiểm tra người dùng có tồn tại chưa
             Optional<Users> existingUser = usersDAO.getUserById(userDTO.getUserId());
             if (existingUser.isEmpty()) {
-                throw new IllegalArgumentException("Không tìm thấy người dùng ID = " + userDTO.getUserId());
+                throw new WebException().new ValidationException(MessageUtil.getError("error.validation.user.not.found"));
             }
 
             // Kiểm tra email, phone (nếu có thay đổi)
             Users oldUser = existingUser.get();
 
+            // Kiểm tra trùng email nếu có thay đổi
             if (!oldUser.getEmail().equals(userDTO.getEmail())
                     && usersDAO.existsEmail(userDTO.getEmail())) {
-                throw new IllegalArgumentException("Email '" + userDTO.getEmail() + "' đã được sử dụng!");
+                throw new WebException().new ValidationException(MessageUtil.getError("error.email.exists"));
             }
-
+            // Kiểm tra trùng phone nếu có thay đổi
             if (!oldUser.getPhone().equals(userDTO.getPhone())
                     && usersDAO.existsPhone(userDTO.getPhone())) {
-                throw new IllegalArgumentException("Số điện thoại '" + userDTO.getPhone() + "' đã tồn tại!");
+                throw new WebException().new ValidationException(MessageUtil.getError("error.phone.exists"));
             }
 
             // Resolve locationId
@@ -157,15 +160,16 @@ public class UserServiceImpl implements UserService {
 
             boolean success = usersDAO.updateUser(user);
             if (!success) {
-                throw new RuntimeException("Không thể cập nhật thông tin người dùng (ID = " + userDTO.getUserId() + ")");
+                throw new WebException().new BusinessException(MessageUtil.getError("error.dataaccess.user.update.failed"));
             }
 
-            
+            System.out.println("Cập nhật user thành công: " + user.getUsername());
 
-        } catch (IllegalArgumentException e) {
+        } catch (WebException.AppException e) {
+            // Re-throw WebException để controller bắt
             throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Đã xảy ra lỗi khi cập nhật người dùng.", e);
+            throw new WebException().new DataAccessException(MessageUtil.getError("error.dataaccess.user.update.error"), e);
         }
     }
 
@@ -174,10 +178,13 @@ public class UserServiceImpl implements UserService {
         try {
             boolean success = usersDAO.deleteUser(userId);
             if (!success) {
-                throw new RuntimeException("Không thể xóa user ID = " + userId);
+                throw new WebException().new BusinessException(MessageUtil.getError("error.dataaccess.user.delete.failed"));
             }
+        } catch (WebException.AppException e) {
+            // Re-throw WebException để controller bắt
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Lỗi khi xóa user: " + e.getMessage());
+            throw new WebException().new DataAccessException(MessageUtil.getError("error.dataaccess.user.delete.error"), e);
         }
     }
 
@@ -249,7 +256,7 @@ public class UserServiceImpl implements UserService {
             if (!PasswordUtil.verifyPassword(oldPassword,
                     user.getPasswordHash(), user.getPasswordSalt())) {
                 // Mật khẩu cũ không đúng
-                return false; 
+                return false;
             }
 
             // Tạo salt mới và hash mật khẩu mới
@@ -264,7 +271,7 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             e.printStackTrace();
             // Có lỗi xảy ra
-            return false; 
+            return false;
         }
     }
 

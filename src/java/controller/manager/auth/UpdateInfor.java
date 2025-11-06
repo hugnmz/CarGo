@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpSession;
 import service.RoleService;
 import util.di.DIContainer;
 import service.UserService;
+import util.exception.WebException;
 
 /**
  *
@@ -40,14 +41,10 @@ public class UpdateInfor extends HttpServlet {
             throws ServletException, IOException {
         //Lấy parameter từ server
         String userIdStr = request.getParameter("userId");
-        //Kiểm tra id của user null hay không
-        if (userIdStr == null || userIdStr.isEmpty()) {
-            response.sendRedirect("profile");
-            return;
-        }
+        // Xóa check - service sẽ check và throw WebException
         try {
             // Lấy dữ liệu từ form
-            int userId = Integer.parseInt(request.getParameter("userId"));
+            int userId = (userIdStr != null && !userIdStr.isEmpty()) ? Integer.parseInt(userIdStr) : 0;
             String fullName = request.getParameter("fullName").trim();
             String email = request.getParameter("email").trim();
             String phone = request.getParameter("phone").trim();
@@ -67,9 +64,18 @@ public class UpdateInfor extends HttpServlet {
             //Truyền dữ liệu về server
             request.setAttribute("message", "Cập nhật user thành công!");
             request.getRequestDispatcher("profile").forward(request, response);
+        } catch (WebException.ValidationException ex) {
+            // Bắt WebException ValidationException
+            request.setAttribute("error", ex.getMessage());
+            request.getRequestDispatcher("profile").forward(request, response);
+        } catch (WebException.AppException ex) {
+            // Bắt các WebException khác
+            request.setAttribute("error", ex.getMessage());
+            request.getRequestDispatcher("profile").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Lỗi khi cập nhật user: " + e.getMessage());
+            request.getRequestDispatcher("profile").forward(request, response);
         }
     }
 

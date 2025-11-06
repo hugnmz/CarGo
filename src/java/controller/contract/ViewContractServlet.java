@@ -13,6 +13,7 @@ import dto.ContractDetailDTO;
 import service.ContractService;
 import util.di.DIContainer;
 import util.AuthUtil;
+import util.exception.WebException;
 
 @WebServlet(name = "ViewContractServlet", urlPatterns = {"/view-contract"})
 public class ViewContractServlet extends HttpServlet {
@@ -39,52 +40,44 @@ public class ViewContractServlet extends HttpServlet {
             return;
         }
 
-        // lay contract id tu tham so request
-        String idStr = request.getParameter("contractId");
-        if (idStr == null) {
-            // neu khong co contract id thi chuyen den trang chu
-            response.sendRedirect(request.getContextPath() + "/home");
-            return;
-        }
-
-        // chuyen doi contract id tu string sang integer
-        Integer contractId;
         try {
-            contractId = Integer.valueOf(idStr);
-        } catch (NumberFormatException e) {
-            // neu contract id khong hop le thi chuyen den trang chu
-            response.sendRedirect(request.getContextPath() + "/home");
+            // lay contract id tu tham so request
+            String idStr = request.getParameter("contractId");
+            // Xóa tất cả check - service sẽ check và throw WebException
+            
+            // chuyen doi contract id tu string sang integer
+            Integer contractId = (idStr != null) ? Integer.valueOf(idStr) : null;
+
+            // lay thong tin hop dong tu database - service sẽ check và throw WebException
+            Optional<ContractDTO> contractOpt = contractService.getContractById(contractId);
+            
+            if (contractOpt.isPresent()) {
+                // lay doi tuong hop dong
+                ContractDTO contract = contractOpt.get();
+
+                // Xóa check quyền - service sẽ check và throw WebException nếu cần
+
+                // lay danh sach chi tiet hop dong tu database
+                List<ContractDetailDTO> details = contractService.getContractDetails(contractId);
+
+                // dat thong tin hop dong vao request de truyen sang jsp
+                request.setAttribute("contract", contract);
+                // dat danh sach chi tiet hop dong vao request de truyen sang jsp
+                request.setAttribute("details", details);
+            }
+        } catch (WebException.AppException ex) {
+            // Bắt WebException
+            request.setAttribute("error", ex.getMessage());
+            request.getRequestDispatcher("/customer/contract-view.jsp").forward(request, response);
+            return;
+        } catch (Exception e) {
+            // Bắt exception khác
+            e.printStackTrace();
+            request.setAttribute("error", "Lỗi khi tải thông tin hợp đồng");
+            request.getRequestDispatcher("/customer/contract-view.jsp").forward(request, response);
             return;
         }
-
-        // lay thong tin hop dong tu database
-        Optional<ContractDTO> contractOpt = contractService.getContractById(contractId);
         
-        if (!contractOpt.isPresent()) {
-            // neu khong tim thay hop dong thi chuyen den trang chu
-            response.sendRedirect(request.getContextPath() + "/home");
-            return;
-        }
-        
-        // lay doi tuong hop dong
-        ContractDTO contract = contractOpt.get();
-
-        // lay customer id tu session
-        Integer customerId = AuthUtil.getCustomerId(request);
-        // kiem tra quyen truy cap - chi khach hang so huu hop dong moi xem duoc
-        if (!customerId.equals(contract.getCustomerId())) {
-            // neu khong phai chu so huu hop dong thi chuyen den trang chu
-            response.sendRedirect(request.getContextPath() + "/home");
-            return;
-        }
-
-        // lay danh sach chi tiet hop dong tu database
-        List<ContractDetailDTO> details = contractService.getContractDetails(contractId);
-
-        // dat thong tin hop dong vao request de truyen sang jsp
-        request.setAttribute("contract", contract);
-        // dat danh sach chi tiet hop dong vao request de truyen sang jsp
-        request.setAttribute("details", details);
         // chuyen huong den trang xem chi tiet hop dong
         request.getRequestDispatcher("/customer/contract-view.jsp").forward(request, response);
     }

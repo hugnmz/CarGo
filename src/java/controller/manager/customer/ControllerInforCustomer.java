@@ -8,19 +8,18 @@ import dto.ContractDTO;
 import dto.CustomerDTO;
 import dto.LocationDTO;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import service.ContractService;
 import util.di.DIContainer;
 import service.CustomerService;
+import util.exception.WebException;
 
 /**
  *
@@ -47,11 +46,8 @@ public class ControllerInforCustomer extends HttpServlet {
             throws ServletException, IOException {
         try {
             String idStr = request.getParameter("customerId");
-            if (idStr == null) {
-                response.sendRedirect("managecus");
-                return;
-            }
-            Integer customerId = Integer.parseInt(idStr);
+            // Xóa check - chỉ parse
+            Integer customerId = (idStr != null) ? Integer.parseInt(idStr) : null;
 
             // Load thông tin khách hàng từ database
             Optional<CustomerDTO> customerOpt = customerService.getCustomerById(customerId);
@@ -67,6 +63,11 @@ public class ControllerInforCustomer extends HttpServlet {
             // Forward đến trang profile
             request.getRequestDispatcher("/manager/manage_detail_cus.jsp").forward(request, response);
 
+        } catch (WebException.AppException ex) {
+            // Bắt WebException
+            ex.printStackTrace();
+            request.setAttribute("error", ex.getMessage());
+            request.getRequestDispatcher("/manager/manage_detail_cus.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
             // Vẫn forward đến profile, sử dụng session data
@@ -78,11 +79,8 @@ public class ControllerInforCustomer extends HttpServlet {
             throws ServletException, IOException {
         try {
             String idStr = request.getParameter("customerId");
-            if (idStr == null) {
-                response.sendRedirect("managecus");
-                return;
-            }
-            Integer customerId = Integer.parseInt(idStr);
+            // Xóa check - chỉ parse
+            Integer customerId = (idStr != null) ? Integer.parseInt(idStr) : null;
 
             // Load thông tin khách hàng từ database
             Optional<CustomerDTO> customerOpt = customerService.getCustomerById(customerId);
@@ -109,10 +107,8 @@ public class ControllerInforCustomer extends HttpServlet {
 
         try {
             String idStr = request.getParameter("customerId");
-            if (idStr == null) {
-                throw new IllegalArgumentException("Không có customerId trong request!");
-            }
-            Integer customerId = Integer.parseInt(idStr);
+            // Xóa check - service sẽ check và throw WebException
+            Integer customerId = (idStr != null) ? Integer.parseInt(idStr) : null;
 
             String fullName = request.getParameter("fullName");
             String email = request.getParameter("email");
@@ -139,11 +135,17 @@ public class ControllerInforCustomer extends HttpServlet {
             customerDTO.setLocationId(locationId);
             customerDTO.setIsVerified(isVerified);
 
-            // Gọi service
+            // Gọi service - service sẽ check và throw WebException
             customerService.updateCustomer(customerDTO);
 
             request.setAttribute("message", "Cập nhật khách hàng thành công!");
 
+        } catch (WebException.ValidationException ex) {
+            // Bắt WebException ValidationException
+            request.setAttribute("error", ex.getMessage());
+        } catch (WebException.AppException ex) {
+            // Bắt các WebException khác
+            request.setAttribute("error", ex.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             // Đẩy lỗi ra
@@ -157,13 +159,10 @@ public class ControllerInforCustomer extends HttpServlet {
             throws ServletException, IOException {
         try {
             String idStr = request.getParameter("customerId");
-            if (idStr == null || idStr.isEmpty()) {
-                throw new IllegalArgumentException("Không có ID khách hàng cần xóa!");
-            }
+            // Xóa check - service sẽ check và throw WebException
+            int customerId = (idStr != null && !idStr.isEmpty()) ? Integer.parseInt(idStr) : 0;
 
-            int customerId = Integer.parseInt(idStr);
-
-            // Gọi service để xóa
+            // Gọi service để xóa - service sẽ check và throw WebException
             boolean deleted = customerService.deleteCustomer(customerId);
 
             if (deleted) {
@@ -172,6 +171,12 @@ public class ControllerInforCustomer extends HttpServlet {
                 request.setAttribute("error", "Không tìm thấy khách hàng để xóa!");
             }
 
+        } catch (WebException.ValidationException ex) {
+            // Bắt WebException ValidationException
+            request.setAttribute("error", ex.getMessage());
+        } catch (WebException.AppException ex) {
+            // Bắt các WebException khác
+            request.setAttribute("error", ex.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Xóa thất bại: " + e.getMessage());

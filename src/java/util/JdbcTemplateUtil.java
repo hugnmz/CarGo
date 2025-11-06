@@ -109,7 +109,10 @@ public class JdbcTemplateUtil {
         StringBuilder condition = new StringBuilder(" WHERE 1=1 ");
 
         if (locationId != null) {
-            condition.append(" AND l.locationId = ").append(locationId);
+            condition.append(" AND")
+                    .append(" EXISTS (SELECT 1 FROM dbo.Vehicles v WHERE v.carId = c.carId AND v.locationId = ")
+                    .append(locationId)
+                    .append(")");
         }
 
         if (name != null && !name.trim().isEmpty()) {
@@ -119,7 +122,7 @@ public class JdbcTemplateUtil {
                     .append("%')");
         }
 
-        if (categoryId != null ) {
+        if (categoryId != null) {
             condition.append(" AND c.categoryId = ").append(categoryId);
         }
 
@@ -128,6 +131,7 @@ public class JdbcTemplateUtil {
         }
 
         return condition.toString();
+    
     }
 
 

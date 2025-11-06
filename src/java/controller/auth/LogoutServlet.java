@@ -24,7 +24,6 @@ public class LogoutServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         
         if (session != null) {
-            String username = (String) session.getAttribute("username");
             // huy session
             session.invalidate();
         }

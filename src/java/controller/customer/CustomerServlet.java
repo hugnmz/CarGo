@@ -22,6 +22,7 @@ import service.ContractService;
 import service.CustomerService;
 import service.LocationService;
 import util.di.DIContainer;
+import util.exception.WebException;
 
 @WebServlet(name = "CustomerServlet", urlPatterns = {"/CustomerServlet"})
 public class CustomerServlet extends HttpServlet {
@@ -122,7 +123,6 @@ public class CustomerServlet extends HttpServlet {
             String dateOfBirthStr = request.getParameter("dateOfBirth");
             String customerIdStr = request.getParameter("customerId");
             String username = request.getParameter("username");
-            String isVerifiedStr = request.getParameter("isVerified");
 
             // tao doi tuong customer dto de cap nhat
             CustomerDTO customerDTO = new CustomerDTO();
@@ -133,36 +133,13 @@ public class CustomerServlet extends HttpServlet {
             customerDTO.setPhone(phone);
             customerDTO.setCity(city);
 
-            // kiem tra va set ngay sinh neu co
+            // Xóa tất cả check - đã chuyển vào service
+            // Set ngay sinh neu co
             if (dateOfBirthStr != null && !dateOfBirthStr.isEmpty()) {
                 customerDTO.setDateOfBirth(LocalDate.parse(dateOfBirthStr));
             }
 
-            // kiểm tra trùng email/phone nếu người dùng thay đổi
-            Optional<CustomerDTO> currentOpt = customerService.getCustomerById(Integer.valueOf(customerIdStr));
-            if (currentOpt.isPresent()) {
-                CustomerDTO current = currentOpt.get();
-
-                if (email != null && !email.trim().equalsIgnoreCase(current.getEmail())) {
-                    if (customerService.isEmailExists(email.trim())) {
-                        errors.add(util.MessageUtil.getError("error.email.exists"));
-                    }
-                }
-
-                if (phone != null && !phone.trim().equals(current.getPhone())) {
-                    if (customerService.isPhoneExists(phone.trim())) {
-                        errors.add(util.MessageUtil.getError("error.phone.exists"));
-                    }
-                }
-            }
-
-            if (!errors.isEmpty()) {
-                request.setAttribute("errors", errors);
-                request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
-                return;
-            }
-
-            // goi service de cap nhat thong tin khach hang
+            // goi service de cap nhat thong tin khach hang - service sẽ check trùng và throw WebException
             boolean success = customerService.updateCustomer(customerDTO);
 
             if (success) {
@@ -187,6 +164,16 @@ public class CustomerServlet extends HttpServlet {
                 request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
             }
 
+        } catch (WebException.ValidationException ex) {
+            // Bắt WebException ValidationException - lỗi check trùng
+            errors.add(ex.getMessage());
+            request.setAttribute("errors", errors);
+            request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
+        } catch (WebException.AppException ex) {
+            // Bắt các WebException khác
+            errors.add(ex.getMessage());
+            request.setAttribute("errors", errors);
+            request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
         } catch (Exception e) {
             // log loi ra console
             e.printStackTrace();

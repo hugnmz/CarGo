@@ -6,14 +6,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import service.CustomerService;
 import service.UserService;
-import util.MessageUtil;
 import util.di.DIContainer;
+import util.exception.WebException;
 
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
@@ -61,14 +59,6 @@ public class LoginServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
-        // Check du lieu dau vao
-        if (username == null || username.trim().isEmpty()
-                || password == null || password.trim().isEmpty()) {
-            request.setAttribute("errors", "Vui lòng nhập đầy đủ thông tin");
-            request.getRequestDispatcher("auth/login.jsp").forward(request, response);
-            return;
-        }
-
         try {
             //1. Đăng nhập với vai trò Customer
             Optional<CustomerDTO> customerOpt = customerService.loginCustomer(username, password);
@@ -96,6 +86,11 @@ public class LoginServlet extends HttpServlet {
             request.setAttribute("errors", "Sai tên đăng nhập hoặc mật khẩu.");
             request.getRequestDispatcher("auth/login.jsp").forward(request, response);
 
+        } catch (WebException.AppException ex) {
+            // Bắt WebException
+            ex.printStackTrace();
+            request.setAttribute("errors", "Đã xảy ra lỗi khi đăng nhập: " + ex.getMessage());
+            request.getRequestDispatcher("auth/login.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("errors", "Đã xảy ra lỗi khi đăng nhập.");
@@ -139,19 +134,5 @@ public class LoginServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/HomeAdmin");
                 break;
         }
-    }
-
-    // Chặn open-redirect
-    private boolean isSafeInternalPath(String url) {
-        if (url == null || url.isEmpty()) {
-            return false;
-        }
-        if (!url.startsWith("/")) {
-            return false;
-        }
-        if (url.contains("://") || url.contains("\r") || url.contains("\n")) {
-            return false;
-        }
-        return true;
     }
 }

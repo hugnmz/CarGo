@@ -19,6 +19,8 @@ import service.CustomerService;
 import util.VerificationUtil;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
+import util.exception.WebException;
+import util.MessageUtil;
 
 /**
  *
@@ -74,18 +76,18 @@ public class CustomerServiceImpl implements CustomerService {
         try {
             // Bước 1: Kiểm tra dữ liệu đầu vào
             if (customerDTO == null || password == null) {
-                return false; // Dữ liệu không hợp lệ
+                throw new WebException().new ValidationException(MessageUtil.getError("error.validation.data.invalid"));
             }
 
-            // Defensive: chặn trùng username/email/phone trước khi tạo
+            // Chuyển check trùng từ servlet vào đây - throw WebException nếu trùng
             if (customerDTO.getUsername() != null && customersDAO.existsUsername(customerDTO.getUsername())) {
-                return false;
+                throw new WebException().new ValidationException(MessageUtil.getError("error.username.exists"));
             }
             if (customerDTO.getEmail() != null && customersDAO.existEmail(customerDTO.getEmail())) {
-                return false;
+                throw new WebException().new ValidationException(MessageUtil.getError("error.email.exists"));
             }
             if (customerDTO.getPhone() != null && customersDAO.existPhone(customerDTO.getPhone())) {
-                return false;
+                throw new WebException().new ValidationException(MessageUtil.getError("error.phone.exists"));
             }
 
             Integer locationId = null;
@@ -114,8 +116,11 @@ public class CustomerServiceImpl implements CustomerService {
 
             // Bước 6: Lưu khách hàng vào database
             return customersDAO.addCustomer(customer);
+        } catch (WebException.ValidationException e) {
+            // Re-throw WebException để controller bắt
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new WebException().new DataAccessException(MessageUtil.getError("error.dataaccess.customer.register.failed"), e);
         }
     }
 
@@ -205,12 +210,12 @@ public class CustomerServiceImpl implements CustomerService {
     public boolean updateCustomer(CustomerDTO customerDTO) {
         // Cập nhật thông tin khách hàng
         if (customerDTO == null) {
-            return false; // Dữ liệu không hợp lệ
+            throw new WebException().new ValidationException(MessageUtil.getError("error.validation.data.invalid"));
         }
         try {
             Optional<Customers> existingCustomer = customersDAO.getCustomerById(customerDTO.getCustomerId());
             if (existingCustomer.isEmpty()) {
-                return false;
+                throw new WebException().new ValidationException(MessageUtil.getError("error.validation.customer.not.found"));
             }
 
             // Lấy customer hiện tại từ database
@@ -222,19 +227,20 @@ public class CustomerServiceImpl implements CustomerService {
             }
             if (customerDTO.getEmail() != null) {
                 String newEmail = customerDTO.getEmail().trim();
+                // Chuyển check trùng từ servlet vào đây - throw WebException nếu trùng
                 if (!newEmail.equalsIgnoreCase(existing.getEmail())) {
-                    // email thay đổi -> kiểm tra trùng
                     if (customersDAO.existEmail(newEmail)) {
-                        return false;
+                        throw new WebException().new ValidationException(MessageUtil.getError("error.email.exists"));
                     }
                     existing.setEmail(newEmail);
                 }
             }
             if (customerDTO.getPhone() != null) {
                 String newPhone = customerDTO.getPhone().trim();
+                // Chuyển check trùng từ servlet vào đây - throw WebException nếu trùng
                 if (!newPhone.equals(existing.getPhone())) {
                     if (customersDAO.existPhone(newPhone)) {
-                        return false;
+                        throw new WebException().new ValidationException(MessageUtil.getError("error.phone.exists"));
                     }
                     existing.setPhone(newPhone);
                 }
@@ -259,9 +265,11 @@ public class CustomerServiceImpl implements CustomerService {
             }
 
             return customersDAO.updateCustomer(existing);
+        } catch (WebException.ValidationException e) {
+            // Re-throw WebException để controller bắt
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false; // Có lỗi xảy ra
+            throw new WebException().new DataAccessException(MessageUtil.getError("error.dataaccess.customer.update.failed"), e);
         }
     }
 

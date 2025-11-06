@@ -1,16 +1,118 @@
-body {
-  background: linear-gradient(135deg, #2b5876, #4e4376);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* Chỉ áp dụng cho trang admin */
+.admin-page .card {
+  border-radius: 10px;
 }
 
-.login-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 40px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  width: 100%;
-  max-width: 400px;
+.admin-page .card-header {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
+
+.admin-page .table thead th {
+  white-space: nowrap;
+}
+
+.admin-page .badge {
+  font-size: 90%;
+  padding: 0.5em 0.6em;
+}
+
+/* Khoảng cách nhỏ giữa các nút hành động */
+.admin-page .btn + .btn {
+  margin-left: 0.25rem;
+}
+
+/* Nâng cấp viền focus cho input/select */
+.admin-page .form-control:focus,
+.admin-page .custom-select:focus {
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+  border-color: #80bdff;
+}
+
+/* Giới hạn độ rộng input dài trên màn lớn */
+@media (min-width: 992px) {
+  .admin-page .form-group input[type="text"],
+  .admin-page .form-group input[type="email"],
+  .admin-page .form-group input[type="password"],
+  .admin-page .form-group select {
+    max-width: 100%;
+  }
+}
+
+/* Nút “Thêm User” nổi bật hơn chút */
+.navbar .btn-primary {
+  font-weight: 600;
+}
+
+/* Tinh chỉnh khoảng cách container lớn */
+.container-fluid {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+/* Navbar */
+.navbar {
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+
+/* Căn chỉnh nút */
+.navbar .btn {
+  font-weight: 500;
+  border-radius: 6px;
+}
+
+/* Tối ưu responsive */
+@media (max-width: 768px) {
+  .navbar .btn-group {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* === FORCE TOP NAVBAR (override sidebar styles) === */
+body > nav.navbar {
+  position: sticky !important;  /* hoặc relative nếu không muốn dính top khi cuộn */
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100% !important;
+  height: auto !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  border-radius: 0 !important;
+  margin: 0 0 1rem 0 !important;
+  padding-top: .75rem !important;
+  padding-bottom: .75rem !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+
+/* Bên trong navbar: giãn hai đầu (logo trái, nút phải) */
+body > nav.navbar .container,
+body > nav.navbar .container-fluid {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-wrap: wrap !important; /* để đẹp trên mobile */
+}
+
+/* Nhóm nút ở vế phải */
+body > nav.navbar .btn-group,
+body > nav.navbar .navbar-buttons {
+  margin-left: auto !important;
+}
+
+/* Trường hợp CSS cũ đặt width cố định cho .navbar, hủy bỏ: */
+body > nav.navbar {
+  max-width: none !important;
+}
+
+/* Responsive: khi hẹp, cho nhóm nút full width, canh giữa */
+@media (max-width: 768px) {
+  body > nav.navbar .btn-group,
+  body > nav.navbar .navbar-buttons {
+    width: 100% !important;
+    justify-content: center !important;
+    margin-top: .5rem !important;
+  }
+}
+

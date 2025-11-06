@@ -19,6 +19,7 @@ import java.util.List;
 import service.CarService;
 import util.MessageUtil;
 import util.di.DIContainer;
+import util.exception.WebException;
 import util.di.annotation.Autowired;
 
 /**
@@ -121,6 +122,11 @@ public class SearchCarServlet extends HttpServlet {
             request.setAttribute("searchCars", searchCars);
             request.getRequestDispatcher("/customer/search-car.jsp").forward(request, response);
 
+        } catch (WebException.AppException ex) {
+            // Bắt WebException
+            ex.printStackTrace();
+            request.setAttribute("error", ex.getMessage());
+            request.getRequestDispatcher("/customer/search-car.jsp").forward(request, response);
         } catch (Exception e) {
             // xu ly loi he thong
             e.printStackTrace();

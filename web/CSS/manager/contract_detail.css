@@ -1,0 +1,186 @@
+
+:root{
+    --bg-soft: #f8fafc;
+    --card-bg: #ffffff;
+    --text-muted: #6b7280;
+    --border: #eef2f7;
+    --shadow: 0 8px 24px rgba(15, 23, 42, .06);
+    --radius: 16px;
+}
+
+/* Page header */
+.page-header{
+    background: linear-gradient(180deg, #f1f5ff 0%, #fff 100%);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 1.25rem 0;
+}
+.page-header .h2{
+    font-weight: 700;
+    letter-spacing: .2px;
+}
+.btn-back{
+    background: #eef2ff;
+    color: #3843d0;
+    border: 1px solid #e3e8ff;
+    padding: .5rem .875rem;
+    border-radius: .75rem;
+    transition: .2s ease;
+}
+.btn-back:hover{
+    background: #e5e9ff;
+    color:#2730c7
+}
+
+/* Card chung */
+.info-card{
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.25rem;
+}
+.info-card h5{
+    font-weight: 700;
+}
+
+/* Hàng thông tin */
+.info-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:.625rem .75rem;
+    background: var(--bg-soft);
+    border:1px solid var(--border);
+    border-radius:.75rem;
+    margin-bottom:.75rem;
+    gap:1rem;
+}
+.info-label{
+    display:flex;
+    align-items:center;
+    gap:.5rem;
+    font-weight:600;
+    color:#111827;
+}
+.info-label i{
+    width:1.1rem;
+    text-align:center;
+    color:#475569
+}
+.info-value{
+    color:#111827
+}
+.note{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.info-text {
+    margin-left: 26px;
+    color: #475569;
+    font-size: 15px;
+    min-height: 20px;
+}
+
+/* Badge trạng thái */
+.status-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:.4rem;
+    font-weight:700;
+    font-size:.85rem;
+    padding:.35rem .6rem;
+    border-radius:999px;
+    border:1px solid transparent;
+    letter-spacing:.3px;
+    text-transform: capitalize;
+}
+.status-pending{
+    background:#fff8e1;
+    color:#8a6d00;
+    border-color:#fde68a
+}
+.status-accepted{
+    background:#e8fff3;
+    color:#0f7a4f;
+    border-color:#86efac
+}
+.status-in-progress{
+    background:#e6f2ff;
+    color:#1d4ed8;
+    border-color:#93c5fd
+}
+.status-completed{
+    background:#ecfdf5;
+    color:#047857;
+    border-color:#a7f3d0
+}
+.status-cancelled{
+    background:#fff1f2;
+    color:#b91c1c;
+    border-color:#fecaca
+}
+
+/* Tổng tiền */
+.total-amount{
+    background: #495057;
+    color:#fff;
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    text-align:center;
+    box-shadow: var(--shadow);
+}
+.total-amount h2{
+    margin: .25rem 0 0;
+    font-weight:800;
+    font-size: clamp(1.4rem, 2.8vw, 2rem);
+}
+
+/* Card chi tiết xe */
+.detail-card{
+    border:1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1rem;
+    margin-bottom: .9rem;
+    background:#fff;
+    box-shadow: var(--shadow);
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+.detail-card:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(15,23,42,.08)
+}
+
+.vehicle-icon{
+    width:48px;
+    height:48px;
+    border-radius:12px;
+    background: #eef2ff;
+    color:#3b82f6;
+    display:grid;
+    place-items:center;
+    font-size:1.1rem;
+    border:1px solid #e5e7eb;
+}
+
+/* Text tinh chỉnh */
+.opacity-75{
+    color: var(--text-muted)!important
+}
+small.text-muted{
+    color: var(--text-muted)!important
+}
+
+/* Responsive */
+@media (max-width: 991.98px){
+    .info-row{
+        flex-direction:column;
+        align-items:flex-start
+    }
+    .status-badge{
+        align-self:flex-start
+    }
+}

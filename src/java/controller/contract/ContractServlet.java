@@ -6,9 +6,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import service.ContractService;
 import util.di.DIContainer;
+import util.exception.WebException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -131,6 +131,9 @@ public class ContractServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/staff?error=contract_creation_failed");
             }
 
+        } catch (WebException.AppException ex) {
+            // Bắt WebException
+            throw ex;
         } catch (Exception e) {
             throw new RuntimeException("error.system", e);
         }
@@ -151,6 +154,9 @@ public class ContractServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/staff?error=status_update_failed&contractId=" + contractId + "&status=" + status);
             }
 
+        } catch (WebException.AppException ex) {
+            // Bắt WebException
+            throw ex;
         } catch (Exception e) {
             throw new RuntimeException("error.system", e);
         }
@@ -195,6 +201,9 @@ public class ContractServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/customer/payment-failed.jsp");
             }
 
+        } catch (WebException.AppException ex) {
+            // Bắt WebException
+            throw ex;
         } catch (Exception e) {
             throw new RuntimeException("error.system", e);
         }

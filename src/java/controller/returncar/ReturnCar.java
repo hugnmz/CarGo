@@ -24,6 +24,7 @@ import service.ContractService;
 import service.ReturnCarService;
 import util.AuthUtil;
 import util.di.DIContainer;
+import util.exception.WebException;
 
 /**
  *
@@ -70,73 +71,48 @@ public class ReturnCar extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<String> errors = new ArrayList<>();
-        HttpSession session = req.getSession();
-        String contractIdParam = req.getParameter("contractId");
+        try {
+            HttpSession session = req.getSession();
+            String contractIdParam = req.getParameter("contractId");
 
-        // 1) Validate input
-        if (contractIdParam == null || contractIdParam.trim().isEmpty()) {
-            req.getSession().setAttribute("error", "Không nhận được mã hợp đồng");
-            req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
-            return;
-        }
+            // Xóa tất cả check - đã chuyển vào service
+            // Parse contractId
+            int id = (contractIdParam != null && !contractIdParam.trim().isEmpty()) 
+                ? Integer.parseInt(contractIdParam.trim()) : 0;
 
-        int id = 0;
-        if (errors.isEmpty()) {
-            try {
-                id = Integer.parseInt(contractIdParam.trim());
-            } catch (NumberFormatException ex) {
-                req.getSession().setAttribute("error", "Mã hợp đồng không hợp lệ");
-                req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
-                return;
-            }
-        }
+            // Gọi service - service sẽ check và throw WebException
+            Optional<ContractDTO> dtoOpt = contractService.getContractById(id);
+            if (dtoOpt.isPresent()) {
+                ContractDTO dto = dtoOpt.get();
+                dto.setContractDetails(contractService.getContractDetails(id));
+                int cid = dto.getContractId();
 
-        Optional<ContractDTO> dtoOpt = Optional.empty();
-        if (errors.isEmpty()) {
-            try {
-                dtoOpt = contractService.getContractById(id);
-                if (dtoOpt.isEmpty()) {
-                    req.getSession().setAttribute("error", "Không tồn tại hợp đồng");
-                    req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
-                    return;
+                RequestReturnCar existing = returnCarService.get(cid);
+                if (existing == null) {
+                    // Chưa có → thêm mới
+                    RequestReturnCar newReq = new RequestReturnCar(dto, LocalDateTime.now());
+                    returnCarService.putIfAbsentOrKeep(cid, newReq);
+                    req.getSession().setAttribute("message", "Gửi yêu cầu trả xe thành công");
                 } else {
-                    if ("PENDING".equals(dtoOpt.get().getStatus()) || "REJECTED".equals(dtoOpt.get().getStatus())) {
-                        req.getSession().setAttribute("error", "Hợp đồng không hợp lệ");
-                        req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
-                        return;
-
-                    } else if ("COMPLETED".equals(dtoOpt.get().getStatus())) {
-                        req.getSession().setAttribute("error", "Hợp đồng đã hoàn thành");
-                        req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
-                        return;
-                    }
+                    // Đã có trong hàng chờ
+                    req.getSession().setAttribute("message", "Hợp đồng đang chờ xử lí");
                 }
-            } catch (Exception e) {
-                req.getSession().setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
-                req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
-                return;
             }
+
+            // Redirect về trang khách để tránh submit lại khi F5
+            resp.sendRedirect(req.getContextPath() + "/view-contract?contractId=" + id);
+        } catch (WebException.ValidationException ex) {
+            // Bắt WebException ValidationException
+            req.getSession().setAttribute("error", ex.getMessage());
+            req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
+        } catch (WebException.AppException ex) {
+            // Bắt các WebException khác
+            req.getSession().setAttribute("error", ex.getMessage());
+            req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
+        } catch (Exception e) {
+            req.getSession().setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+            req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
         }
-
-        // Không lỗi → thêm/ cập nhật vào queue theo contractId (chống trùng)
-        ContractDTO dto = dtoOpt.get();
-        dto.setContractDetails(contractService.getContractDetails(id));
-        int cid = dto.getContractId();
-
-        RequestReturnCar existing = returnCarService.get(cid);
-        if (existing == null) {
-            // Chưa có → thêm mới
-            RequestReturnCar newReq = new RequestReturnCar(dto, LocalDateTime.now());
-            returnCarService.putIfAbsentOrKeep(cid, newReq);
-            req.getSession().setAttribute("message", "Gửi yêu cầu trả xe thành công");
-        } else {
-            // Đã có trong hàng chờ
-            req.getSession().setAttribute("message", "Hợp đồng đang chờ xử lí");
-        }
-
-        // Redirect về trang khách để tránh submit lại khi F5
-        resp.sendRedirect(req.getContextPath() + "/view-contract?contractId=" + id);
     }
 
 

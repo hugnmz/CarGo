@@ -32,7 +32,7 @@
             <div class="container-fluid d-flex justify-content-between align-items-center">
                 <!-- Left: Logo -->
                 <a class="navbar-brand" href="HomeAdmin">🚗 Admin</a>
-                
+
                 <!-- Right: Nút thêm và logout -->
                 <div>
                     <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#addUserForm">
@@ -54,6 +54,20 @@
                 <div class="alert alert-danger">${error}</div>
             </c:if>
 
+
+            <!-- Hiển thị lỗi từ filter -->
+            <c:if test="${not empty errors}">
+                <div class="alert alert-danger mt-2">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Có lỗi xảy ra:</strong>
+                    <ul class="mb-0 mt-2">
+                        <c:forEach var="error" items="${errors}">
+                            <li>${error}</li>
+                            </c:forEach>
+                    </ul>
+                </div>
+            </c:if>
+
             <!-- Form thêm người dùng (ẩn lúc đầu) -->
             <div class="collapse mb-4" id="addUserForm">
                 <div class="card shadow-lg border-primary">
@@ -62,7 +76,7 @@
                     </div>
                     <div class="card-body">
                         <form action="ControllerAdmin" method="post" class="row g-3">
-                            <input type="hidden" name="_back" value="/admin/adminhome.jsp" />
+                            <input type="hidden" name="_back" value="/HomeAdmin"/>
                             <input type="hidden" name="action" value="create">
 
                             <div class="col-md-6">
@@ -108,7 +122,6 @@
                                     </c:forEach>
                                 </select>
                             </div>
-
                             <div class="col-md-6">
                                 <label class="form-label">Mật khẩu:</label>
                                 <input type="password" name="password" class="form-control" 
@@ -167,7 +180,7 @@
                                             </form>
                                             <a href="ControllerAdmin?action=edit&userId=${user.userId}" 
                                                class="btn btn-warning btn-sm"
-                                               
+
                                                >Sửa</a>
                                         </c:if>
                                     </td>

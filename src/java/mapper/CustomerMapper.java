@@ -1,3 +1,4 @@
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -33,9 +34,11 @@ public class CustomerMapper {
         dto.setDateOfBirth(customer.getDateOfBirth());
         dto.setCreateAt(customer.getCreateAt());
         dto.setIsVerified(customer.isIsVerified());
+        
+        dto.setLocationId(customer.getLocationId());
+
 
         if (customer.getLocationId() != null && customer.getLocation() != null) {
-            dto.setLocationId(customer.getLocationId());
             dto.setCity(customer.getLocation().getCity());
         }
 
@@ -56,18 +59,20 @@ public class CustomerMapper {
         user.setPhone(dto.getPhone());
         user.setEmail(dto.getEmail());
         user.setDateOfBirth(dto.getDateOfBirth());
-        user.setIsVerified(dto.getIsVerified());
-        user.setCreateAt(dto.getCreateAt());
-
-        if (dto.getLocationId() != null) {
-            user.setLocationId(dto.getLocationId());
-        } else if (dto.getCity() != null) {
+        user.setIsVerified(dto.getIsVerified()); // Thêm mapping cho isVerified
+        if (dto.getCity() != null) {
             Locations location = new Locations();
             location.setCity(dto.getCity());
-
             user.setLocation(location);
         }
         //tra ve user
+        if (dto.getLocationId() != null) {
+            Locations location = new Locations();
+            location.setLocationId(dto.getLocationId()); // Set locationId
+            location.setCity(dto.getCity());
+            user.setLocation(location);
+            user.setLocationId(dto.getLocationId()); // Set cho field locationId trong Customers
+        }
         return user;
     }
 }

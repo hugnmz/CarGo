@@ -15,8 +15,10 @@ import util.MessageUtil;
 import service.CustomerService;
 import service.LocationService;
 import dto.LocationDTO;
+import java.time.LocalDate;
 import util.EmailUtil;
 import util.di.DIContainer;
+import util.exception.WebException;
 
 @WebServlet("/RegisterServlet")
 public class RegisterServlet extends HttpServlet {
@@ -39,7 +41,6 @@ public class RegisterServlet extends HttpServlet {
         }
     }
 
-      
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -66,35 +67,13 @@ public class RegisterServlet extends HttpServlet {
         String city = request.getParameter("city");
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        String confirmPassword = request.getParameter("confirmPassword");
+        String dateOfBirth = request.getParameter("dateOfBirth");
 
         // tao danh sach de luu cac loi validation
         List<String> errors = new ArrayList<>();
 
         try {
-
-            // kiem tra trung lap email
-            if (customerService.isEmailExists(email)) {
-                errors.add(MessageUtil.getError("error.email.exists"));
-            }
-
-            // kiem tra trung lap so dien thoai
-            if (customerService.isPhoneExists(phone)) {
-                errors.add(MessageUtil.getError("error.phone.exists"));
-            }
-
-            // kiem tra trung lap username
-            if (customerService.isUsernameExists(username)) {
-                errors.add(MessageUtil.getError("error.username.exists"));
-            }
-
-            // neu co loi trung lap thi hien thi tat ca loi
-            if (!errors.isEmpty()) {
-                request.setAttribute("errors", errors);
-                setFormData(request, fullname, phone, email, city, username);
-                request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
-                return;
-            }
+            // Xóa tất cả check - đã chuyển vào service
 
             // tao doi tuong customer dto de luu thong tin dang ky
             CustomerDTO customerDTO = new CustomerDTO();
@@ -103,6 +82,7 @@ public class RegisterServlet extends HttpServlet {
             customerDTO.setPhone(phone.trim());
             customerDTO.setEmail(email.trim());
             customerDTO.setCity(city);
+            customerDTO.setDateOfBirth(LocalDate.parse(dateOfBirth));
             customerDTO.setCreateAt(LocalDateTime.now());
             // thuc hien dang ky tai khoan customer
             boolean success = customerService.registerCustomer(customerDTO, password);
@@ -143,9 +123,25 @@ public class RegisterServlet extends HttpServlet {
                 setFormData(request, fullname, phone, email, city, username);
                 request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
             }
+        } catch (WebException.ValidationException ex) {
+            // Bắt WebException ValidationException - lỗi check trùng
+            errors.add(ex.getMessage());
+            request.setAttribute("errors", errors);
+            setFormData(request, fullname, phone, email, city, username);
+            request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
+        } catch (WebException.AppException ex) {
+            // Bắt các WebException khác
+            errors.add(ex.getMessage());
+            request.setAttribute("errors", errors);
+            setFormData(request, fullname, phone, email, city, username);
+            request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
         } catch (Exception e) {
             // log loi ra console
-            throw new RuntimeException("error.system.register", e);
+            e.printStackTrace();
+            errors.add("Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.");
+            request.setAttribute("errors", errors);
+            setFormData(request, fullname, phone, email, city, username);
+            request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
         }
     }
 

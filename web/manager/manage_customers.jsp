@@ -127,7 +127,7 @@
                                         <a href="controllerinformationcustomer?action=detail&customerId=${cus.customerId}" class="btn btn-info btn-sm text-white">
                                             <i class="fa-solid fa-circle-info"></i> Chi tiết
                                         </a>
-                                        <a href="controllerinformationcustomer?action=delete&customerId=${c.customerId}" 
+                                        <a href="controllerinformationcustomer?action=delete&customerId=${cus.customerId}" 
                                            class="btn btn-danger btn-sm"
                                            onclick="return confirm('Bạn có chắc chắn muốn xóa khách hàng này không?');">
                                             Xóa

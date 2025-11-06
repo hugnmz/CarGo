@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import service.CarService;
 import util.di.DIContainer;
 import util.MessageUtil;
+import util.exception.WebException;
 import java.io.IOException;
 import java.util.List;
 import dto.CarDTO;
@@ -54,6 +55,11 @@ public class HomeServlet extends HttpServlet {
             // forward den trang home.jsp
             request.getRequestDispatcher("/customer/home.jsp").forward(request, response);
 
+        } catch (WebException.AppException ex) {
+            // Bắt WebException
+            ex.printStackTrace();
+            request.setAttribute("error", ex.getMessage());
+            request.getRequestDispatcher("/customer/home.jsp").forward(request, response);
         } catch (Exception e) {
             // xu ly loi he thong
             e.printStackTrace();
