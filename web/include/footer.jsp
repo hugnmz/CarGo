@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<footer class="cg-footer">
+<footer class="cg-footer is-fullbleed">
   <div class="cg-container">
     <div class="cg-row">
       <div class="cg-col">
@@ -46,7 +46,17 @@
 
 <style>
   .cg-footer{background:#0f172a;color:#e2e8f0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,sans-serif;padding:40px 0 16px;margin-top:40px}
-  .cg-container{max-width:1140px;margin:0 auto;padding:0 16px}
+  /* Full-bleed ngay cả khi footer nằm trong .container hẹp */
+  .cg-footer.is-fullbleed{
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    width: 100vw;
+  }
+  /* Nội dung bên trong cũng full-width, có padding 2 bên cho đẹp */
+  .cg-container{max-width:none;width:100%;margin:0 auto;padding:0 24px;box-sizing:border-box}
   .cg-row{display:flex;flex-wrap:wrap;gap:24px}
   .cg-col{flex:1 1 220px;min-width:200px}
   .cg-brand{font-weight:700;font-size:20px;margin-bottom:8px}
@@ -60,5 +70,9 @@
   .cg-bottom{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;font-size:14px;opacity:.8}
   .cg-links a{color:#e2e8f0;text-decoration:none;margin-left:16px}
   .cg-links a:hover{text-decoration:underline}
-  @media (max-width:576px){.cg-row{gap:12px}.cg-footer{padding:28px 0 12px}}
+  @media (max-width:576px){
+    .cg-row{gap:12px}
+    .cg-footer{padding:28px 0 12px}
+    .cg-container{padding:0 16px}
+  }
 </style>

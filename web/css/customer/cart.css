@@ -168,4 +168,9 @@
   .cart-table td {
     padding: 0.5rem;
   }
+  html, body { height: 100%; }
+body { display: flex; flex-direction: column; min-height: 100vh; }
+
+/* đẩy footer xuống đáy khi nội dung ngắn */
+.cg-footer { margin-top: auto; }
 }

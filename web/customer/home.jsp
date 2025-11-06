@@ -21,48 +21,8 @@
     </head>
 
     <body>
+        <%@ include file="/include/header.jsp" %>
 
-        <!-- Modern Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-modern fixed-top">
-            <div class="container">
-                <a class="navbar-brand" href="${pageContext.request.contextPath}/home">
-                    <i class="fas fa-car"></i> CarGo
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto align-items-center">
-                        <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/home">Trang chủ</a></li>
-                        <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/cars">Xe cho thuê</a></li>
-                        <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/contact.jsp">Chúng Tôi</a></li>
-
-                        <c:choose>
-                            <c:when test="${not empty username}">
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/my-contracts">Hợp đồng</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/ViewCartDetail"><i class="fas fa-shopping-cart"></i></a></li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                        <img src="${avatar}" alt="Avatar" style="width:35px; height:35px; border-radius:50%; margin-right:8px;">
-                                        ${username}
-                                    </a>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/CustomerServlet"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/LogoutServlet"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
-                                    </ul>
-                                </li>
-                            </c:when>
-                            <c:otherwise>
-                                <li class="nav-item">
-                                    <a class="btn btn-primary-custom" href="${pageContext.request.contextPath}/auth/login.jsp">Đăng nhập</a>
-                                </li>
-                            </c:otherwise>
-                        </c:choose>
-                    </ul>
-                </div>
-            </div>
-        </nav>
 
         <!-- Hero Section -->
         <div class="hero-modern">
@@ -476,45 +436,7 @@
                 })();
             </script>
             <!-- Footer -->
-            <footer class="footer-modern">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-4 mb-4">
-                            <h5 class="fw-bold mb-3"><i class="fas fa-car me-2"></i>CarGo</h5>
-                            <p class="text-white-50">Dịch vụ cho thuê xe tự lái cao cấp hàng đầu Việt Nam. Cam kết mang đến trải nghiệm tốt nhất cho khách hàng.</p>
-                        </div>
-                        <div class="col-md-2 mb-4">
-                            <h6 class="fw-bold mb-3">Dịch vụ</h6>
-                            <ul class="list-unstyled">
-                                <li class="mb-2"><a href="#">Thuê xe tự lái</a></li>
-                                <li class="mb-2"><a href="#">Thuê xe có tài</a></li>
-                                <li class="mb-2"><a href="#">Xe dài hạn</a></li>
-                            </ul>
-                        </div>
-                        <div class="col-md-2 mb-4">
-                            <h6 class="fw-bold mb-3">Về chúng tôi</h6>
-                            <ul class="list-unstyled">
-                                <li class="mb-2"><a href="#">Giới thiệu</a></li>
-                                <li class="mb-2"><a href="#">Liên hệ</a></li>
-                                <li class="mb-2"><a href="#">Tuyển dụng</a></li>
-                            </ul>
-                        </div>
-                        <div class="col-md-4 mb-4">
-                            <h6 class="fw-bold mb-3">Liên hệ</h6>
-                            <p class="text-white-50">
-                                <i class="fas fa-phone me-2"></i>1900 1234<br>
-                                <i class="fas fa-envelope me-2"></i>support@cargo.vn<br>
-                                <i class="fas fa-map-marker-alt me-2"></i>TP. Hồ Chí Minh
-                            </p>
-                        </div>
-                    </div>
-                    <hr style="border-color: rgba(255,255,255,0.1)">
-                    <div class="text-center text-white-50">
-                        <p class="mb-0">© 2025 CarGo. All rights reserved.</p>
-                    </div>
-                </div>
-            </footer>
-
+            <%@ include file="/include/footer.jsp" %>
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     </body>
