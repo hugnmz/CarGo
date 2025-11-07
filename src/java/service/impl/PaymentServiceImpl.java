@@ -125,4 +125,27 @@ public class PaymentServiceImpl implements PaymentService {
         BigDecimal total = contractsDAO.getTotalAmount(contractId);
         return total != null ? Optional.of(total) : Optional.empty();
     }
+<<<<<<< Updated upstream
+=======
+
+    @Override
+    public PaymentDTO createPendingPayment(int contractId, BigDecimal amount) {
+        int affected = paymentsDAO.insertPendingPayment(contractId, amount);
+        if (affected > 0) {
+            Payments payment = new Payments();
+            payment.setContractId(contractId);
+            payment.setAmount(amount);
+            payment.setStatus("pending");
+            payment.setPaymentDate(null);
+            return paymentsMapper.toDTO(payment);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public void handleSuccessfulPayment(int paymentId, int contractId) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+>>>>>>> Stashed changes
 }

@@ -62,7 +62,7 @@ public class PaymentServlet extends HttpServlet {
             if (completed) {
                 // ĐÃ THANH TOÁN → không render QR
                 req.setAttribute("initialStatus", "SUCCESS");
-                req.getRequestDispatcher("/payment.jsp").forward(req, resp);
+                req.getRequestDispatcher("/payment/payment.jsp").forward(req, resp);
                 return;
             }
             // CHƯA THANH TOÁN (PENDING/NONE) → render QR + bật polling
@@ -73,7 +73,7 @@ public class PaymentServlet extends HttpServlet {
 
             req.setAttribute("qrUrl", qr);
             req.setAttribute("initialStatus", "PENDING"); // chỉ hiển thị, KHÔNG tạo bản ghi mới
-            req.getRequestDispatcher("/payment.jsp").forward(req, resp);
+            req.getRequestDispatcher("/payment/payment.jsp").forward(req, resp);
 
         } catch (Exception ex) {
             req.setAttribute("error", "Lỗi hệ thống khi xử lý thanh toán.");

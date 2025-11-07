@@ -1,5 +1,6 @@
 package controller.payment;
 
+import constant.ConstractStatus;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -9,12 +10,14 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.json.JSONObject;
+import service.ContractService;
 import service.PaymentService;
 import util.di.DIContainer;
 
 @WebServlet("/paymentCallback")
 public class PaymentCallbackServlet extends HttpServlet {
 
+    private ContractService contractService;
     private PaymentService paymentService;
 
     @Override
@@ -22,6 +25,7 @@ public class PaymentCallbackServlet extends HttpServlet {
         super.init();
         try {
             paymentService = DIContainer.get(PaymentService.class);
+            contractService = DIContainer.get(ContractService.class);
         } catch (Exception e) {
             throw new RuntimeException("Dependency injection error", e);
         }
@@ -83,10 +87,10 @@ public class PaymentCallbackServlet extends HttpServlet {
             if (pendingPayment.isPresent() && !paymentService.isPaymentCompleted(pendingPayment.get().getPaymentId())) {
                 boolean updatedPayment = paymentService.completePaymentById(pendingPayment.get().getPaymentId());
 
-                System.out.println("[CALLBACK] UpdatedPayment=" + updatedPayment);
-
-                System.out.println("Payment updated: " + updatedPayment);
-
+                if (updatedPayment) {
+                    contractService.updateContractStatus(contractId, ConstractStatus.COMPLETED.name());
+                    System.out.println("[CALLBACK] Contract status updated to COMPLETED for contractId=" + contractId);
+                }
                 String statusNow = paymentService.getPaymentStatus(contractId);
                 System.out.println("[CALLBACK] Recheck DB status after update: " + statusNow);
 
