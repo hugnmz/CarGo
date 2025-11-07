@@ -75,12 +75,9 @@ public interface PaymentService {
      * ContractsDAO bên trong để không cần tạo ContractService
      */
     Optional<BigDecimal> getContractTotalAmount(Integer contractId);
-<<<<<<< Updated upstream
-}
-=======
+
 
     public PaymentDTO createPendingPayment(int contractId, BigDecimal amount);
 
     public void handleSuccessfulPayment(int paymentId, int contractId);
 }
->>>>>>> Stashed changes
