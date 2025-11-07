@@ -200,41 +200,32 @@
               <li>Trong trường hợp bất khả kháng (tai nạn, hỏng hóc), hai bên phối hợp xử lý, ưu tiên an toàn và liên hệ ngay cho Bên cho thuê.</li>
               <li>Hợp đồng có hiệu lực từ thời điểm ký và được chấm dứt khi hai bên hoàn thành nghĩa vụ.</li>
             </ol>
-
-            <div class="signature-box">
-              <div class="signature">
-                <strong>ĐẠI DIỆN BÊN A (Cho thuê)</strong>
-                <div class="mt-3">Ký, ghi rõ họ tên</div>
-              </div>
-              <div class="signature">
-                <strong>ĐẠI DIỆN BÊN B (Thuê)</strong>
-                <div class="mt-3">Ký, ghi rõ họ tên</div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
 
-      <!-- Thanh toán: full width action bar dưới Điều khoản -->
-      <div class="row mt-3">
-        <div class="col-12">
-          <div class="action-bar d-flex align-items-center justify-content-between">
-            <div class="action-amount">
-              <small class="d-block opacity-75">Tổng giá trị hợp đồng</small>
-              <h2 class="mb-0">
-                <fmt:formatNumber value="${contract.totalAmount}" pattern="#,###" />
-                <small class="opacity-75">VNĐ</small>
-              </h2>
-            </div>
-            <div class="action-cta">
-              <a class="btn btn-primary px-4 py-2"
-                 href="${pageContext.request.contextPath}/PaymentServlet?action=by_contract&contractId=${contract.contractId}">
-                <i class="fas fa-credit-card me-2"></i>Thanh toán
-              </a>
+      <!-- Thanh toán: chỉ hiển thị khi hợp đồng đã được chấp thuận -->
+      <c:if test="${contract.status == 'ACCEPTED'}">
+        <div class="row mt-3">
+          <div class="col-12">
+            <div class="action-bar d-flex align-items-center justify-content-between">
+              <div class="action-amount">
+                <small class="d-block opacity-75">Tổng giá trị hợp đồng</small>
+                <h2 class="mb-0">
+                  <fmt:formatNumber value="${contract.totalAmount}" pattern="#,###" />
+                  <small class="opacity-75">VNĐ</small>
+                </h2>
+              </div>
+              <div class="action-cta">
+                <a class="btn btn-primary px-4 py-2"
+                   href="${pageContext.request.contextPath}/PaymentServlet?action=by_contract&contractId=${contract.contractId}">
+                  <i class="fas fa-credit-card me-2"></i>Thanh toán
+                </a>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </c:if>
 
     </div>
   </main>

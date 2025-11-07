@@ -301,11 +301,6 @@
                                                     onclick="window.location.href = '${pageContext.request.contextPath}/ContractServlet?action=view&contractId=${contract.contractId}'">
                                                 <i class="fas fa-eye"></i> Xem chi tiết
                                             </button>
-
-                                            <button type="button" class="btn btn-info btn-action btn-sm mb-1"
-                                                    onclick="window.location.href = '${pageContext.request.contextPath}/PaymentServlet?action=by_contract&contractId=${contract.contractId}'">
-                                                <i class="fas fa-money-check"></i> Thanh toán
-                                            </button>
                                             <c:if test="${contract.status == 'PENDING'}">
                                                 <div class="btn-group" role="group">
                                                     <button type="button" class="btn btn-success btn-sm" 

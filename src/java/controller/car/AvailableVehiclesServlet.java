@@ -1,5 +1,4 @@
 package controller.car;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,7 +11,6 @@ import java.util.List;
 import dto.VehicleDTO;
 import service.VehicleService;
 import util.di.DIContainer;
-
 
 @WebServlet(name = "AvailableVehiclesServlet", urlPatterns = {"/api/available-vehicles"})
 public class AvailableVehiclesServlet extends HttpServlet {
