@@ -1,5 +1,4 @@
-
-package service.impl;
+package impl;
 
 import dao.FeedbacksDAO;
 import dto.FeedbackDTO;

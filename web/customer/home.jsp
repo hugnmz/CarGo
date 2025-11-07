@@ -19,48 +19,10 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
         <link href="${pageContext.request.contextPath}/css/customer/home.css" rel="stylesheet">
     </head>
-    <body>
-        <!-- Modern Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-modern fixed-top">
-            <div class="container">
-                <a class="navbar-brand" href="${pageContext.request.contextPath}/home">
-                    <i class="fas fa-car"></i> CarGo
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto align-items-center">
-                        <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/home">Trang chủ</a></li>
-                        <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/cars">Xe cho thuê</a></li>
-                        <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/customer/contact.jsp">Chúng Tôi</a></li>
 
-                        <c:choose>
-                            <c:when test="${not empty username}">
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/my-contracts">Hợp đồng</a></li>
-                                <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/ViewCartDetail"><i class="fas fa-shopping-cart"></i></a></li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                        <img src="${avatar}" alt="Avatar" style="width:35px; height:35px; border-radius:50%; margin-right:8px;">
-                                        ${username}
-                                    </a>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/CustomerServlet"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/LogoutServlet"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
-                                    </ul>
-                                </li>
-                            </c:when>
-                            <c:otherwise>
-                                <li class="nav-item">
-                                    <a class="btn btn-primary-custom" href="${pageContext.request.contextPath}/auth/login.jsp">Đăng nhập</a>
-                                </li>
-                            </c:otherwise>
-                        </c:choose>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+    <body>
+        <%@ include file="/include/header.jsp" %>
+
 
         <!-- Hero Section -->
         <div class="hero-modern">
@@ -150,81 +112,6 @@
                         </button>
                     </div>
                 </form>
-            </div>
-
-
-            <!-- Chọn xe theo hãng -->
-            <h3 class="fw-bold mt-5 mb-3 text-center">Chọn xe theo hãng</h3>
-            <div class="d-flex flex-wrap justify-content-center gap-3">
-                <div class="brand-logo text-center">
-                    <img src="https://cdnlogo.com/logos/f/41/ford.svg">
-                    <p>Ford</p>
-                </div>
-                <div class="brand-logo text-center">
-                    <img src="https://cdnlogo.com/logos/m/48/mercedes.svg">
-                    <p>Mercedes</p>
-                </div>
-                <div class="brand-logo text-center">
-                    <img src="https://cdnlogo.com/logos/a/56/audi.svg">
-                    <p>Audi</p>
-                </div>
-                <div class="brand-logo text-center">
-                    <img src="https://cdnlogo.com/logos/p/84/peugeot.svg">
-                    <p>Peugeot</p>
-                </div>
-                <div class="brand-logo text-center">
-                    <img src="https://cdnlogo.com/logos/s/32/subaru.svg">
-                    <p>Subaru</p>
-                </div>
-                <div class="brand-logo text-center">
-                    <img src="https://cdnlogo.com/logos/b/16/byd.svg">
-                    <p>BYD</p>
-                </div>
-            </div>
-
-            <!-- Địa điểm nổi bật -->
-            <h3 class="fw-bold mt-5 mb-3 text-center">Địa điểm nổi bật</h3>
-            <div class="row g-4">
-                <div class="col-md-3">
-                    <div class="card card-location shadow">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Bitexco_Financial_Tower_2016.jpg" class="card-img-top" alt="">
-                        <div class="card-body">
-                            <h5 class="card-title">Hồ Chí Minh</h5>
-                            <p class="text-success"><i class="fa fa-car"></i> 500+ xe</p>
-                            <a href="#" class="btn btn-outline-success w-100">TÌM XE</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card card-location shadow">
-                        <img src="https://statics.vinpearl.com/cau-vang-da-nang-2_1665731772.jpg" class="card-img-top" alt="">
-                        <div class="card-body">
-                            <h5 class="card-title">Đà Nẵng</h5>
-                            <p class="text-success"><i class="fa fa-car"></i> 100+ xe</p>
-                            <a href="#" class="btn btn-outline-success w-100">TÌM XE</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card card-location shadow">
-                        <img src="https://statics.vinpearl.com/ho-hoan-kiem-ha-noi-2_1684468738.jpg" class="card-img-top" alt="">
-                        <div class="card-body">
-                            <h5 class="card-title">Hà Nội</h5>
-                            <p class="text-success"><i class="fa fa-car"></i> 150+ xe</p>
-                            <a href="#" class="btn btn-outline-success w-100">TÌM XE</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card card-location shadow">
-                        <img src="https://static.vinwonders.com/production/binh-duong-1.jpg" class="card-img-top" alt="">
-                        <div class="card-body">
-                            <h5 class="card-title">Bình Dương</h5>
-                            <p class="text-success"><i class="fa fa-car"></i> 150+ xe</p>
-                            <a href="#" class="btn btn-outline-success w-100">TÌM XE</a>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Stats Section -->
@@ -345,7 +232,7 @@
                 </a>
             </div>
 
-              <!-- Testimonials / Feedback -->
+            <!-- Testimonials / Feedback -->
             <div class="d-flex align-items-center justify-content-between mt-5">
                 <h2 class="section-title m-0">Khách hàng nói gì về chúng tôi</h2>
                 <button id="btnOpenFeedback" class="btn btn-primary-custom btn-sm">
@@ -358,6 +245,9 @@
             <div class="text-center mb-5">
                 <button id="btnLoadMoreFeedback" class="btn btn-outline-primary" style="display:none;">
                     Xem thêm
+                </button>
+                <button id="btnCollapseFeedback" class="btn btn-outline-secondary ms-2" style="display:none;">
+                    Rút gọn
                 </button>
             </div>
 
@@ -399,10 +289,13 @@
                     var ctx = '${pageContext.request.contextPath}';
                     var listEl = document.getElementById('feedbackList');
                     var btnMore = document.getElementById('btnLoadMoreFeedback');
+                    var btnCollapse = document.getElementById('btnCollapseFeedback');
                     var btnOpen = document.getElementById('btnOpenFeedback');
                     var modalEl = document.getElementById('feedbackModal');
+
                     var offset = 0;
-                    var limit = 6;
+                    var limit = 3;        // chỉ tải 3 mỗi lần
+                    var expanded = false; // đã bấm xem thêm hay chưa
 
                     if (btnOpen) {
                         btnOpen.addEventListener('click', function () {
@@ -417,20 +310,20 @@
                         var img = item.carImage || ('https://i.pravatar.cc/100?u=' + (item.customerEmail || name));
                         return ''
                                 + '<div class="col-md-4">'
-                                + '<div class="testimonial-card">'
-                                + '<div class="text-warning mb-2">'
-                                + '<i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>'
-                                + '<i class="fas fa-star"></i><i class="fas fa-star"></i>'
-                                + '</div>'
-                                + '<p class="mb-3">' + escapeHtml(item.comment || '') + '</p>'
-                                + '<div class="d-flex align-items-center">'
-                                + '<img src="' + img + '" class="rounded-circle me-3" width="50" height="50"/>'
-                                + '<div>'
-                                + '<strong>' + escapeHtml(name) + '</strong><br/>'
-                                + '<small class="text-muted">' + created + '</small>'
-                                + '</div>'
-                                + '</div>'
-                                + '</div>'
+                                + '  <div class="testimonial-card">'
+                                + '    <div class="text-warning mb-2">'
+                                + '      <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>'
+                                + '      <i class="fas fa-star"></i><i class="fas fa-star"></i>'
+                                + '    </div>'
+                                + '    <p class="mb-3">' + escapeHtml(item.comment || '') + '</p>'
+                                + '    <div class="d-flex align-items-center">'
+                                + '      <img src="' + img + '" class="rounded-circle me-3" width="50" height="50"/>'
+                                + '      <div>'
+                                + '        <strong>' + escapeHtml(name) + '</strong><br/>'
+                                + '        <small class="text-muted">' + created + '</small>'
+                                + '      </div>'
+                                + '    </div>'
+                                + '  </div>'
                                 + '</div>';
                     }
 
@@ -448,21 +341,46 @@
                         var res = await fetch(url);
                         if (!res.ok)
                             return;
+
                         var data = await res.json();
                         if (Array.isArray(data)) {
                             var html = data.map(renderItem).join('');
                             listEl.insertAdjacentHTML('beforeend', html);
                             offset += data.length;
-                            btnMore.style.display = (data.length === limit ? 'inline-block' : 'none');
+
+                            // Hiện "Xem thêm" nếu còn khả năng có dữ liệu tiếp (server trả đủ limit)
+                            if (btnMore)
+                                btnMore.style.display = (data.length === limit ? 'inline-block' : 'none');
+
+                            // Hiện "Rút gọn" nếu đã từng mở rộng và hiện có hơn 3 item
+                            if (btnCollapse)
+                                btnCollapse.style.display = (expanded && listEl.children.length > limit) ? 'inline-block' : 'none';
                         }
                     }
 
                     if (btnMore) {
                         btnMore.addEventListener('click', function () {
+                            expanded = true;
                             load(offset);
                         });
                     }
 
+                    if (btnCollapse) {
+                        btnCollapse.addEventListener('click', function () {
+                            // Reset về trạng thái ban đầu: chỉ 3 item
+                            expanded = false;
+                            offset = 0;
+                            listEl.innerHTML = '';
+                            // Tải lại 3 feedback đầu
+                            load(offset);
+                            // Ẩn nút rút gọn, nút xem thêm sẽ được quyết định sau khi load
+                            btnCollapse.style.display = 'none';
+                            // Cuộn tới danh sách
+                            listEl.scrollIntoView({behavior: 'smooth', block: 'start'});
+                        });
+                    }
+
+                    // Submit feedback
                     var form = document.getElementById('feedbackForm');
                     if (form) {
                         form.addEventListener('submit', async function (e) {
@@ -490,16 +408,19 @@
                                 }
 
                                 var item = await res.json();
-                                if (listEl) {
-                                    listEl.insertAdjacentHTML('afterbegin', renderItem(item));
-                                } else {
-                                    location.reload();
-                                }
+
+                                // Sau khi gửi, reset về trạng thái rút gọn để đảm bảo nhất quán
+                                expanded = false;
+                                offset = 0;
+                                listEl.innerHTML = '';
+                                load(offset);
 
                                 var inst = bootstrap.Modal.getInstance(modalEl);
                                 if (inst)
                                     inst.hide();
                                 form.reset();
+                                if (btnCollapse)
+                                    btnCollapse.style.display = 'none';
                             } catch (err) {
                                 console.error(err);
                                 alert('Có lỗi kết nối khi gửi nhận xét.');
@@ -514,46 +435,10 @@
                     load(offset);
                 })();
             </script>
-        <!-- Footer -->
-        <footer class="footer-modern">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-4 mb-4">
-                        <h5 class="fw-bold mb-3"><i class="fas fa-car me-2"></i>CarGo</h5>
-                        <p class="text-white-50">Dịch vụ cho thuê xe tự lái cao cấp hàng đầu Việt Nam. Cam kết mang đến trải nghiệm tốt nhất cho khách hàng.</p>
-                    </div>
-                    <div class="col-md-2 mb-4">
-                        <h6 class="fw-bold mb-3">Dịch vụ</h6>
-                        <ul class="list-unstyled">
-                            <li class="mb-2"><a href="#">Thuê xe tự lái</a></li>
-                            <li class="mb-2"><a href="#">Thuê xe có tài</a></li>
-                            <li class="mb-2"><a href="#">Xe dài hạn</a></li>
-                        </ul>
-                    </div>
-                    <div class="col-md-2 mb-4">
-                        <h6 class="fw-bold mb-3">Về chúng tôi</h6>
-                        <ul class="list-unstyled">
-                            <li class="mb-2"><a href="#">Giới thiệu</a></li>
-                            <li class="mb-2"><a href="#">Liên hệ</a></li>
-                            <li class="mb-2"><a href="#">Tuyển dụng</a></li>
-                        </ul>
-                    </div>
-                    <div class="col-md-4 mb-4">
-                        <h6 class="fw-bold mb-3">Liên hệ</h6>
-                        <p class="text-white-50">
-                            <i class="fas fa-phone me-2"></i>1900 1234<br>
-                            <i class="fas fa-envelope me-2"></i>support@cargo.vn<br>
-                            <i class="fas fa-map-marker-alt me-2"></i>TP. Hồ Chí Minh
-                        </p>
-                    </div>
-                </div>
-                <hr style="border-color: rgba(255,255,255,0.1)">
-                <div class="text-center text-white-50">
-                    <p class="mb-0">© 2025 CarGo. All rights reserved.</p>
-                </div>
-            </div>
-        </footer>
+            <!-- Footer -->
+            <%@ include file="/include/footer.jsp" %>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     </body>
+
 </html>

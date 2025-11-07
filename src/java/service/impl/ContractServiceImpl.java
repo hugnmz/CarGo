@@ -236,17 +236,25 @@ public class ContractServiceImpl implements ContractService {
                 return createdContracts;
             }
 
-            // 3. Nhóm orders theo (startDate, endDate)
+            // 3. Chọn staff một lần cho toàn bộ phiên tạo hợp đồng
+            // Staff được chọn là staff có số lượng hợp đồng PENDING ít nhất
+            // Nếu có nhiều staff cùng số lượng, random chọn một
+            Integer assignedStaffId = contractsDAO.findLeastLoadedStaffId();
+            if (assignedStaffId == null) {
+                throw new BusinessException(MessageUtil.getError("error.dataaccess.staff.not.found"));
+            }
+
+            // 4. Nhóm orders theo (startDate, endDate)
             Map<String, List<OrderDTO>> groups = groupOrdersByDateRange(selectedOrders);
 
-            // 4. Tạo hợp đồng cho từng nhóm
+            // 5. Tạo hợp đồng cho từng nhóm - dùng cùng 1 staff đã chọn
             for (Map.Entry<String, List<OrderDTO>> entry : groups.entrySet()) {
                 List<OrderDTO> orders = entry.getValue();
                 if (orders.isEmpty()) {
                     continue;
                 }
 
-                ContractDTO contractDTO = createContractFromOrders(customerId, customerName, orders);
+                ContractDTO contractDTO = createContractFromOrders(customerId, customerName, orders, assignedStaffId);
                 if (contractDTO != null) {
                     createdContracts.add(contractDTO);
                 }
@@ -314,7 +322,7 @@ public class ContractServiceImpl implements ContractService {
         return groups;
     }
 
-    private ContractDTO createContractFromOrders(Integer customerId, String customerName, List<OrderDTO> orders) {
+    private ContractDTO createContractFromOrders(Integer customerId, String customerName, List<OrderDTO> orders, Integer staffId) {
         try {
             if (orders.isEmpty()) {
                 return null;
@@ -339,8 +347,9 @@ public class ContractServiceImpl implements ContractService {
             contract.setDepositAmount(deposit);
             contract.setCreateAt(LocalDateTime.now());
 
-            Integer staffId = contractsDAO.findLeastLoadedStaffId();
+            // Sử dụng staffId đã được chọn từ đầu phiên
             contract.setStaffId(staffId);
+            
             // Lưu contract
             boolean contractSaved = contractsDAO.addContract(contract);
             if (!contractSaved) {

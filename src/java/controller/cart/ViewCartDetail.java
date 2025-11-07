@@ -1,13 +1,11 @@
 package controller.cart;
 
-import dto.CustomerDTO;
 import dto.OrderDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import service.CartService;
@@ -64,13 +62,13 @@ public class ViewCartDetail extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // kiem tra session va customer id, neu khong co thi chuyen den trang dang nhap
-        HttpSession session = request.getSession(false);
-        CustomerDTO dto = (CustomerDTO)session.getAttribute("c");
-        
+        // kiem tra dang nhap, neu chua dang nhap thi chuyen den trang dang nhap
+        if (!AuthUtil.requireLogin(request, response)) {
+            return;
+        }
         
         // lay thong tin customer tu session
-        Integer customerId = dto.getCustomerId();
+        Integer customerId = AuthUtil.getCustomerId(request);
         // lay tham so action de xac dinh hanh dong can thuc hien
         String action = request.getParameter("action");
         // lay danh sach id cac san pham duoc chon de xoa

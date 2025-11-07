@@ -2,11 +2,16 @@ package dao.impl;
 
 import dao.ContractsDAO;
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import model.Contracts;
-import model.Users;
+import util.DB;
 import util.JdbcTemplateUtil;
 import util.di.annotation.Repository;
 
@@ -137,18 +142,67 @@ public class ContractsDAOImpl implements ContractsDAO {
 
     @Override
     public Integer findLeastLoadedStaffId() {
+        // Lấy tất cả staff với số lượng hợp đồng PENDING
         String sql = """
-        SELECT TOP 1 u.userId
+        SELECT u.userId, COUNT(c.contractId) as contractCount
         FROM Users u
         JOIN Roles r ON r.roleId = u.roleId AND r.roleName = 'STAFF'
         LEFT JOIN Contracts c
             ON c.staffId = u.userId
             AND c.status = 'PENDING'
         GROUP BY u.userId
-        ORDER BY COUNT(c.contractId) ASC, MIN(c.createAt) ASC
+        ORDER BY COUNT(c.contractId) ASC
         """;
-        Users u = JdbcTemplateUtil.queryOne(sql, model.Users.class);
-        return (u != null) ? u.getUserId() : null;
+        
+        List<StaffContractCount> staffList = new ArrayList<>();
+        
+        try (Connection conn = DB.get(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Integer userId = rs.getInt("userId");
+                    int contractCount = rs.getInt("contractCount");
+                    staffList.add(new StaffContractCount(userId, contractCount));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("error.system", e);
+        }
+        
+        if (staffList.isEmpty()) {
+            return null;
+        }
+        
+        // Tìm số lượng hợp đồng ít nhất
+        int minCount = staffList.get(0).contractCount;
+        List<Integer> staffIdsWithMinCount = new ArrayList<>();
+        
+        for (StaffContractCount staff : staffList) {
+            if (staff.contractCount == minCount) {
+                staffIdsWithMinCount.add(staff.userId);
+            } else {
+                // Đã vượt quá minCount, dừng lại
+                break;
+            }
+        }
+        
+        // Random chọn một trong số các staff có cùng số lượng hợp đồng ít nhất
+        if (staffIdsWithMinCount.size() == 1) {
+            return staffIdsWithMinCount.get(0);
+        }
+        
+        Random random = new Random();
+        return staffIdsWithMinCount.get(random.nextInt(staffIdsWithMinCount.size()));
+    }
+    
+    // Inner class để lưu thông tin staff và số lượng hợp đồng
+    private static class StaffContractCount {
+        Integer userId;
+        int contractCount;
+        
+        StaffContractCount(Integer userId, int contractCount) {
+            this.userId = userId;
+            this.contractCount = contractCount;
+        }
     }
     
         @Override

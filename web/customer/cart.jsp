@@ -11,29 +11,12 @@ contentType="text/html; charset=UTF-8" language="java" %>
     <link href="${pageContext.request.contextPath}/css/customer/cart.css" rel="stylesheet" />
   </head>
   <body>
-    <div class="cart-wrapper">
-      <div class="cart-header">
-        <h3 style="margin:0">Giỏ hàng</h3>
-        <div>
-          <c:choose>
-            <c:when test="${not empty carId}">
-              <a class="btn outline" href="${pageContext.request.contextPath}/car-detail?carId=${carId}">
-                <i class="fa fa-arrow-left me-1"></i>
-                Quay lại xem xe
-              </a>
-            </c:when>
-            <c:otherwise>
-              <a class="btn outline" href="${pageContext.request.contextPath}/home">
-                <i class="fa fa-arrow-left me-1"></i>
-                Về trang chủ
-              </a>
-            </c:otherwise>
-          </c:choose>
-        </div>
-      </div>
+<%@ include file="/include/header.jsp" %>
+<main class="container" style="flex:1">
     <c:choose>
       <c:when test="${not empty cartItems}">
         
+        <%-- Đếm số nhóm ngày khác nhau --%>
         <%
             java.util.Set<String> uniqueDates = new java.util.LinkedHashSet<>();
             java.util.Map<String, java.util.List> dateGroupsMap = new java.util.LinkedHashMap<>();
@@ -42,7 +25,6 @@ contentType="text/html; charset=UTF-8" language="java" %>
             if (cartItems != null) {
                 for (Object obj : cartItems) {
                     try {
-                    
                         // Sử dụng reflection để lấy rentStartDate và rentEndDate
                         java.lang.reflect.Method getStart = obj.getClass().getMethod("getRentStartDate");
                         java.lang.reflect.Method getEnd = obj.getClass().getMethod("getRentEndDate");
@@ -192,5 +174,7 @@ contentType="text/html; charset=UTF-8" language="java" %>
         </div>
       </c:otherwise>
     </c:choose>
+</main>
+     <%@ include file="/include/footer.jsp" %>
   </body>
 </html>

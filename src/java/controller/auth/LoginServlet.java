@@ -12,7 +12,6 @@ import service.CustomerService;
 import service.UserService;
 import util.di.DIContainer;
 import util.MessageUtil;
-import util.exception.ApplicationException;
 import util.exception.ValidationException;
 import util.exception.BusinessException;
 import util.exception.DataAccessException;
@@ -70,7 +69,7 @@ public class LoginServlet extends HttpServlet {
                     CustomerDTO customer = customerOpt.get();
                     HttpSession session = request.getSession(true);
                     setCustomerSession(session, customer);
-                    redirectByRole(response, request, "CUSTOMER");
+                    redirectAfterLogin(response, request, "CUSTOMER");
                     return;
                 }
             } catch (ValidationException | BusinessException | DataAccessException e) {
@@ -86,7 +85,7 @@ public class LoginServlet extends HttpServlet {
 
                     HttpSession session = request.getSession(true);
                     setUserSession(session, user);
-                    redirectByRole(response, request, user.getRoleName());
+                    redirectAfterLogin(response, request, user.getRoleName());
                     return;
                 }
             } catch (ValidationException | BusinessException | DataAccessException e) {
@@ -123,7 +122,32 @@ public class LoginServlet extends HttpServlet {
     }
     
 
-        private void redirectByRole(HttpServletResponse response, HttpServletRequest request, String role)
+    /**
+     * Redirect sau khi đăng nhập thành công
+     * Ưu tiên redirect về trang trước đó (nếu có), nếu không thì redirect theo role
+     */
+    private void redirectAfterLogin(HttpServletResponse response, HttpServletRequest request, String role)
+            throws IOException, ServletException {
+        HttpSession session = request.getSession(false);
+        String redirectUrl = null;
+        
+        // Kiểm tra xem có URL cần redirect sau khi login không
+        if (session != null) {
+            redirectUrl = (String) session.getAttribute("redirectAfterLogin");
+            if (redirectUrl != null) {
+                // Xóa redirectAfterLogin khỏi session sau khi sử dụng
+                session.removeAttribute("redirectAfterLogin");
+                // Redirect về trang trước đó
+                response.sendRedirect(request.getContextPath() + redirectUrl);
+                return;
+            }
+        }
+        
+        // Nếu không có redirectAfterLogin, redirect theo role như cũ
+        redirectByRole(response, request, role);
+    }
+    
+    private void redirectByRole(HttpServletResponse response, HttpServletRequest request, String role)
             throws IOException, ServletException {
         String path = request.getContextPath();
 

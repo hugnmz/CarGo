@@ -37,7 +37,7 @@
                     <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#addUserForm">
                         + Thêm User
                     </button>
-                    <a href="LogoutAdmin" class="btn btn-outline-light">Đăng xuất</a>
+                    <a href="LogoutServlet" class="btn btn-outline-light">Đăng xuất</a>
                 </div>
             </div>
         </nav>

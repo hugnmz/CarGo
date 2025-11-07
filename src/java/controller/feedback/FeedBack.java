@@ -7,8 +7,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import service.FeedbackService;
 import util.di.DIContainer;
-import util.MessageUtil;
-import util.exception.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -54,8 +52,10 @@ public class FeedBack extends HttpServlet {
         HttpSession session = req.getSession(false);
         CustomerDTO customer = (session != null) ? (CustomerDTO) session.getAttribute("c") : null;
         Integer customerId = (customer != null) ? customer.getCustomerId() : null;
-        
-        // Xóa check - service sẽ check và throw WebException
+        if (customerId == null) {
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
 
         String comment = req.getParameter("comment");
         Integer vehicleId = null;
@@ -67,25 +67,23 @@ public class FeedBack extends HttpServlet {
         }
 
         try {
-            // Gọi service - service sẽ check customerId null và throw WebException
             FeedbackDTO dto = feedbackService.create(customerId, comment, vehicleId);
             resp.setCharacterEncoding("UTF-8");
             resp.setContentType("application/json; charset=UTF-8");
             try (PrintWriter out = resp.getWriter()) {
                 out.print(toJson(dto));
             }
-        } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
+        } catch (IllegalArgumentException ex) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.setCharacterEncoding("UTF-8");
             resp.setContentType("text/plain; charset=UTF-8");
-            resp.getWriter().write(MessageUtil.getErrorFromException(e));
+            resp.getWriter().write(ex.getMessage());
         } catch (Exception ex) {
-            ex.printStackTrace();
+            ex.printStackTrace(); // log ra console/server log
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.setCharacterEncoding("UTF-8");
             resp.setContentType("text/plain; charset=UTF-8");
-            resp.getWriter().write(MessageUtil.getError("error.system"));
+            resp.getWriter().write(ex.getMessage() != null ? ex.getMessage() : "Internal error");
         }
     }
 

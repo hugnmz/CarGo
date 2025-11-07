@@ -22,6 +22,7 @@ import model.RequestReturnCar;
 import service.ContractService;
 import service.ReturnCarService;
 import util.di.DIContainer;
+import util.AuthUtil;
 import util.MessageUtil;
 import util.exception.*;
 
@@ -70,6 +71,11 @@ public class ReturnCar extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // kiem tra dang nhap, neu chua dang nhap thi chuyen den trang dang nhap
+        if (!AuthUtil.requireLogin(req, resp)) {
+            return;
+        }
+        
         try {
             String contractIdParam = req.getParameter("contractId");
 

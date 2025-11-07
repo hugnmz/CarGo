@@ -22,6 +22,7 @@ import service.ContractService;
 import service.CustomerService;
 import service.LocationService;
 import util.di.DIContainer;
+import util.AuthUtil;
 import util.MessageUtil;
 import util.exception.ValidationException;
 import util.exception.BusinessException;
@@ -57,25 +58,17 @@ public class CustomerServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // lay session hien tai, neu khong co thi null
-        HttpSession session = request.getSession(false);
-        if (session == null) {
-            // neu khong co session thi chuyen den trang dang nhap
-            response.sendRedirect(request.getContextPath() + "/auth/login.jsp");
+        // kiem tra dang nhap, neu chua dang nhap thi chuyen den trang dang nhap
+        if (!AuthUtil.requireLogin(request, response)) {
             return;
         }
 
         // lay customer id tu session
-        CustomerDTO customerDTO = (CustomerDTO) session.getAttribute("c");
-        if (customerDTO.getCustomerId() == null) {
-            // neu khong co customer id thi chuyen den trang dang nhap
-            response.sendRedirect(request.getContextPath() + "/auth/login.jsp");
-            return;
-        }
+        Integer customerId = AuthUtil.getCustomerId(request);
 
         try {
             // lay thong tin khach hang tu database bang customer id
-            Optional<CustomerDTO> customerOpt = customerService.getCustomerById(customerDTO.getCustomerId());
+            Optional<CustomerDTO> customerOpt = customerService.getCustomerById(customerId);
 
             CustomerDTO customer = customerOpt.get();
 
@@ -109,6 +102,11 @@ public class CustomerServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        // kiem tra dang nhap, neu chua dang nhap thi chuyen den trang dang nhap
+        if (!AuthUtil.requireLogin(request, response)) {
+            return;
+        }
 
         // kiem tra neu co thong bao thanh cong hoac loi tu truoc do
         if (request.getAttribute("ok") != null || request.getAttribute("errorMess") != null) {
@@ -148,15 +146,16 @@ public class CustomerServlet extends HttpServlet {
             boolean success = customerService.updateCustomer(customerDTO);
 
             if (success) {
-                HttpSession session = request.getSession(false);
-                CustomerDTO oldCustomer = (CustomerDTO) session.getAttribute("c");
-                
                 // lay customer updated tu database
-                Optional<CustomerDTO> updatedOpt = customerService.getCustomerById(oldCustomer.getCustomerId());
+                Integer customerId = AuthUtil.getCustomerId(request);
+                Optional<CustomerDTO> updatedOpt = customerService.getCustomerById(customerId);
                 
                 if (updatedOpt.isPresent()) {
                     // cap nhat lai customer object trong session
-                    session.setAttribute("c", updatedOpt.get());
+                    HttpSession session = request.getSession(false);
+                    if (session != null) {
+                        session.setAttribute("c", updatedOpt.get());
+                    }
                 }
 
                 // chuyen huong den trang profile voi thong bao thanh cong
