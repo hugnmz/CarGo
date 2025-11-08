@@ -170,4 +170,10 @@ public class PaymentsDAOImpl implements PaymentsDAO {
         String sql = "UPDATE Payments SET status = 'COMPLETED', paymentDate = GETDATE() WHERE paymentId = ?";
         return JdbcTemplateUtil.update(sql, paymentId) > 0;
     }
+   @Override
+     public int insertPendingPayment(int contractId, BigDecimal amount) {
+        String sql = "INSERT INTO Payments(contractId, amount, status, paymentDate, methodId) "
+                   + "VALUES (?, ?, ?, NULL, 1)"; // methodId = 1 default
+        return JdbcTemplateUtil.update(sql, contractId, amount, "PENDING");
+    }
 }

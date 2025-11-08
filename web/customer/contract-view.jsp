@@ -230,12 +230,15 @@
                                     <small class="opacity-75">VNĐ</small>
                                 </h2>
                             </div>
-                            <div class="action-cta">
-                                <a class="btn btn-primary px-4 py-2"
-                                   href="${pageContext.request.contextPath}/PaymentServlet?action=by_contract&contractId=${contract.contractId}">
-                                    <i class="fas fa-credit-card me-2"></i>Thanh toán
-                                </a>
-                            </div>
+                                    <div class="action-cta">
+                                        <c:if test="${contract.status == 'RETURNED' || contract.status == 'COMPLETED'}">
+                                            <a class="btn btn-primary px-4 py-2"
+                                               href="${pageContext.request.contextPath}/paymentServlet?contractId=${contract.contractId}">
+                                                <i class="fas fa-credit-card me-2"></i>Thanh toán
+                                            </a>
+                                        </c:if>
+
+                                    </div>
                         </div>
                     </div>
                 </div>

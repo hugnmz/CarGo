@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import model.RequestReturnCar;
 import service.ContractService;
+import service.PaymentService;
 import service.ReturnCarService;
 import util.di.DIContainer;
 
@@ -25,6 +26,7 @@ import util.di.DIContainer;
 @WebServlet(name = "ProcessReturnCar", urlPatterns = {"/processreturncar"})
 public class ProcessReturnCar extends HttpServlet {
 
+    private PaymentService paymentService;
     private ContractService contractService;
     private ReturnCarService returnCarService;
 
@@ -33,6 +35,7 @@ public class ProcessReturnCar extends HttpServlet {
         super.init(config); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
 
         try {
+            paymentService = DIContainer.get(PaymentService.class);
             contractService = DIContainer.get(ContractService.class);
             returnCarService = DIContainer.get(ReturnCarService.class);
         } catch (Exception e) {
@@ -138,11 +141,14 @@ public class ProcessReturnCar extends HttpServlet {
             //update tổng tiền sau khi trả xe
             contractService.updateContractTotalAmount(contractId, totalAmount);
 
-            //update note vào hợp đồng
-            contractService.updateNote(note, contractId);
-            
             //update trạng thái hợp đồng
             contractService.updateContractStatus(contractId, ConstractStatus.RETURNED.name());
+
+            //update note vào hợp đồng
+            contractService.updateNote(note, contractId);
+
+            //tao paymentpending
+            paymentService.createPendingPayment(contractId, totalAmount);
 
             // Dọn dẹp: bỏ khỏi whitelist theo phiên + hàng chờ service
             pendingMap.remove(contractId);

@@ -83,12 +83,17 @@ async function check() {
 
 window.onload = () => {
     if (initialStatus === "SUCCESS") {
-        setTimeout(() => location.href = "${pageContext.request.contextPath}/home.jsp", 3000);
+        
+        setTimeout(() => {
+            location.href = "${pageContext.request.contextPath}/view-contract?contractId=" + contractId;
+        }, 1000);
     } else {
+        // Nếu chưa thanh toán thì bắt đầu kiểm tra định kỳ
         check();
         intervalId = setInterval(check, 5000);
     }
 };
+
 </script>
 </body>
 </html>
