@@ -338,7 +338,12 @@ public class DepositPaymentFlowTest {
         if (amount == null) {
             return "0 VND";
         }
-        return String.format("%,.0f VND", amount.doubleValue());
+        // Format theo định dạng VN: 1.000.000 VND
+        java.text.DecimalFormat formatter = new java.text.DecimalFormat("#,###");
+        java.text.DecimalFormatSymbols symbols = formatter.getDecimalFormatSymbols();
+        symbols.setGroupingSeparator('.');
+        formatter.setDecimalFormatSymbols(symbols);
+        return formatter.format(amount.doubleValue()) + " VND";
     }
 }
 

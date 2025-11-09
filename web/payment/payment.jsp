@@ -9,26 +9,26 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
             .qr-img {
-                width: 220px;
-                height: 220px;
-                border: 10px solid white;
-                border-radius: 12px;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                width:220px;
+                height:220px;
+                border:10px solid white;
+                border-radius:12px;
+                box-shadow:0 5px 15px rgba(0,0,0,0.2);
             }
             .amount {
-                font-size: 2rem;
-                font-weight: 700;
-                color: #dc3545;
+                font-size:2rem;
+                font-weight:700;
+                color:#dc3545;
             }
             .spinner {
-                width: 1.2rem;
-                height: 1.2rem;
-                border: 2px solid #f3f3f3;
-                border-top: 2px solid #007bff;
-                border-radius: 50%;
+                width:1.2rem;
+                height:1.2rem;
+                border:2px solid #f3f3f3;
+                border-top:2px solid #007bff;
+                border-radius:50%;
                 animation: spin 1s linear infinite;
-                display: inline-block;
-                margin-right: 8px;
+                display:inline-block;
+                margin-right:8px;
             }
             @keyframes spin {
                 to {
@@ -47,6 +47,15 @@
                     <c:if test="${initialStatus ne 'SUCCESS'}">
                         <img id="qr" src="${qrUrl}" alt="QR Code" class="qr-img mb-4">
                     </c:if>
+
+                    <p class="mb-1"><strong>Loại thanh toán:</strong></p>
+                    <p class="text-info fw-bold">
+                        <c:choose>
+                            <c:when test="${payType eq 'deposit'}">Đặt cọc</c:when>
+                            <c:when test="${payType eq 'full'}">Thanh toán phần còn lại</c:when>
+                            <c:otherwise>Không xác định</c:otherwise>
+                        </c:choose>
+                    </p>
 
                     <p class="mb-1"><strong>Số tiền:</strong></p>
                     <p class="amount">${totalAmount} VNĐ</p>
@@ -71,54 +80,52 @@
         </div>
 
         <script>
-            const contractId = "${contractId}";
-            const initialStatus = "${initialStatus}";
-            let intervalId = null;
+    const contractId = "${contractId}";
+    const initialStatus = "${initialStatus}";
+    const amountToPay = "${totalAmount}";
+    const payType = "${payType}";
+    let intervalId = null;
 
-            async function check() {
-                try {
-                    const response = await fetch("${pageContext.request.contextPath}/checkPayment?contractId=" + contractId + "&t=" + Date.now(), {cache: "no-store"});
-                    const data = await response.json();
-                    console.log("[checkPayment]", data);
+    async function check() {
+        try {
+            const response = await fetch("${pageContext.request.contextPath}/checkPayment?contractId=" + contractId + "&t=" + Date.now(), {cache: "no-store"});
+            const data = await response.json();
+            console.log("[checkPayment]", data);
 
-                    if (data.status === "SUCCESS") {
-                        if (intervalId)
-                            clearInterval(intervalId);
-                        const qr = document.getElementById("qr");
-                        if (qr)
-                            qr.style.display = "none";
+            if (data.status === "SUCCESS" || data.status === "PARTIAL") {
+                if (intervalId)
+                    clearInterval(intervalId);
+                const qr = document.getElementById("qr");
+                if (qr)
+                    qr.style.display = "none";
 
-                        document.getElementById("status").innerHTML = `
+                document.getElementById("status").innerHTML = `
                 <div class="text-success text-center p-4">
                     <i class="fas fa-check-circle fa-4x mb-3"></i>
                     <h4 class="fw-bold">THÀNH CÔNG!</h4>
-                    <p>Hợp đồng #${contractId} đã được xác nhận thanh toán.</p>
+                    <p>${payType=='deposit' ? 'Đặt cọc' : 'Thanh toán còn lại'} đã được thanh toán: ${amountToPay} VNĐ</p>
                     <p class="text-muted">Đang chuyển về trang xem hợp đồng...</p>
                 </div>`;
-                        setTimeout(() => location.href = "${pageContext.request.contextPath}/view-contract?contractId=" + contractId, 3000);
-                    } else if (data.status === "PENDING") {
-                        console.log("⏳ Đang chờ thanh toán...");
-                    } else {
-                        console.warn("⚠️", data.message);
-                    }
-                } catch (err) {
-                    console.error("Lỗi khi gọi checkPayment:", err);
-                }
+
+                setTimeout(() => location.href = "${pageContext.request.contextPath}/view-contract?contractId=" + contractId, 3000);
+            } else if (data.status === "PENDING") {
+                console.log("⏳ Đang chờ thanh toán...");
+            } else {
+                console.warn("⚠️", data.message);
             }
+        } catch (err) {
+            console.error("Lỗi khi gọi checkPayment:", err);
+        }
+    }
 
-            window.onload = () => {
-                if (initialStatus === "SUCCESS") {
-
-                    setTimeout(() => {
-                        location.href = "${pageContext.request.contextPath}/view-contract?contractId=" + contractId;
-                    }, 1000);
-                } else {
-                    // Nếu chưa thanh toán thì bắt đầu kiểm tra định kỳ
-                    check();
-                    intervalId = setInterval(check, 5000);
-                }
-            };
-
+    window.onload = () => {
+        if (initialStatus === "SUCCESS") {
+            setTimeout(() => location.href = "${pageContext.request.contextPath}/view-contract?contractId=" + contractId, 1000);
+        } else {
+            check();
+            intervalId = setInterval(check, 5000);
+        }
+    };
         </script>
     </body>
 </html>

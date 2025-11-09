@@ -8,6 +8,7 @@
             java.util.List,
             java.util.ArrayList,
             java.lang.reflect.Method" %>
+<fmt:setLocale value="vi_VN" />
 <!DOCTYPE html>
 <html lang="vi">
   <head>
@@ -139,32 +140,40 @@
           
           <div class="actions">
             <c:choose>
-              <c:when test="${not empty refererUrl}">
-                <a class="btn btn-outline-secondary" href="${refererUrl}">
-                  <i class="fas fa-arrow-left me-1"></i>Quay lại
-                </a>
-              </c:when>
               <c:when test="${not empty carId}">
                 <a class="btn btn-outline-secondary" href="${pageContext.request.contextPath}/car-detail?carId=${carId}">
                   <i class="fas fa-arrow-left me-1"></i>Quay lại xem xe
                 </a>
               </c:when>
               <c:otherwise>
-                <button type="button" class="btn btn-outline-secondary" onclick="window.history.back();">
-                  <i class="fas fa-arrow-left me-1"></i>Quay lại
-                </button>
+                <a class="btn btn-outline-secondary" href="${pageContext.request.contextPath}/cars">
+                  <i class="fas fa-arrow-left me-1"></i>Tiếp tục chọn xe
+                </a>
               </c:otherwise>
             </c:choose>
-            <button type="submit" class="btn" name="action" value="remove" onclick="return confirm('Bạn có chắc muốn xóa các mục đã chọn?')">
+            
+            <button type="submit" class="btn" name="action" value="remove" onclick="return validateRemoveSelected()">
               <i class="fas fa-trash me-1"></i>Xóa mục đã chọn
             </button>
-            <button type="submit" class="btn secondary" name="action" value="clear" onclick="return confirm('Bạn có chắc muốn xóa tất cả?')">
+            <button type="submit" class="btn secondary" name="action" value="clear" onclick="return confirm('Bạn có chắc muốn xóa TẤT CẢ xe trong giỏ hàng không?')">
               <i class="fas fa-trash-alt me-1"></i>Xóa tất cả
             </button>
             <button type="submit" class="btn btn-success" formaction="${pageContext.request.contextPath}/checkout">
               <i class="fas fa-credit-card me-1"></i>Thanh toán
             </button>
           </div>
+          
+          <script>
+            // Kiểm tra có ít nhất 1 item được chọn trước khi xóa
+            function validateRemoveSelected() {
+              const checkboxes = document.querySelectorAll('input[name="selectedIds"]:checked');
+              if (checkboxes.length === 0) {
+                alert('Vui lòng chọn ít nhất 1 xe để xóa!');
+                return false;
+              }
+              return confirm('Bạn có chắc muốn xóa ' + checkboxes.length + ' xe đã chọn?');
+            }
+          </script>
           
         </form>
       </c:when>
@@ -176,12 +185,6 @@
             <p class="text-muted mb-4">Bạn chưa có sản phẩm nào trong giỏ hàng</p>
             <div class="d-flex justify-content-center gap-3">
               <c:choose>
-                <c:when test="${not empty refererUrl}">
-                  <a class="btn btn-primary" href="${refererUrl}">
-                    <i class="fa fa-arrow-left me-1"></i>
-                    Quay lại
-                  </a>
-                </c:when>
                 <c:when test="${not empty carId}">
                   <a class="btn btn-primary" href="${pageContext.request.contextPath}/car-detail?carId=${carId}">
                     <i class="fa fa-arrow-left me-1"></i>
@@ -189,15 +192,15 @@
                   </a>
                 </c:when>
                 <c:otherwise>
-                  <button type="button" class="btn btn-primary" onclick="window.history.back();">
-                    <i class="fa fa-arrow-left me-1"></i>
-                    Quay lại
-                  </button>
+                  <a class="btn btn-primary" href="${pageContext.request.contextPath}/cars">
+                    <i class="fa fa-car me-1"></i>
+                    Chọn xe
+                  </a>
                 </c:otherwise>
               </c:choose>
               <a class="btn btn-outline-primary" href="${pageContext.request.contextPath}/home">
                 <i class="fa fa-home me-1"></i>
-                Khám phá thêm
+                Về trang chủ
               </a>
             </div>
           </div>

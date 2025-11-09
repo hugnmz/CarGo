@@ -78,5 +78,7 @@ public interface PaymentService {
     Optional<BigDecimal> getContractTotalAmount(Integer contractId);
 
     public PaymentDTO createPendingPayment(int contractId, BigDecimal amount);
-
+    
+    
+int markDepositPaid(int contractId, BigDecimal amount); // trả về paymentId
 }

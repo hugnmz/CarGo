@@ -2,6 +2,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<fmt:setLocale value="vi_VN" />
 <%
     response.setHeader("Cache-Control","no-cache, no-store, must-revalidate");
     response.setHeader("Pragma","no-cache");
@@ -145,11 +146,11 @@
                 <p><strong>Số chỗ ngồi:</strong> ${car.seatingType}</p>
                 <p><strong>Giá thuê/ngày:</strong> 
                     <span class="price">
-                        <fmt:formatNumber value="${car.dailyPrice}" type="currency" currencySymbol="₫"/>
+                        <fmt:formatNumber value="${car.dailyPrice}" pattern="#,###" />₫
                     </span>
                 </p>
                 <p><strong>Tiền đặt cọc:</strong> 
-                    <fmt:formatNumber value="${car.depositAmount}" type="currency" currencySymbol="₫"/>
+                    <fmt:formatNumber value="${car.depositAmount}" pattern="#,###" />₫
                 </p>
                 <p><strong>Mô tả:</strong> ${car.description}</p>
             </div>
@@ -199,10 +200,10 @@
                                 </c:choose>
                             </td>
                             <td class="price">
-                                <fmt:formatNumber value="${price.dailyPrice}" pattern="#,##0.00" />₫
+                                <fmt:formatNumber value="${price.dailyPrice}" pattern="#,###" />₫
                             </td>
                             <td>
-                                <fmt:formatNumber value="${price.depositAmount}" pattern="#,##0.00" />₫
+                                <fmt:formatNumber value="${price.depositAmount}" pattern="#,###" />₫
                             </td>
                         </tr>
                     </c:forEach>

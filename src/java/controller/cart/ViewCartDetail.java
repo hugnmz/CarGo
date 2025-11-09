@@ -45,20 +45,31 @@ public class ViewCartDetail extends HttpServlet {
         // dat danh sach san pham vao request de truyen sang jsp
         request.setAttribute("cartItems", items);
         
-        // lay car id va vehicle id tu tham so de hien thi link "quay lai xem xe"
         String carId = request.getParameter("carId");
         String vehicleId = request.getParameter("vehicleId");
+        
+        // Nếu không có carId từ parameter, thử lấy từ referer (nếu từ trang car-detail)
+        if (carId == null || carId.trim().isEmpty()) {
+            String referer = request.getHeader("Referer");
+            if (referer != null && referer.contains("/car-detail")) {
+                // Trích xuất carId từ URL: /car-detail?carId=1
+                int carIdIndex = referer.indexOf("carId=");
+                if (carIdIndex != -1) {
+                    String carIdFromUrl = referer.substring(carIdIndex + 6);
+                    int ampIndex = carIdFromUrl.indexOf("&");
+                    if (ampIndex != -1) {
+                        carIdFromUrl = carIdFromUrl.substring(0, ampIndex);
+                    }
+                    carId = carIdFromUrl;
+                }
+            }
+        }
+        
         if (carId != null && !carId.trim().isEmpty()) {
             request.setAttribute("carId", carId);
         }
         if (vehicleId != null && !vehicleId.trim().isEmpty()) {
             request.setAttribute("vehicleId", vehicleId);
-        }
-        
-        // lay referer URL de quay lai trang truoc do
-        String referer = request.getHeader("Referer");
-        if (referer != null && !referer.trim().isEmpty()) {
-            request.setAttribute("refererUrl", referer);
         }
         
         // chuyen huong den trang cart.jsp
@@ -103,7 +114,6 @@ public class ViewCartDetail extends HttpServlet {
         List<OrderDTO> items = cartService.getCartItems(customerId);
         request.setAttribute("cartItems", items);
         
-        // lay car id va vehicle id tu tham so de hien thi link "quay lai xem xe"
         String carId = request.getParameter("carId");
         String vehicleId = request.getParameter("vehicleId");
         if (carId != null && !carId.trim().isEmpty()) {
@@ -111,12 +121,6 @@ public class ViewCartDetail extends HttpServlet {
         }
         if (vehicleId != null && !vehicleId.trim().isEmpty()) {
             request.setAttribute("vehicleId", vehicleId);
-        }
-        
-        // lay referer URL de quay lai trang truoc do
-        String referer = request.getHeader("Referer");
-        if (referer != null && !referer.trim().isEmpty()) {
-            request.setAttribute("refererUrl", referer);
         }
         
         // chuyen huong lai trang cart.jsp

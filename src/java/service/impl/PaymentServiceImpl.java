@@ -140,4 +140,8 @@ public class PaymentServiceImpl implements PaymentService {
             return null;
         }
     }
+    @Override
+public int markDepositPaid(int contractId, BigDecimal amount) {
+    return paymentsDAO.insertDepositPayment(contractId, amount);
+}
 }

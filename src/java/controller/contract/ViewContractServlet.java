@@ -51,6 +51,7 @@ public class ViewContractServlet extends HttpServlet {
             Optional<ContractDTO> contractOpt = contractService.getContractById(contractId);
             
             if (contractOpt.isPresent()) {
+                
                 // lay doi tuong hop dong
                 ContractDTO contract = contractOpt.get();
 

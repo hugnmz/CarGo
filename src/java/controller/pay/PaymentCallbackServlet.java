@@ -16,7 +16,6 @@ import util.di.DIContainer;
 import util.MessageUtil;
 import dto.ContractDTO;
 import dto.PaymentDTO;
-
 @WebServlet("/paymentCallback")
 public class PaymentCallbackServlet extends HttpServlet {
 
@@ -29,7 +28,6 @@ public class PaymentCallbackServlet extends HttpServlet {
         try {
             paymentService = DIContainer.get(PaymentService.class);
             contractService = DIContainer.get(ContractService.class);
-
         } catch (Exception e) {
             throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
@@ -40,95 +38,63 @@ public class PaymentCallbackServlet extends HttpServlet {
             throws ServletException, IOException {
 
         resp.setContentType("application/json;charset=UTF-8");
-
-        // Đọc dữ liệu JSON từ body
         StringBuilder sb = new StringBuilder();
         try (BufferedReader reader = req.getReader()) {
             String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
+            while ((line = reader.readLine()) != null) sb.append(line);
         }
 
         JSONObject responseJson = new JSONObject();
-
         try {
-            System.out.println("=== CALLBACK START ===");
-            System.out.println("Raw JSON: " + sb.toString());
-
             JSONObject json = new JSONObject(sb.toString());
-
-            // Kiểm tra error
             int errorCode = json.optInt("error", 1);
-            System.out.println("Casso error code: " + errorCode);
             if (errorCode != 0) {
                 responseJson.put("status", "error");
-                responseJson.put("message", "Casso returned error");
+                responseJson.put("message", "Payment provider returned error");
                 resp.getWriter().write(responseJson.toString());
                 return;
             }
+
             JSONObject data = json.getJSONObject("data");
             BigDecimal amount = new BigDecimal(String.valueOf(data.opt("amount")));
-            String description = data.optString("description", "").toLowerCase();
-            String toAccount = data.optString("accountNumber", "");
+            String description = data.optString("description", "");
+            int contractId = Integer.parseInt(description.replaceAll("\\D+", ""));
 
-            System.out.println("Parsed callback: description=" + description + ", amount=" + amount + ", toAccount=" + toAccount);
-
-            // Lấy contractId từ description
-            int contractId = extractContractId(description);
-            System.out.println("Extracted contractId: " + contractId);
-            if (contractId == -1) {
+            Optional<ContractDTO> contractOpt = contractService.getContractById(contractId);
+            if (!contractOpt.isPresent()) {
                 responseJson.put("status", "error");
-                responseJson.put("message", "Could not extract contractId");
+                responseJson.put("message", "Contract not found");
                 resp.getWriter().write(responseJson.toString());
                 return;
             }
 
-            // Kiểm tra pending payment
-            Optional<PaymentDTO> pendingPayment = paymentService.findPendingPayment(contractId, amount);
-            System.out.println("Pending payment found: " + pendingPayment.isPresent());
+            ContractDTO contract = contractOpt.get();
 
-            if (pendingPayment.isPresent() && !paymentService.isPaymentCompleted(pendingPayment.get().getPaymentId())) {
-                boolean updatedPayment = paymentService.completePaymentById(pendingPayment.get().getPaymentId());
-
-                System.out.println("[CALLBACK] UpdatedPayment=" + updatedPayment);
-                if (updatedPayment) {
-                    BigDecimal totalPaid = paymentService.getTotalPaidAmount(contractId);
-                    Optional<ContractDTO> contractOpt = contractService.getContractById(contractId);
-
-                    if (contractOpt.isPresent()) {
-                        ContractDTO contract = contractOpt.get();
-                        BigDecimal totalAmount = contract.getTotalAmount();
-                        BigDecimal depositAmount = contract.getDepositAmount();
-
-                        if (totalAmount != null && totalPaid.compareTo(totalAmount) >= 0) {
-                            contractService.updateContractStatus(contractId, ConstractStatus.COMPLETED.name());
-                            System.out.println("[CALLBACK] Contract status updated to COMPLETED for contractId=" + contractId);
-                        } else if (depositAmount != null && totalPaid.compareTo(depositAmount) >= 0
-                                && totalPaid.compareTo(totalAmount) < 0
-                                && "ACCEPTED".equals(contract.getStatus())) {
-                            contractService.updateContractStatus(contractId, ConstractStatus.DEPOSIT_PAID.name());
-                            System.out.println("[CALLBACK] Contract status updated to DEPOSIT_PAID for contractId=" + contractId);
-                        } else {
-                            System.out.println("[CALLBACK] Payment completed but no status update needed. TotalPaid=" + totalPaid + ", TotalAmount=" + totalAmount + ", DepositAmount=" + depositAmount);
-                        }
-                    }
-                }
-                System.out.println("Payment updated: " + updatedPayment);
-
-                String statusNow = paymentService.getPaymentStatus(contractId);
-                System.out.println("[CALLBACK] Recheck DB status after update: " + statusNow);
-
+            // --- Deposit ---
+            if (description.startsWith("deposit-contract-")) {
+                int id = paymentService.markDepositPaid(contractId, amount); // trả về paymentId
+                contractService.updateContractStatus(contractId, "DEPOSIT_PAID");
                 responseJson.put("status", "ok");
-                responseJson.put("message", "Payment updated successfully for contract " + contractId);
+                responseJson.put("message", "Deposit completed: " + amount + " VNĐ");
+            }
+            // --- Full payment ---
+            else if (description.startsWith("fullpayment-contract-")) {
+                Optional<PaymentDTO> pending = paymentService.findPendingPayment(contractId, amount);
+                if (pending.isPresent()) {
+                    paymentService.completePaymentById(pending.get().getPaymentId());
+                    contractService.updateContractStatus(contractId, "COMPLETED");
+responseJson.put("status", "ok");
+                    responseJson.put("message", "Full payment completed: " + amount + " VNĐ");
+                } else {
+                    responseJson.put("status", "warning");
+                    responseJson.put("message", "No pending payment or already completed");
+                }
             } else {
-                System.out.println("No matching pending payment or already completed.");
-                responseJson.put("status", "warning");
-                responseJson.put("message", "No matching pending payment found or already completed for contract " + contractId);
+                responseJson.put("status", "error");
+                responseJson.put("message", "Unknown payment type");
             }
 
             resp.getWriter().write(responseJson.toString());
-            System.out.println("=== CALLBACK END ===");
 
         } catch (Exception e) {
             responseJson.put("status", "error");
@@ -136,19 +102,5 @@ public class PaymentCallbackServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().write(responseJson.toString());
         }
-    }
-
-    private int extractContractId(String description) {
-        try {
-            // Match cả "Thanh toan hop dong <số>" và "Dat coc hop dong <số>"
-            Pattern p = Pattern.compile("(?:Thanh toan|Dat coc) hop dong (\\d+)", Pattern.CASE_INSENSITIVE);
-            Matcher m = p.matcher(description);
-            if (m.find()) {
-                return Integer.parseInt(m.group(1));
-            }
-        } catch (Exception e) {
-            System.out.println("Error extracting contractId: " + e.getMessage());
-        }
-        return -1;
     }
 }

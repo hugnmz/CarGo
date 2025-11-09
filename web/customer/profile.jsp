@@ -2,6 +2,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
+<fmt:setLocale value="vi_VN" />
 
 <c:set var="c" value="${sessionScope.c}" />
 <c:set var="userType" value="${sessionScope.userType}" />

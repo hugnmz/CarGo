@@ -2,23 +2,27 @@ package controller.pay;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-import service.PaymentService;
+
 import service.ContractService;
+import service.PaymentService;
 import util.di.DIContainer;
 import util.MessageUtil;
-import util.exception.ValidationException;
-import util.exception.BusinessException;
-import util.exception.DataAccessException;
 import dto.ContractDTO;
 import dto.PaymentDTO;
+
+import util.MessageUtil;
+
+import java.nio.charset.StandardCharsets;
+
+import java.nio.charset.StandardCharsets;
+
+import java.nio.charset.StandardCharsets;
 
 @WebServlet("/paymentServlet")
 public class PaymentServlet extends HttpServlet {
@@ -26,7 +30,6 @@ public class PaymentServlet extends HttpServlet {
     private PaymentService paymentService;
     private ContractService contractService;
 
-    // Cấu hình QR
     private static final String BANK_ID = "MB";
     private static final String ACCOUNT_NO = "0862671682";
     private static final String ACCOUNT_NAME = "NGUYEN THI VAN";
@@ -54,8 +57,6 @@ public class PaymentServlet extends HttpServlet {
 
         try {
             int contractId = Integer.parseInt(idStr);
-
-            // Lấy thông tin contract để check status
             Optional<ContractDTO> contractOpt = contractService.getContractById(contractId);
             if (!contractOpt.isPresent()) {
                 req.setAttribute("error", "Không tìm thấy hợp đồng");
@@ -64,67 +65,51 @@ public class PaymentServlet extends HttpServlet {
             }
 
             ContractDTO contract = contractOpt.get();
-            BigDecimal amountToPay;
-            String description;
 
-            // Nếu ACCEPTED và chưa có payment completed -> đặt cọc
-            if ("ACCEPTED".equalsIgnoreCase(contract.getStatus()) && !paymentService.hasCompleted(contractId)) {
+            String payType = null;
+            BigDecimal amountToPay = null;
+            String description = null;
+
+            // === Xác định loại thanh toán ===
+            if (contract.getStatus().equalsIgnoreCase("ACCEPTED") ) {
+                payType = "deposit";
                 amountToPay = contract.getDepositAmount();
-                description = "Dat coc hop dong " + contractId;
-            } else {
-                // Ngược lại -> thanh toán toàn bộ (giữ logic cũ)
-                Optional<BigDecimal> totalOpt = paymentService.getContractTotalAmount(contractId);
-                if (!totalOpt.isPresent()) {
-                    req.setAttribute("error", "Không tìm thấy hợp đồng hoặc số tiền không hợp lệ");
-                    req.getRequestDispatcher("/error.jsp").forward(req, resp);
-                    return;
-                }
-                amountToPay = totalOpt.get();
-                description = "Thanh toan hop dong " + contractId;
+                description = "deposit-contract-" + contractId;
+            } else if ((contract.getStatus().equalsIgnoreCase("RETURNED") || contract.getStatus().equalsIgnoreCase("DEPOSIT_PAID"))
+                    && !paymentService.hasCompleted(contractId)) {
+                payType = "full";
+                amountToPay = contract.getTotalAmount().subtract(contract.getDepositAmount());
+                description = "fullpayment-contract-" + contractId;
             }
-
-            if (amountToPay == null || amountToPay.compareTo(BigDecimal.ZERO) <= 0) {
-                req.setAttribute("error", "Số tiền thanh toán không hợp lệ");
+if (amountToPay == null || amountToPay.compareTo(BigDecimal.ZERO) <= 0) {
+                req.setAttribute("error", "Không có số tiền thanh toán hợp lệ");
                 req.getRequestDispatcher("/error.jsp").forward(req, resp);
                 return;
             }
 
-            // CHỈ ĐỌC TRẠNG THÁI THANH TOÁN
-            boolean completed = paymentService.hasCompleted(contractId);
-            System.out.println("[PaymentServlet] contractId=" + contractId + ", completed=" + completed);
-
-            req.setAttribute("contractId", contractId);
-            req.setAttribute("totalAmount", amountToPay.intValue());
-
-            if (completed) {
-                // ĐÃ THANH TOÁN → không render QR
-                req.setAttribute("initialStatus", "SUCCESS");
-                req.getRequestDispatcher("/payment/payment.jsp").forward(req, resp);
-                return;
-            }
-            
-            // Tạo pending payment nếu chưa có (để callback có thể match)
+            // Tạo Payment nếu chưa có
             Optional<PaymentDTO> existingPending = paymentService.findPendingPayment(contractId, amountToPay);
             if (!existingPending.isPresent()) {
                 paymentService.createPendingPayment(contractId, amountToPay);
             }
-            
-            // CHƯA THANH TOÁN (PENDING/NONE) → render QR + bật polling
+
+            // Tạo URL QR
             String qr = "https://img.vietqr.io/image/" + BANK_ID + "-" + ACCOUNT_NO + "-" + TEMPLATE + ".jpg"
                     + "?amount=" + amountToPay.intValue()
                     + "&addInfo=" + URLEncoder.encode(description, StandardCharsets.UTF_8)
                     + "&accountName=" + URLEncoder.encode(ACCOUNT_NAME, StandardCharsets.UTF_8);
 
             req.setAttribute("qrUrl", qr);
+            req.setAttribute("contractId", contractId);
+            req.setAttribute("totalAmount", amountToPay.intValue());
             req.setAttribute("initialStatus", "PENDING");
+            req.setAttribute("payType", payType);
+
             req.getRequestDispatcher("/payment/payment.jsp").forward(req, resp);
 
-        } catch (ValidationException | BusinessException | DataAccessException e) {
-            req.setAttribute("error", MessageUtil.getErrorFromException(e));
-            req.getRequestDispatcher("/payment/payment.jsp").forward(req, resp);
-        } catch (Exception ex) {
+        } catch (Exception e) {
             req.setAttribute("error", MessageUtil.getError("error.system.payment.processing"));
-            req.getRequestDispatcher("/payment/payment.jsp").forward(req, resp);
+            req.getRequestDispatcher("/error.jsp").forward(req, resp);
         }
     }
 }

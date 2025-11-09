@@ -2,6 +2,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
+<fmt:setLocale value="vi_VN" />
 
 <c:set var="c" value="${sessionScope.c}" />
 <c:set var="username" value="${c != null ? c.username : sessionScope.username}" />
@@ -84,9 +85,9 @@
 
     <div class="container my-5">
       <div class="mb-4">
-        <a href="${pageContext.request.contextPath}/home" class="back-btn">
-          <i class="fa fa-arrow-left me-2"></i>Quay lại trang chủ
-        </a>
+        <button onclick="window.history.back()" class="back-btn" style="border: none; background: none; cursor: pointer;">
+          <i class="fa fa-arrow-left me-2"></i>Quay lại
+        </button>
       </div>
 
       <c:if test="${not empty error}">
@@ -320,7 +321,7 @@
               <i class="fa fa-car fa-3x text-muted mb-3"></i>
               <h3 class="text-muted">Không có xe nào có sẵn</h3>
               <p class="text-muted">Hiện tại không có xe ${car.name} nào có sẵn để thuê.</p>
-              <a href="${pageContext.request.contextPath}/home" class="btn btn-primary"><i class="fa fa-arrow-left me-2"></i>Quay lại trang chủ</a>
+              <button onclick="window.history.back()" class="btn btn-primary"><i class="fa fa-arrow-left me-2"></i>Quay lại</button>
             </div>
           </c:otherwise>
         </c:choose>

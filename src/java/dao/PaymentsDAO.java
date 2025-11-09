@@ -50,5 +50,7 @@ public interface PaymentsDAO {
     public boolean completePaymentById(Integer paymentId);
 
     public int insertPendingPayment(int contractId, BigDecimal amount);
+    
+    int insertDepositPayment(int contractId, BigDecimal amount);
 
 }

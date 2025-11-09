@@ -2,6 +2,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %> <!-- 🔹 Thêm dòng này để dùng fmt:formatNumber -->
+<fmt:setLocale value="vi_VN" />
 
 <%
     response.setHeader("Cache-Control","no-cache, no-store, must-revalidate");
@@ -215,7 +216,7 @@
                                         </c:choose>
                                     </td>
                                     <td><c:out value="${car.name}"/></td>
-                                    <td><fmt:formatNumber value="${car.dailyPrice}" type="currency" currencySymbol="₫"/> /ngày</td> <!-- 🔹 sửa hiển thị giá -->
+                                    <td><fmt:formatNumber value="${car.dailyPrice}" pattern="#,###" />₫ /ngày</td> <!-- 🔹 sửa hiển thị giá -->
                                     <td><c:out value="${car.categoryName}"/></td>
                                     <td>
                                         <form action="controllerinformationcar" method="post" 

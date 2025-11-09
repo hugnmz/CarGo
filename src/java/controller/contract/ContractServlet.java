@@ -171,7 +171,7 @@ public class ContractServlet extends HttpServlet {
             throws ServletException, IOException {
         try {
             // Lấy thông tin từ request sau khi customer thanh toán
-            Integer customerId = Integer.parseInt(request.getParameter("customerId"));
+            Integer customerId = Integer.valueOf(request.getParameter("customerId"));
             String startDateStr = request.getParameter("startDate");
             String endDateStr = request.getParameter("endDate");
             String totalAmountStr = request.getParameter("totalAmount");
