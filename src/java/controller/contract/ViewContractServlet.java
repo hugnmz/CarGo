@@ -43,19 +43,16 @@ public class ViewContractServlet extends HttpServlet {
         try {
             // lay contract id tu tham so request
             String idStr = request.getParameter("contractId");
-            // Xóa tất cả check - service sẽ check và throw WebException
             
             // chuyen doi contract id tu string sang integer
             Integer contractId = (idStr != null) ? Integer.valueOf(idStr) : null;
 
-            // lay thong tin hop dong tu database - service sẽ check và throw WebException
+            // lay thong tin hop dong tu database
             Optional<ContractDTO> contractOpt = contractService.getContractById(contractId);
             
             if (contractOpt.isPresent()) {
                 // lay doi tuong hop dong
                 ContractDTO contract = contractOpt.get();
-
-                // Xóa check quyền - service sẽ check và throw WebException nếu cần
 
                 // lay danh sach chi tiet hop dong tu database
                 List<ContractDetailDTO> details = contractService.getContractDetails(contractId);

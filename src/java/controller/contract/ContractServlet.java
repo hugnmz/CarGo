@@ -50,7 +50,7 @@ public class ContractServlet extends HttpServlet {
             String contractIdStr = request.getParameter("contractId");
             if (contractIdStr != null) {
                 try {
-                    Integer contractId = Integer.parseInt(contractIdStr);
+                    Integer contractId = Integer.valueOf(contractIdStr);
 
                     var opt = contractService.getContractById(contractId);
                     if (opt.isPresent()) {
@@ -147,7 +147,7 @@ public class ContractServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
-            Integer contractId = Integer.parseInt(request.getParameter("contractId"));
+            Integer contractId = Integer.valueOf(request.getParameter("contractId"));
             String status = request.getParameter("status");
             String reason = request.getParameter("reason"); // có thể null
 

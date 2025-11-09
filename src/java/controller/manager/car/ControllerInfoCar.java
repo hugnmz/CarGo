@@ -277,12 +277,17 @@ public class ControllerInfoCar extends HttpServlet {
                     // Lấy danh sách các vehicle thuộc car này
                     List<VehicleDTO> vehicles = carService.getVehicalByCarId(carId);
                     List<LocationDTO> locations = carService.getAllLocation();
+                    
+                    
+                    // Lấy danh sách giá xe theo ngày
+                    List<model.CarPrices> carPrices = carService.getPricesByCarId(carId);
 
                     request.setAttribute("categories", categories);
                     request.setAttribute("fuels", fuels);
                     request.setAttribute("seatings", seatings);
                     request.setAttribute("vehicles", vehicles);
                     request.setAttribute("locations", locations);
+                    request.setAttribute("carPrices", carPrices);
 
                     // Forward sang JSP
                     request.getRequestDispatcher("manager/manage_detail_car.jsp").forward(request, response);

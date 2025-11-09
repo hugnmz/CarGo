@@ -321,4 +321,14 @@ public class CarServiceImpl implements CarService {
 
         return carDTOs;
     }
+
+    @Override
+    public List<CarPrices> getPricesByCarId(int carId) {
+        try {
+            return carPricesDAO.getPricesByCar(carId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of();
+        }
+    }
 }
