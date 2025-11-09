@@ -1,4 +1,3 @@
-
 package service;
 
 import dto.PaymentDTO;
@@ -79,4 +78,7 @@ public interface PaymentService {
 
     public PaymentDTO createPendingPayment(int contractId, BigDecimal amount);
 
+    public boolean markDepositPaid(int contractId, BigDecimal amount);
+
+    public boolean hasCompletedDeposit(int contractId);
 }

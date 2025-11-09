@@ -2,7 +2,6 @@ package dao.impl;
 
 import dao.PaymentsDAO;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.List;
 import model.Payments;
 import util.JdbcTemplateUtil;
@@ -13,65 +12,33 @@ public class PaymentsDAOImpl implements PaymentsDAO {
 
     @Override
     public List<Payments> getAllPayments() {
-        String sql = "SELECT paymentId, contractId, amount, methodId, status, paymentDate FROM Payments";
+        String sql = "SELECT * FROM Payments";
         return JdbcTemplateUtil.query(sql, Payments.class);
     }
 
     @Override
     public Payments getPaymentById(Integer paymentId) {
-        String sql = "SELECT paymentId, contractId, amount, methodId, status, paymentDate FROM Payments WHERE paymentId = ?";
+        String sql = "SELECT * FROM Payments WHERE paymentId = ?";
         return JdbcTemplateUtil.queryOne(sql, Payments.class, paymentId);
     }
 
     @Override
     public List<Payments> getPaymentsByContract(Integer contractId) {
-        String sql = "SELECT paymentId, contractId, amount, methodId, status, paymentDate FROM Payments WHERE contractId = ?";
+        String sql = "SELECT * FROM Payments WHERE contractId = ?";
         return JdbcTemplateUtil.query(sql, Payments.class, contractId);
-    }
-
-    @Override
-    public List<Payments> getPaymentsByStatus(String status) {
-        String sql = "SELECT paymentId, contractId, amount, methodId, status, paymentDate FROM Payments WHERE status = ?";
-        return JdbcTemplateUtil.query(sql, Payments.class, status);
-    }
-
-    @Override
-    public List<Payments> getPaymentsByMethod(Integer methodId) {
-        String sql = "SELECT paymentId, contractId, amount, methodId, status, paymentDate FROM Payments WHERE methodId = ?";
-        return JdbcTemplateUtil.query(sql, Payments.class, methodId);
     }
 
     @Override
     public boolean addPayment(Payments payment) {
         String sql = "INSERT INTO Payments (contractId, amount, methodId, status, paymentDate) VALUES (?, ?, ?, ?, ?)";
-        int id = JdbcTemplateUtil.insertAndReturnKey(
-                sql,
+        int id = JdbcTemplateUtil.insertAndReturnKey(sql,
                 payment.getContractId(),
                 payment.getAmount(),
                 payment.getMethodId(),
                 payment.getStatus(),
-                payment.getPaymentDate() != null ? Timestamp.valueOf(payment.getPaymentDate()) : null
+                payment.getPaymentDate()
         );
-        if (id > 0) {
-            payment.setPaymentId(id);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean updatePayment(Payments payment) {
-        String sql = "UPDATE Payments SET contractId = ?, amount = ?, methodId = ?, status = ?, paymentDate = ? WHERE paymentId = ?";
-        int affected = JdbcTemplateUtil.update(
-                sql,
-                payment.getContractId(),
-                payment.getAmount(),
-                payment.getMethodId(),
-                payment.getStatus(),
-                payment.getPaymentDate() != null ? Timestamp.valueOf(payment.getPaymentDate()) : null,
-                payment.getPaymentId()
-        );
-        return affected > 0;
+        return id > 0;
     }
 
     @Override
@@ -82,98 +49,56 @@ public class PaymentsDAOImpl implements PaymentsDAO {
     }
 
     @Override
-    public boolean deletePayment(Integer paymentId) {
-        String sql = "DELETE FROM Payments WHERE paymentId = ?";
-        int affected = JdbcTemplateUtil.update(sql, paymentId);
-        return affected > 0;
-    }
-
-    @Override
-    public BigDecimal getTotalPaidAmount(Integer contractId) {
-        String sql = "SELECT COALESCE(SUM(amount), 0) AS total FROM Payments WHERE contractId = ? AND UPPER(LTRIM(RTRIM(status))) = 'COMPLETED'";
-        return JdbcTemplateUtil.queryOne(sql, BigDecimal.class, contractId);
-    }
-
-    @Override
-    public BigDecimal getRemainingAmount(Integer contractId) {
-        String sql = """
-            SELECT (c.totalAmount - COALESCE((SELECT SUM(amount)
-                                              FROM Payments
-                                              WHERE contractId = ?
-                                              AND UPPER(LTRIM(RTRIM(status))) = 'COMPLETED'), 0)) AS remaining
-            FROM Contracts c WHERE c.contractId = ?
-            """;
-        return JdbcTemplateUtil.queryOne(sql, BigDecimal.class, contractId, contractId);
-    }
-
-    @Override
     public boolean isPaymentCompleted(Integer paymentId) {
-        String sql = "SELECT COUNT(*) FROM Payments WHERE paymentId = ? AND UPPER(LTRIM(RTRIM(status))) = 'COMPLETED'";
+        String sql = "SELECT COUNT(*) FROM Payments WHERE paymentId = ? AND status = 'COMPLETED'";
         int count = JdbcTemplateUtil.count(sql, paymentId);
-        System.out.println("[isPaymentCompleted] paymentId=" + paymentId + " → count=" + count);
         return count > 0;
     }
 
     @Override
-    public Payments findPendingPayment(Integer contractId, BigDecimal amount) {
-        String sql;
-        List<Payments> list;
-
-        if (amount == null) {
-            sql = "SELECT TOP 1 * FROM Payments WHERE contractId = ? AND UPPER(LTRIM(RTRIM(status))) = 'PENDING' ORDER BY paymentId DESC";
-            list = JdbcTemplateUtil.query(sql, Payments.class, contractId);
-        } else {
-            sql = "SELECT TOP 1 * FROM Payments WHERE contractId = ? AND CAST(amount AS DECIMAL(10,2)) = CAST(? AS DECIMAL(10,2)) AND UPPER(LTRIM(RTRIM(status))) = 'PENDING' ORDER BY paymentId DESC";
-            list = JdbcTemplateUtil.query(sql, Payments.class, contractId, amount);
-        }
-
-        System.out.println("[findPendingPayment] contractId=" + contractId + ", amount=" + amount + ", found=" + list.size());
-        return list.isEmpty() ? null : list.get(0);
+    public int insertPendingPayment(int contractId, BigDecimal amount) {
+        String sql = "INSERT INTO Payments (contractId, amount, methodId, status) VALUES (?, ?, 1, 'PENDING')";
+        return JdbcTemplateUtil.insertAndReturnKey(sql, contractId, amount);
     }
 
     @Override
-    public Payments findPendingPaymentByCode(Integer contractId, BigDecimal amount) {
-        String sql = """
-            SELECT TOP 1 * FROM Payments
-            WHERE contractId = ?
-              AND CAST(amount AS DECIMAL(10,2)) = CAST(? AS DECIMAL(10,2))
-              AND UPPER(LTRIM(RTRIM(status))) = 'PENDING'
-              AND transactionCode IS NOT NULL
-            ORDER BY paymentDate DESC
-            """;
-        List<Payments> list = JdbcTemplateUtil.query(sql, Payments.class, contractId, amount);
-        return list.isEmpty() ? null : list.get(0);
+    public Payments findPendingPayment(int contractId, BigDecimal amount) {
+        String sql = "SELECT * FROM Payments WHERE contractId = ? AND amount = ? AND status = 'PENDING'";
+        return JdbcTemplateUtil.queryOne(sql, Payments.class, contractId, amount);
     }
 
-    // Guard tuyệt đối: đã có completed?
-    public boolean hasCompleted(int contractId) {
-        String sql = "SELECT COUNT(*) FROM Payments WHERE contractId = ? AND UPPER(LTRIM(RTRIM(status))) = 'COMPLETED'";
-        int c = JdbcTemplateUtil.count(sql, contractId);
-        System.out.println("[hasCompleted] contractId=" + contractId + " → " + c);
-        return c > 0;
+    @Override
+    public BigDecimal getTotalPaidAmount(int contractId) {
+        String sql = "SELECT SUM(amount) FROM Payments WHERE contractId = ? AND status IN ('DEPOSIT_PAID','COMPLETED')";
+        BigDecimal total = JdbcTemplateUtil.querySingle(sql, BigDecimal.class, contractId);
+        return total != null ? total : BigDecimal.ZERO;
     }
 
+    @Override
+    public BigDecimal getRemainingAmount(int contractId) {
+        String sql = "SELECT totalAmount FROM Contracts WHERE contractId = ?";
+        BigDecimal total = JdbcTemplateUtil.querySingle(sql, BigDecimal.class, contractId);
+        BigDecimal paid = getTotalPaidAmount(contractId);
+        return total != null ? total.subtract(paid) : BigDecimal.ZERO;
+    }
+
+    @Override
+    public int insertDepositPayment(int contractId, BigDecimal amount) {
+        String sql = "INSERT INTO Payments (contractId, amount, methodId, status) VALUES (?, ?, 1, 'DEPOSIT_PAID')";
+        return JdbcTemplateUtil.insertAndReturnKey(sql, contractId, amount);
+    }
+
+    @Override
+    public boolean hasDepositPaid(int contractId) {
+        String sql = "SELECT COUNT(*) FROM Payments WHERE contractId = ? AND status = 'DEPOSIT_PAID'";
+        int count = JdbcTemplateUtil.count(sql, contractId);
+        return count > 0;
+    }
+
+    @Override
     public String getPaymentStatus(int contractId) {
-        String sql = """
-            SELECT CASE 
-                     WHEN EXISTS (SELECT 1 FROM Payments WHERE contractId = ? AND UPPER(LTRIM(RTRIM(status)))='COMPLETED') THEN 'COMPLETED'
-                     WHEN EXISTS (SELECT 1 FROM Payments WHERE contractId = ? AND UPPER(LTRIM(RTRIM(status)))='PENDING') THEN 'PENDING'
-                     ELSE 'NONE'
-                   END AS status
-            """;
-        String status = JdbcTemplateUtil.queryOne(sql, String.class, contractId, contractId);
-        System.out.println("[getPaymentStatus] contractId=" + contractId + " -> status=" + status);
-        return status;
-    }
-
-    public boolean completePaymentById(Integer paymentId) {
-        String sql = "UPDATE Payments SET status = 'COMPLETED', paymentDate = GETDATE() WHERE paymentId = ?";
-        return JdbcTemplateUtil.update(sql, paymentId) > 0;
-    }
-   @Override
-     public int insertPendingPayment(int contractId, BigDecimal amount) {
-        String sql = "INSERT INTO Payments(contractId, amount, status, paymentDate, methodId) "
-                   + "VALUES (?, ?, ?, NULL, 1)"; // methodId = 1 default
-        return JdbcTemplateUtil.update(sql, contractId, amount, "PENDING");
+        String sql = "SELECT TOP 1 status FROM Payments WHERE contractId = ? ORDER BY paymentDate DESC";
+        String status = JdbcTemplateUtil.querySingle(sql, String.class, contractId);
+        return status != null ? status : "NONE";
     }
 }

@@ -133,6 +133,43 @@ public class JdbcTemplateUtil {
         return condition.toString();
     
     }
+public static <T> T querySingle(String sql, Class<T> type, Object... params) {
+    try (Connection conn = DB.get(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
+        // bind cac tham so vao placeholder
+        for (int i = 0; i < params.length; i++) {
+            ps.setObject(i + 1, params[i]);
+        }
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                Object value = rs.getObject(1); // lay cot dau tien
+                if (value == null) return null;
+
+                // cast sang kieu mong muon
+                if (type == Integer.class) {
+                    return type.cast(((Number) value).intValue());
+                } else if (type == Long.class) {
+                    return type.cast(((Number) value).longValue());
+                } else if (type == Double.class) {
+                    return type.cast(((Number) value).doubleValue());
+                } else if (type == java.math.BigDecimal.class) {
+                    return type.cast(new java.math.BigDecimal(value.toString()));
+                } else if (type == String.class) {
+                    return type.cast(value.toString());
+                } else if (type == Boolean.class) {
+                    return type.cast((Boolean) value);
+                } else {
+                    return type.cast(value);
+                }
+            }
+        }
+
+    } catch (Exception e) {
+        throw new RuntimeException("error.system", e);
+    }
+
+    return null;
+}
 
 }

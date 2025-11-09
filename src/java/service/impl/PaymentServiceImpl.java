@@ -4,18 +4,15 @@ import dao.ContractsDAO;
 import dao.PaymentsDAO;
 import dto.PaymentDTO;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import mapper.PaymentsMapper;
 import model.Payments;
-import service.PaymentService;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
 
-/**
- * PaymentServiceImpl - Implementation của PaymentService
- */
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
@@ -23,7 +20,7 @@ public class PaymentServiceImpl implements PaymentService {
     private PaymentsDAO paymentsDAO;
 
     @Autowired
-    private ContractsDAO contractsDAO; // Dùng để lấy totalAmount cho payment flow
+    private ContractsDAO contractsDAO;
 
     @Autowired
     private PaymentsMapper paymentsMapper;
@@ -32,41 +29,37 @@ public class PaymentServiceImpl implements PaymentService {
     public List<PaymentDTO> getAllPayments() {
         List<Payments> payments = paymentsDAO.getAllPayments();
         List<PaymentDTO> paymentDTOs = new ArrayList<>();
-        for (Payments payment : payments) {
-            PaymentDTO dto = paymentsMapper.toDTO(payment);
-            paymentDTOs.add(dto);
+        for (Payments p : payments) {
+            paymentDTOs.add(paymentsMapper.toDTO(p));
         }
-
         return paymentDTOs;
     }
 
     @Override
     public Optional<PaymentDTO> getPaymentById(Integer paymentId) {
         Payments payment = paymentsDAO.getPaymentById(paymentId);
-        if (payment != null) {
-            PaymentDTO dto = paymentsMapper.toDTO(payment);
-            return Optional.of(dto);
-        }
-        return Optional.empty();
+        return payment != null ? Optional.of(paymentsMapper.toDTO(payment)) : Optional.empty();
     }
 
     @Override
     public List<PaymentDTO> getPaymentsByContract(Integer contractId) {
         List<Payments> payments = paymentsDAO.getPaymentsByContract(contractId);
-        List<PaymentDTO> paymentDTOs = new ArrayList<>();
-
-        for (Payments payment : payments) {
-            PaymentDTO dto = paymentsMapper.toDTO(payment);
-            paymentDTOs.add(dto);
-        }
-
-        return paymentDTOs;
+        List<PaymentDTO> dtos = new ArrayList<>();
+        for (Payments p : payments) dtos.add(paymentsMapper.toDTO(p));
+        return dtos;
     }
 
     @Override
     public boolean addPayment(PaymentDTO paymentDTO) {
         Payments payment = paymentsMapper.toModel(paymentDTO);
-        return paymentsDAO.addPayment(payment);
+        if ("DEPOSIT_PAID".equals(payment.getStatus())) {
+            // thêm deposit
+            int id = paymentsDAO.insertDepositPayment(payment.getContractId(), payment.getAmount());
+            return id > 0;
+        } else {
+            // thêm thanh toán bình thường
+            return paymentsDAO.addPayment(payment);
+        }
     }
 
     @Override
@@ -77,18 +70,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public Optional<PaymentDTO> findPendingPayment(Integer contractId, BigDecimal amount) {
         Payments payment = paymentsDAO.findPendingPayment(contractId, amount);
-        if (payment != null) {
-            PaymentDTO dto = paymentsMapper.toDTO(payment);
-            return Optional.of(dto);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public boolean completePaymentById(Integer paymentId) {
-        // Cast to implementation để gọi method không có trong interface
-        dao.impl.PaymentsDAOImpl impl = (dao.impl.PaymentsDAOImpl) paymentsDAO;
-        return impl.completePaymentById(paymentId);
+        return payment != null ? Optional.of(paymentsMapper.toDTO(payment)) : Optional.empty();
     }
 
     @Override
@@ -97,17 +79,20 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public boolean hasCompleted(Integer contractId) {
-        // Cast to implementation để gọi method không có trong interface
-        dao.impl.PaymentsDAOImpl impl = (dao.impl.PaymentsDAOImpl) paymentsDAO;
-        return impl.hasCompleted(contractId);
-    }
-
-    @Override
     public String getPaymentStatus(Integer contractId) {
-        // Cast to implementation để gọi method không có trong interface
-        dao.impl.PaymentsDAOImpl impl = (dao.impl.PaymentsDAOImpl) paymentsDAO;
-        return impl.getPaymentStatus(contractId);
+        String status = paymentsDAO.getPaymentStatus(contractId);
+        if ("NONE".equals(status)) {
+            BigDecimal total = paymentsDAO.getTotalPaidAmount(contractId);
+            BigDecimal contractTotal = contractsDAO.getTotalAmount(contractId);
+            if (total != null && contractTotal != null && total.compareTo(contractTotal) >= 0) {
+return "COMPLETED";
+            } else if (total != null && total.compareTo(BigDecimal.ZERO) > 0) {
+                return "DEPOSIT_PAID";
+            } else {
+                return "PENDING";
+            }
+        }
+        return status;
     }
 
     @Override
@@ -128,16 +113,15 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentDTO createPendingPayment(int contractId, BigDecimal amount) {
-        int affected = paymentsDAO.insertPendingPayment(contractId, amount);
-        if (affected > 0) {
+        int id = paymentsDAO.insertPendingPayment(contractId, amount);
+        if (id > 0) {
             Payments payment = new Payments();
             payment.setContractId(contractId);
             payment.setAmount(amount);
-            payment.setStatus("pending");
+            payment.setStatus("PENDING");
             payment.setPaymentDate(null);
             return paymentsMapper.toDTO(payment);
-        } else {
-            return null;
         }
+        return null;
     }
 }

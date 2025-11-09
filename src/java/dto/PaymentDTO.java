@@ -11,7 +11,7 @@ public class PaymentDTO {
     private String methodName;        // Tên phương thức thanh toán
     private String status;            // Trạng thái thanh toán
     private LocalDateTime paymentDate; // Ngày thanh toán
-    
+    private String type;
     // Constructors
     public PaymentDTO() {}
     
@@ -33,4 +33,14 @@ public class PaymentDTO {
     
     public LocalDateTime getPaymentDate() { return paymentDate; }
     public void setPaymentDate(LocalDateTime paymentDate) { this.paymentDate = paymentDate; }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+
 }
