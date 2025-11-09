@@ -1,11 +1,11 @@
 <%-- 
     Document   : staff
-    Created on : 23 thg 10, 2025, 11:31:55
-    Author     : HOANGNAM
+    Author     : CarGo
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -18,17 +18,14 @@
                 background-color: #f8f9fa;
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             }
-
             .navbar {
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             }
-
             .navbar-brand {
                 font-weight: bold;
                 color: white !important;
             }
-
             .staff-header {
                 background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
                 color: white;
@@ -36,7 +33,6 @@
                 margin-bottom: 2rem;
                 border-radius: 15px;
             }
-
             .contract-card {
                 background: white;
                 border-radius: 15px;
@@ -45,123 +41,57 @@
                 margin-bottom: 1.5rem;
                 overflow: hidden;
             }
-
             .contract-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(0,0,0,0.12);
             }
-
             .status-badge {
-                padding: 0.5rem 1rem;
+                padding: 0.35rem 0.7rem;
                 border-radius: 25px;
-                font-weight: bold;
-                font-size: 0.85rem;
+                font-weight: 600;
+                font-size: 0.8rem;
             }
-
             .status-pending {
                 background-color: #fff3cd;
                 color: #856404;
                 border: 1px solid #ffeaa7;
             }
-
             .status-accepted {
                 background-color: #d4edda;
                 color: #155724;
                 border: 1px solid #c3e6cb;
             }
-
             .status-rejected {
                 background-color: #f8d7da;
                 color: #721c24;
                 border: 1px solid #f5c6cb;
             }
-
             .btn-action {
                 border-radius: 25px;
-                padding: 0.5rem 1.5rem;
-                font-weight: bold;
-                transition: all 0.3s ease;
+                padding: 0.45rem 1rem;
+                font-weight: 600;
             }
-
             .btn-view {
                 background: linear-gradient(45deg, #667eea, #764ba2);
                 border: none;
                 color: white;
             }
-
-            .btn-view:hover {
-                transform: scale(1.05);
-                color: white;
-            }
-
             .btn-update {
                 background: linear-gradient(45deg, #43e97b, #38f9d7);
                 border: none;
                 color: white;
             }
-
-            .btn-update:hover {
-                transform: scale(1.05);
-                color: white;
-            }
-
-            .stats-card {
-                background: white;
-                border-radius: 15px;
-                padding: 1.5rem;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-                text-align: center;
-                margin-bottom: 1rem;
-            }
-
-            .stats-number {
-                font-size: 2rem;
-                font-weight: bold;
-                color: #667eea;
-            }
-
-            .alert {
-                border-radius: 10px;
+            .sidebar .list-group-item {
                 border: none;
-            }
-
-            .form-control {
-                border-radius: 10px;
-                border: 1px solid #e0e0e0;
                 padding: 0.75rem 1rem;
             }
-
-            .form-control:focus {
-                border-color: #667eea;
-                box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            .sidebar .list-group-item i {
+                width: 20px;
             }
-
-            .filter-tabs {
-                background: white;
-                border-radius: 15px;
-                padding: 1rem;
-                margin-bottom: 2rem;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            }
-
-            .filter-tab {
-                padding: 0.75rem 1.5rem;
-                border-radius: 25px;
-                border: none;
-                background: #f8f9fa;
-                color: #6c757d;
-                transition: all 0.3s ease;
-                margin-right: 0.5rem;
-                margin-bottom: 0.5rem;
-            }
-
-            .filter-tab.active {
-                background: linear-gradient(45deg, #667eea, #764ba2);
-                color: white;
-            }
-
-            .filter-tab:hover {
-                transform: scale(1.05);
+            .sidebar .list-group-item.active {
+                background: #eef2ff;
+                color: #3730a3;
+                font-weight: 600;
             }
         </style>
     </head>
@@ -169,269 +99,212 @@
         <!-- Navigation -->
         <nav class="navbar navbar-expand-lg navbar-dark">
             <div class="container">
-                <a class="navbar-brand" href="#">
+                <a class="navbar-brand" href="${pageContext.request.contextPath}/staff">
                     <i class="fas fa-car"></i> CarGo Staff Dashboard
                 </a>
                 <div class="navbar-nav ms-auto">
                     <span class="navbar-text me-3">
-                        <i class="fas fa-user"></i> Staff ID:  ${sessionScope.userId}
+                        <i class="fas fa-user"></i> Staff ID: ${sessionScope.userId}
                     </span>
-                    <a class="btn btn-outline-light" href="${pageContext.request.contextPath}/LogoutServlet">
-                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
-                    </a>
                 </div>
             </div>
         </nav>
 
         <div class="container mt-4">
-            <!-- Header -->
             <div class="staff-header text-center">
                 <h1><i class="fas fa-tachometer-alt"></i> Staff Dashboard</h1>
                 <p class="mb-0">Xem và xử lý hợp đồng từ khách hàng</p>
             </div>
-            <!-- Contract List -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3><i class="fas fa-list"></i> Danh sách hợp đồng từ khách hàng</h3>
-                        <div>
-                            <a href="${pageContext.request.contextPath}/returncar" class="btn btn-primary btn-action">
-                                <i class="fas"></i> Danh sách yêu cầu trả xe
-                            </a>
 
-                            <button class="btn btn-primary btn-action" onclick="location.reload()">
-                                <i class="fas fa-sync-alt"></i> Làm mới
-                            </button></div>
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-md-3 col-lg-2 mb-3">
+                    <div class="list-group shadow-sm sidebar">
+                        <a class="list-group-item list-group-item-action" href="${pageContext.request.contextPath}/home">
+                            <i class="fas fa-house"></i> Trở về trang chủ
+                        </a>
+                        <a class="list-group-item list-group-item-action active" href="${pageContext.request.contextPath}/staff">
+                            <i class="fas fa-file-contract"></i> Danh sách hợp đồng
+                        </a>
+                        <a class="list-group-item list-group-item-action" href="${pageContext.request.contextPath}/returncar">
+                            <i class="fas fa-undo"></i> Danh sách trả xe
+                        </a>
+                        <a class="list-group-item list-group-item-action" href="${pageContext.request.contextPath}/manager/staffmanage.jsp">
+                            <i class="fas fa-user"></i> Thông tin cá nhân
+                        </a>
+                        <a class="list-group-item list-group-item-action text-danger" href="${pageContext.request.contextPath}/LogoutServlet">
+                            <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                        </a>
                     </div>
                 </div>
-            </div>
 
-
-            <c:choose>
-                <c:when test="${empty contracts}">
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i> Chưa có hợp đồng nào từ khách hàng
+                <!-- Main content -->
+                <div class="col-md-9 col-lg-10">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3><i class="fas fa-list"></i> Danh sách hợp đồng từ khách hàng</h3>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-primary btn-action" type="button" onclick="location.reload()">
+                                Làm mới
+                            </button>
+                        </div>
                     </div>
-                </c:when>
-                <c:otherwise>
+
+                    <c:if test="${empty contracts}">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Chưa có hợp đồng nào từ khách hàng
+                        </div>
+                    </c:if>
+
                     <c:forEach var="contract" items="${contracts}">
-                        <!-- Contract Item -->
-
                         <div class="contract-card">
-                            <div class="card-body">
-                                <div class="row align-items-center">
-                                    <!-- Contract ID -->
-                                    <div class="col-md-2">
-                                        <div class="text-center">
-                                            <i class="fas fa-file-contract fa-3x text-primary mb-2"></i>
-                                            <div class="fw-bold">#${contract.contractId}</div>
-                                        </div>
+                            <div class="p-3">
+                                <div class="row g-3 align-items-center">
+                                    <!-- ID -->
+                                    <div class="col-6 col-md-2">
+                                        <div class="fw-bold">#${contract.contractId}</div>
+                                        <div class="small text-muted">Hợp đồng</div>
                                     </div>
 
-                                    <!-- Customer info -->
-                                    <div class="col-md-2">
-                                        <h6 class="mb-1">Khách hàng</h6>
-                                        <div class="fw-bold">${contract.customerName}</div>
-                                        <small class="text-muted">
-                                            <i class="fas fa-phone"></i> ---
-                                        </small>
+                                    <!-- Khách hàng -->
+                                    <div class="col-6 col-md-2">
+                                        <div class="small text-muted">Khách hàng</div>
+                                        <div class="fw-semibold">${contract.customerName}</div>
                                     </div>
 
-                                    <!-- Contract time -->
-                                    <div class="col-md-2">
-                                        <h6 class="mb-1">Thời gian</h6>
+                                    <!-- Thời gian -->
+                                    <div class="col-6 col-md-3">
+                                        <div class="small text-muted">Thời gian</div>
                                         <div class="small">
-                                            <i class="fas fa-calendar-start"></i> ${contract.startDate}<br>
-                                            <i class="fas fa-calendar-end"></i> ${contract.endDate}
+                                            Bắt đầu: ${contract.startDate}<br>
+                                            Kết thúc: ${contract.endDate}
                                         </div>
                                     </div>
 
-                                    <!-- Amount -->
-                                    <div class="col-md-2">
-                                        <h6 class="mb-1">Số tiền</h6>
-                                        <div class="fw-bold text-success">
-                                            <i class="fas fa-dollar-sign"></i> ${contract.totalAmount} VNĐ
+                                    <!-- Số tiền -->
+                                    <div class="col-6 col-md-3">
+                                        <div class="small text-muted">Số tiền</div>
+                                        <div class="fw-bold text-success">${contract.totalAmount} VNĐ</div>
+                                        <div class="small text-muted">Cọc: ${contract.depositAmount} VNĐ</div>
+                                    </div>
+
+                                    <!-- Trạng thái + Hành động -->
+                                    <div class="col-12 col-md-2 text-md-end">
+                                        <div class="mb-2">
+                                            <span class="status-badge
+                                                  ${contract.status == 'PENDING' ? 'status-pending' : (contract.status == 'ACCEPTED' ? 'status-accepted' : 'status-rejected')}">
+                                                ${contract.status}
+                                            </span>
                                         </div>
-                                        <small class="text-muted">Cọc: ${contract.depositAmount} VNĐ</small>
-                                    </div>
 
-                                    <!-- Contract status -->
-                                    <div class="col-md-1">
-                                        <h6 class="mb-1">Trạng thái</h6>
-                                        <c:choose>
-                                            <c:when test="${contract.status == 'PENDING'}">
-                                                <span class="status-badge status-pending">Chờ xử lý</span>
-                                            </c:when>
-                                            <c:when test="${contract.status == 'ACCEPTED'}">
-                                                <span class="status-badge status-accepted">Đã chấp nhận</span>
-                                            </c:when>
-                                                <c:when test="${contract.status == 'RETURNED'}">
-                                                <span class="status-badge status-accepted">Đã trả xe</span>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <span class="status-badge status-rejected">Từ chối</span>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </div>
-
-                                    <!-- Payment info -->
-                                    <div class="col-md-2">
-                                        <h6 class="mb-1">Thanh toán</h6>
-                                        <c:if test="${not empty contract.payments}">
-                                            <c:forEach var="payment" items="${contract.payments}">
-                                                <div class="small mb-1">
-                                                    <i class="fas fa-dollar-sign"></i> ${payment.amount} VNĐ<br>
-                                                    <i class="fas fa-credit-card"></i> ${payment.methodName}<br>
-                                                    <span class="text-muted">
-                                                        <c:choose>
-                                                            <c:when test="${payment.status == 'pending'}">Chờ xử lý</c:when>
-                                                            <c:when test="${payment.status == 'completed'}">Hoàn tất</c:when>
-                                                            <c:otherwise>${payment.status}</c:otherwise>
-                                                        </c:choose>
-                                                    </span>
-                                                </div>
-                                            </c:forEach>
-                                        </c:if>
-                                        <c:if test="${empty contract.payments}">
-                                            <div class="text-muted">Chưa thanh toán</div>
-                                        </c:if>
-                                    </div>
-
-                                    <!-- Action buttons -->
-                                    <div class="col-md-1">
-                                        <div class="btn-group-vertical w-100" role="group">
-                                            <button type="button" class="btn btn-view btn-action btn-sm mb-1"
+                                        <div class="d-flex flex-wrap gap-2 justify-content-md-end">
+                                            <button type="button" class="btn btn-sm btn-view btn-action"
                                                     onclick="window.location.href = '${pageContext.request.contextPath}/ContractServlet?action=view&contractId=${contract.contractId}'">
-                                                <i class="fas fa-eye"></i> Xem chi tiết
+                                                Xem chi tiết
                                             </button>
 
-                                            <button type="button" class="btn btn-info btn-action btn-sm mb-1"
-                                                    onclick="window.location.href = '${pageContext.request.contextPath}/paymentServlet?contractId=${contract.contractId}'">
-                                                <i class="fas fa-money-check"></i> Thanh toán
-                                            </button>
                                             <c:if test="${contract.status == 'PENDING'}">
-                                                <div class="btn-group" role="group">
-                                                    <button type="button" class="btn btn-success btn-sm" 
-                                                            onclick="updateStatus(${contract.contractId}, 'ACCEPTED')">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger btn-sm"
-                                                            onclick="openRejectModal(${contract.contractId})">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
+                                                <button type="button" class="btn btn-sm btn-success btn-action"
+                                                        onclick="updateStatus(${contract.contractId}, 'ACCEPTED')">
+                                                    Chấp nhận
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-danger btn-action"
+                                                        onclick="openRejectModal(${contract.contractId})">
+                                                    Từ chối
+                                                </button>
                                             </c:if>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                     </c:forEach>
-                </c:otherwise>
-            </c:choose>
-            <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
-            <!-- Debug: kiểm tra số hợp đồng nhận được -->
-            <div class="alert alert-info">
-                Contracts received: ${fn:length(contracts)}
-            </div>
-
-        </div>
-    </div>
-
-    <!-- Reject Reason Modal -->
-    <div class="modal fade" id="rejectReasonModal" tabindex="-1" aria-labelledby="rejectReasonLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="rejectReasonLabel">Nhập lý do từ chối</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="rejectReasonTextarea" class="form-label">Lý do</label>
-                        <textarea id="rejectReasonTextarea" class="form-control" rows="4" placeholder="Nhập lý do từ chối..." required></textarea>
+                    <!-- Debug nhỏ -->
+                    <div class="alert alert-light border">
+                        Contracts received: ${fn:length(contracts)}
                     </div>
-                    <div class="form-text">Lý do sẽ được hiển thị cho khách hàng trong chi tiết hợp đồng.</div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-danger" id="confirmRejectBtn">Từ chối</button>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-                                                                let rejectContractId = null;
+        <!-- Modal nhập lý do từ chối (dùng chung) -->
+        <div class="modal fade" id="rejectReasonModal" tabindex="-1" aria-labelledby="rejectReasonLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="rejectReasonLabel">Nhập lý do từ chối</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="rejectReasonTextarea" class="form-label">Lý do</label>
+                            <textarea id="rejectReasonTextarea" class="form-control" rows="4" placeholder="Nhập lý do từ chối..." required></textarea>
+                        </div>
+                        <div class="form-text">Lý do sẽ hiển thị cho khách hàng trong chi tiết hợp đồng.</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="button" class="btn btn-danger" id="confirmRejectBtn">Từ chối</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                                                                function openRejectModal(contractId) {
-                                                                    rejectContractId = contractId;
-                                                                    document.getElementById('rejectReasonTextarea').value = '';
-                                                                    const modal = new bootstrap.Modal(document.getElementById('rejectReasonModal'));
-                                                                    modal.show();
+        <!-- Bootstrap JS bundle (Popper included) - chỉ include 1 lần -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+                                                            let rejectContractId = null;
 
-                                                                    const btn = document.getElementById('confirmRejectBtn');
-                                                                    btn.onclick = function () {
-                                                                        const reason = document.getElementById('rejectReasonTextarea').value.trim();
-                                                                        if (!reason) {
-                                                                            document.getElementById('rejectReasonTextarea').focus();
-                                                                            return;
-                                                                        }
-                                                                        submitStatusForm(rejectContractId, 'REJECTED', reason);
-                                                                    };
-                                                                }
-
-                                                                // Giữ behavior cũ cho ACCEPTED: xác nhận -> submit ngay
-                                                                function updateStatus(contractId, status) {
-                                                                    if (status === 'REJECTED') {
-                                                                        openRejectModal(contractId);
+                                                            function openRejectModal(contractId) {
+                                                                rejectContractId = contractId;
+                                                                document.getElementById('rejectReasonTextarea').value = '';
+                                                                const modal = new bootstrap.Modal(document.getElementById('rejectReasonModal'));
+                                                                // Đảm bảo binding 1 lần cho nút confirm
+                                                                const btn = document.getElementById('confirmRejectBtn');
+                                                                btn.onclick = function () {
+                                                                    const reason = document.getElementById('rejectReasonTextarea').value.trim();
+                                                                    if (!reason) {
+                                                                        document.getElementById('rejectReasonTextarea').focus();
                                                                         return;
                                                                     }
-                                                                    if (confirm('Bạn có chắc muốn cập nhật trạng thái hợp đồng?')) {
-                                                                        submitStatusForm(contractId, status, null);
-                                                                    }
+                                                                    submitStatusForm(rejectContractId, 'REJECTED', reason);
+                                                                };
+                                                                modal.show();
+                                                            }
+
+                                                            function updateStatus(contractId, status) {
+                                                                if (status === 'REJECTED') {
+                                                                    openRejectModal(contractId);
+                                                                    return;
+                                                                }
+                                                                if (confirm('Xác nhận cập nhật trạng thái hợp đồng #' + contractId + ' thành ' + status + ' ?')) {
+                                                                    submitStatusForm(contractId, status, null);
+                                                                }
+                                                            }
+
+                                                            function submitStatusForm(contractId, status, reason) {
+                                                                const form = document.createElement('form');
+                                                                form.method = 'POST';
+                                                                form.action = '${pageContext.request.contextPath}/ContractServlet';
+
+                                                                const add = (name, value) => {
+                                                                    const i = document.createElement('input');
+                                                                    i.type = 'hidden';
+                                                                    i.name = name;
+                                                                    i.value = value;
+                                                                    form.appendChild(i);
+                                                                };
+
+                                                                add('action', 'update_status');
+                                                                add('contractId', contractId);
+                                                                add('status', status);
+                                                                if (reason !== null && reason !== undefined) {
+                                                                    add('reason', reason);
                                                                 }
 
-                                                                function submitStatusForm(contractId, status, reason) {
-                                                                    const form = document.createElement('form');
-                                                                    form.method = 'POST';
-                                                                    form.action = '${pageContext.request.contextPath}/ContractServlet';
-
-                                                                    const actionInput = document.createElement('input');
-                                                                    actionInput.type = 'hidden';
-                                                                    actionInput.name = 'action';
-                                                                    actionInput.value = 'update_status';
-                                                                    form.appendChild(actionInput);
-
-                                                                    const contractIdInput = document.createElement('input');
-                                                                    contractIdInput.type = 'hidden';
-                                                                    contractIdInput.name = 'contractId';
-                                                                    contractIdInput.value = contractId;
-                                                                    form.appendChild(contractIdInput);
-
-                                                                    const statusInput = document.createElement('input');
-                                                                    statusInput.type = 'hidden';
-                                                                    statusInput.name = 'status';
-                                                                    statusInput.value = status;
-                                                                    form.appendChild(statusInput);
-
-                                                                    if (reason !== null && reason !== undefined) {
-                                                                        const reasonInput = document.createElement('input');
-                                                                        reasonInput.type = 'hidden';
-                                                                        reasonInput.name = 'reason';
-                                                                        reasonInput.value = reason;
-                                                                        form.appendChild(reasonInput);
-                                                                    }
-
-                                                                    document.body.appendChild(form);
-                                                                    form.submit();
-                                                                }
-    </script>
-</body>
+                                                                document.body.appendChild(form);
+                                                                form.submit();
+                                                            }
+        </script>
+    </body>
 </html>
