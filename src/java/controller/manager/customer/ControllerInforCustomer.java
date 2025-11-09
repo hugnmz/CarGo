@@ -39,7 +39,7 @@ public class ControllerInforCustomer extends HttpServlet {
             customerService = DIContainer.get(CustomerService.class);
             contractService = DIContainer.get(ContractService.class);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServletException(util.MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 
@@ -65,12 +65,10 @@ public class ControllerInforCustomer extends HttpServlet {
             request.getRequestDispatcher("/manager/manage_detail_cus.jsp").forward(request, response);
 
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             request.setAttribute("error", MessageUtil.getErrorFromException(e));
             request.getRequestDispatcher("/manager/manage_detail_cus.jsp").forward(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.system"));
+            request.setAttribute("error", MessageUtil.getError("error.system.customer.management"));
             request.getRequestDispatcher("/manager/manage_detail_cus.jsp").forward(request, response);
         }
     }
@@ -96,12 +94,10 @@ public class ControllerInforCustomer extends HttpServlet {
             request.getRequestDispatcher("/manager/editcustomer.jsp").forward(request, response);
 
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             request.setAttribute("error", MessageUtil.getErrorFromException(e));
             request.getRequestDispatcher("/manager/editcustomer.jsp").forward(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.system"));
+            request.setAttribute("error", MessageUtil.getError("error.system.customer.management"));
             request.getRequestDispatcher("/manager/editcustomer.jsp").forward(request, response);
         }
     }
@@ -145,11 +141,9 @@ public class ControllerInforCustomer extends HttpServlet {
             request.setAttribute("message", MessageUtil.getError("error.user.update.success"));
 
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             request.setAttribute("error", MessageUtil.getErrorFromException(e));
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.user.update.error"));
+            request.setAttribute("error", MessageUtil.getError("error.system.customer.management"));
         }
         // Forward về trang quản lý để hiển thị thông báo
         request.getRequestDispatcher("managecus").forward(request, response);
@@ -172,11 +166,9 @@ public class ControllerInforCustomer extends HttpServlet {
             }
 
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             request.setAttribute("error", MessageUtil.getErrorFromException(e));
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.user.delete.error"));
+            request.setAttribute("error", MessageUtil.getError("error.system.customer.management"));
         }
 
         // Quay lại danh sách sau khi xóa

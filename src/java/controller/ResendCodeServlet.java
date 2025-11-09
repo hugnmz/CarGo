@@ -30,7 +30,7 @@ public class ResendCodeServlet extends HttpServlet {
         try {
             customerService = DIContainer.get(CustomerService.class);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 
@@ -80,11 +80,9 @@ public class ResendCodeServlet extends HttpServlet {
             }
             
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             req.setAttribute("errorMessage", MessageUtil.getErrorFromException(e));
         } catch (Exception e) {
-            e.printStackTrace();
-            req.setAttribute("errorMessage", MessageUtil.getError("error.system"));
+            req.setAttribute("errorMessage", MessageUtil.getError("error.system.resend.code"));
         }
         
         req.getRequestDispatcher("/auth/verify.jsp").forward(req, resp);

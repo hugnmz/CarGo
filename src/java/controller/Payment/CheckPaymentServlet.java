@@ -19,7 +19,7 @@ public class CheckPaymentServlet extends HttpServlet {
         try {
             paymentService = DIContainer.get(PaymentService.class);
         } catch (Exception e) {
-            throw new RuntimeException("Dependency injection error", e);
+            throw new ServletException(util.MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 

@@ -23,7 +23,7 @@ public class SatffServlet extends HttpServlet {
         try {
             contractService = DIContainer.get(ContractService.class);
         } catch (Exception e) {
-            throw new RuntimeException(" Khong the khoi tao ContractService", e);
+            throw new ServletException(util.MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 
@@ -39,9 +39,12 @@ public class SatffServlet extends HttpServlet {
             request.setAttribute("contracts", contracts);
             request.getRequestDispatcher("/staff/staff.jsp").forward(request, response);
 
+        } catch (util.exception.ValidationException | util.exception.BusinessException | util.exception.DataAccessException e) {
+            request.setAttribute("error", util.MessageUtil.getErrorFromException(e));
+            request.getRequestDispatcher("/staff/staff.jsp").forward(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/error.jsp?msg=load_contracts_failed");
+            request.setAttribute("error", util.MessageUtil.getError("error.system.staff"));
+            request.getRequestDispatcher("/staff/staff.jsp").forward(request, response);
         }
     }
 }

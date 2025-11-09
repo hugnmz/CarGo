@@ -54,16 +54,15 @@ public class ContractServiceImpl implements ContractService {
 
     @Autowired
     private OrderMapper orderMapper;
-    
+
     @Autowired
     private VehiclesDAO vehiclesDAO;
-    
+
     @Autowired
     private CarsDAO carsDAO;
-    
+
     @Autowired
     private UsersDAO usersDAO;
-    
 
     @Override
     public List<ContractDTO> getContractsByCustomer(Integer customerId) {
@@ -90,7 +89,7 @@ public class ContractServiceImpl implements ContractService {
             if (customer.isPresent() && customer.get().getFullName() != null) {
                 dto.setCustomerName(customer.get().getFullName());
             }
-              //lấy số điện thoại
+            //lấy số điện thoại
             if (customer.isPresent() && customer.get().getPhone() != null) {
                 dto.setCustomerPhone(customer.get().getPhone());
             }
@@ -349,7 +348,7 @@ public class ContractServiceImpl implements ContractService {
 
             // Sử dụng staffId đã được chọn từ đầu phiên
             contract.setStaffId(staffId);
-            
+
             // Lưu contract
             boolean contractSaved = contractsDAO.addContract(contract);
             if (!contractSaved) {
@@ -420,7 +419,7 @@ public class ContractServiceImpl implements ContractService {
     }
 
     private BigDecimal calculateDepositAmount(BigDecimal total) {
-        return new BigDecimal("30000000");
+        return new BigDecimal("5000");
     }
 
     @Override

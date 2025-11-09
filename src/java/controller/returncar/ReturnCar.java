@@ -44,7 +44,7 @@ public class ReturnCar extends HttpServlet {
             contractService = DIContainer.get(ContractService.class);
             returnCarService = DIContainer.get(ReturnCarService.class);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize ContractService", e);
+            throw new ServletException(util.MessageUtil.getError("error.system.dependency.injection"), e);
         }
 
     }
@@ -106,12 +106,10 @@ public class ReturnCar extends HttpServlet {
             // Redirect về trang khách để tránh submit lại khi F5
             resp.sendRedirect(req.getContextPath() + "/view-contract?contractId=" + id);
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             req.getSession().setAttribute("error", MessageUtil.getErrorFromException(e));
             req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
         } catch (Exception e) {
-            e.printStackTrace();
-            req.getSession().setAttribute("error", MessageUtil.getError("error.system"));
+            req.getSession().setAttribute("error", MessageUtil.getError("error.system.return.car"));
             req.getRequestDispatcher("/customer/contract-view.jsp").forward(req, resp);
         }
     }

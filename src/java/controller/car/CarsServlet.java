@@ -25,8 +25,7 @@ public class CarsServlet extends HttpServlet {
             // khoi tao car service tu di container
             carService = DIContainer.get(CarService.class);
         } catch (Exception e) {
-            // nem loi neu khoi tao service that bai
-            throw new RuntimeException("Failed to initialize CarService", e);
+            throw new ServletException(util.MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 
@@ -41,11 +40,11 @@ public class CarsServlet extends HttpServlet {
             request.setAttribute("allCars", allCars);
             // chuyen huong den trang danh sach xe
             request.getRequestDispatcher("/customer/cars.jsp").forward(request, response);
+        } catch (util.exception.ValidationException | util.exception.BusinessException | util.exception.DataAccessException e) {
+            request.setAttribute("error", util.MessageUtil.getErrorFromException(e));
+            request.getRequestDispatcher("/customer/cars.jsp").forward(request, response);
         } catch (Exception e) {
-            // log loi ra console
-            e.printStackTrace();
-            // dat thong bao loi vao request
-            request.setAttribute("error", "Khong the tai danh sach xe: " + e.getMessage());
+            request.setAttribute("error", util.MessageUtil.getError("error.system.cars.list"));
             request.getRequestDispatcher("/customer/cars.jsp").forward(request, response);
         }
     }

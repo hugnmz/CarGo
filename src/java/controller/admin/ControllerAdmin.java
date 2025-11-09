@@ -126,20 +126,17 @@ public class ControllerAdmin extends HttpServlet {
                     util.EmailUtil.sendCredentials(email, fullname, username, password, roleName);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
-                request.setAttribute("error", MessageUtil.getError("error.user.add.email.error"));
+                request.setAttribute("error", MessageUtil.getError("error.system.email.send"));
             }
 
             request.setAttribute("message", MessageUtil.getError("error.user.add.success"));
             request.getRequestDispatcher("HomeAdmin").forward(request, response);
 
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             request.setAttribute("error", MessageUtil.getErrorFromException(e));
             request.getRequestDispatcher("HomeAdmin").forward(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.user.add.error"));
+            request.setAttribute("error", MessageUtil.getError("error.system.admin"));
             request.getRequestDispatcher("HomeAdmin").forward(request, response);
         }
     }
@@ -180,12 +177,10 @@ public class ControllerAdmin extends HttpServlet {
             request.setAttribute("message", MessageUtil.getError("error.user.update.success"));
             request.getRequestDispatcher("HomeAdmin").forward(request, response);
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             request.setAttribute("error", MessageUtil.getErrorFromException(e));
             request.getRequestDispatcher("HomeAdmin").forward(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.user.update.error"));
+            request.setAttribute("error", MessageUtil.getError("error.system.admin"));
             request.getRequestDispatcher("HomeAdmin").forward(request, response);
         }
     }
@@ -203,11 +198,9 @@ public class ControllerAdmin extends HttpServlet {
                 request.setAttribute("message", MessageUtil.getError("error.user.delete.success"));
             }
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             request.setAttribute("error", MessageUtil.getErrorFromException(e));
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.user.delete.error"));
+            request.setAttribute("error", MessageUtil.getError("error.system.admin"));
         }
         //Gửi dữ liệu về home admin
         request.getRequestDispatcher("HomeAdmin").forward(request, response);

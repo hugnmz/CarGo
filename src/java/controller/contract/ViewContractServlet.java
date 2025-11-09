@@ -29,8 +29,7 @@ public class ViewContractServlet extends HttpServlet {
             // khoi tao contract service tu di container
             contractService = DIContainer.get(ContractService.class);
         } catch (Exception e) {
-            // nem loi neu khoi tao service that bai
-            throw new RuntimeException(e);
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 
@@ -67,13 +66,11 @@ public class ViewContractServlet extends HttpServlet {
                 request.setAttribute("details", details);
             }
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getErrorFromException(e));
+            request.getSession().setAttribute("error", MessageUtil.getErrorFromException(e));
             request.getRequestDispatcher("/customer/contract-view.jsp").forward(request, response);
             return;
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.system"));
+            request.getSession().setAttribute("error", MessageUtil.getError("error.system.contract.view"));
             request.getRequestDispatcher("/customer/contract-view.jsp").forward(request, response);
             return;
         }

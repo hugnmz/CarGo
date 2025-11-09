@@ -301,7 +301,7 @@
                                     <div class="col-md-1">
                                         <div class="btn-group-vertical w-100" role="group">
                                             <button type="button" class="btn btn-view btn-action btn-sm mb-1"
-                                                    onclick="window.location.href = '${pageContext.request.contextPath}/ContractServlet?action=view&contractId=${contract.contractId}'">
+                                                    onclick="window.location.href = '${pageContext.request.contextPath}/contractdetail?contractId=${contract.contractId}'">
                                                 <i class="fas fa-eye"></i> Xem chi tiết
                                             </button>
 
@@ -331,11 +331,6 @@
                 </c:otherwise>
             </c:choose>
             <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-
-            <!-- Debug: kiểm tra số hợp đồng nhận được -->
-            <div class="alert alert-info">
-                Contracts received: ${fn:length(contracts)}
-            </div>
 
         </div>
     </div>

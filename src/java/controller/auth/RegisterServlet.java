@@ -53,10 +53,12 @@ public class RegisterServlet extends HttpServlet {
 
             // chuyen huong den trang dang ky
             request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
-        } catch (ApplicationException e) {
-            throw e;
+        } catch (ApplicationException | DataAccessException e) {
+            request.setAttribute("errors", java.util.Arrays.asList(MessageUtil.getErrorFromException((e))));
+            request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
         } catch (Exception e) {
-            throw new ServletException(MessageUtil.getError("error.system.register"), e);
+            request.setAttribute("errors", java.util.Arrays.asList(MessageUtil.getError("error.system.register")));
+            request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
         }
     }
 
@@ -126,13 +128,11 @@ public class RegisterServlet extends HttpServlet {
                 request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
             }
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             errors.add(MessageUtil.getErrorFromException(e));
             request.setAttribute("errors", errors);
             setFormData(request, fullname, phone, email, city, username);
             request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
             errors.add(MessageUtil.getError("error.system.register"));
             request.setAttribute("errors", errors);
             setFormData(request, fullname, phone, email, city, username);

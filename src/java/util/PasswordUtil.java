@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Arrays;
-import java.util.Base64;
+
 
 // class xu ly password
 public class PasswordUtil {
@@ -12,7 +12,7 @@ public class PasswordUtil {
     // so lan lap lai khi hash password
     public static final int ITERATIONS = 100_000;
 
-    // tra ve password da hash dang byte[] (de luu vao varbinary)
+    // tra ve password da hash dang byte[] (de l    uu vao varbinary)
     public static byte[][] hashPassword(String password, byte[] salt) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");

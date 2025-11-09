@@ -213,7 +213,7 @@ public class CustomerServiceImpl implements CustomerService {
         if (customerDTO.getEmail() != null) {
             String newEmail = customerDTO.getEmail().trim();
             if (!newEmail.equalsIgnoreCase(existing.getEmail())) {
-                if (customersDAO.existEmail(newEmail)) {
+                if (isEmailExists(newEmail)) {
                     String emailError = MessageUtil.getError("error.email.exists").replace("{0}", newEmail);
                     throw new ValidationException(emailError);
                 }
@@ -223,7 +223,7 @@ public class CustomerServiceImpl implements CustomerService {
         if (customerDTO.getPhone() != null) {
             String newPhone = customerDTO.getPhone().trim();
             if (!newPhone.equals(existing.getPhone())) {
-                if (customersDAO.existPhone(newPhone)) {
+                if (isPhoneExists(newPhone)) {
                    String phoneError = MessageUtil.getError("error.phone.exists").replace("{0}", newPhone);
                    throw new ValidationException(phoneError);
                 }

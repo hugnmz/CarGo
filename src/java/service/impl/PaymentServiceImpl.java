@@ -125,6 +125,19 @@ public class PaymentServiceImpl implements PaymentService {
         BigDecimal total = contractsDAO.getTotalAmount(contractId);
         return total != null ? Optional.of(total) : Optional.empty();
     }
-    
 
+    @Override
+    public PaymentDTO createPendingPayment(int contractId, BigDecimal amount) {
+        int affected = paymentsDAO.insertPendingPayment(contractId, amount);
+        if (affected > 0) {
+            Payments payment = new Payments();
+            payment.setContractId(contractId);
+            payment.setAmount(amount);
+            payment.setStatus("pending");
+            payment.setPaymentDate(null);
+            return paymentsMapper.toDTO(payment);
+        } else {
+            return null;
+        }
+    }
 }

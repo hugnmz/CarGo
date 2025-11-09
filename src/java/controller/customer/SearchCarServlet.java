@@ -40,7 +40,7 @@ public class SearchCarServlet extends HttpServlet {
             carService = DIContainer.get(CarService.class);
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize CarService", e);
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
 
     }
@@ -63,10 +63,11 @@ public class SearchCarServlet extends HttpServlet {
             // forward den trang home.jsp
             request.getRequestDispatcher("/customer/search-car.jsp").forward(request, response);
 
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
+            request.getRequestDispatcher("/customer/search-car.jsp").forward(request, response);
         } catch (Exception e) {
-            // xu ly loi he thong
-            e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.home.cars.load.failed"));
+            request.setAttribute("error", MessageUtil.getError("error.system.search.car"));
             request.getRequestDispatcher("/customer/search-car.jsp").forward(request, response);
         }
     }
@@ -123,12 +124,10 @@ public class SearchCarServlet extends HttpServlet {
             request.getRequestDispatcher("/customer/search-car.jsp").forward(request, response);
 
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             request.setAttribute("error", MessageUtil.getErrorFromException(e));
             request.getRequestDispatcher("/customer/search-car.jsp").forward(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.home.cars.load.failed"));
+            request.setAttribute("error", MessageUtil.getError("error.system.search.car"));
             request.getRequestDispatcher("/customer/search-car.jsp").forward(request, response);
         }
     }

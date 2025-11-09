@@ -142,7 +142,6 @@ public class ContractsDAOImpl implements ContractsDAO {
 
     @Override
     public Integer findLeastLoadedStaffId() {
-        // Lấy tất cả staff với số lượng hợp đồng PENDING
         String sql = """
         SELECT u.userId, COUNT(c.contractId) as contractCount
         FROM Users u
@@ -153,59 +152,43 @@ public class ContractsDAOImpl implements ContractsDAO {
         GROUP BY u.userId
         ORDER BY COUNT(c.contractId) ASC
         """;
-        
-        List<StaffContractCount> staffList = new ArrayList<>();
-        
+
+        List<Integer> staffIds = new ArrayList<>();
+        Integer minCount = null;
+
         try (Connection conn = DB.get(); PreparedStatement ps = conn.prepareStatement(sql)) {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Integer userId = rs.getInt("userId");
-                    int contractCount = rs.getInt("contractCount");
-                    staffList.add(new StaffContractCount(userId, contractCount));
+                    Integer userId = rs.getInt(1);
+                    int contractCount = rs.getInt(2);
+
+                    if (minCount == null) {
+                        minCount = contractCount;
+                        staffIds.add(userId);
+                    } else if (contractCount == minCount) {
+                        staffIds.add(userId);
+                    } else {
+                        break;
+                    }
                 }
             }
         } catch (Exception e) {
             throw new RuntimeException("error.system", e);
         }
-        
-        if (staffList.isEmpty()) {
+
+        if (staffIds.isEmpty()) {
             return null;
         }
-        
-        // Tìm số lượng hợp đồng ít nhất
-        int minCount = staffList.get(0).contractCount;
-        List<Integer> staffIdsWithMinCount = new ArrayList<>();
-        
-        for (StaffContractCount staff : staffList) {
-            if (staff.contractCount == minCount) {
-                staffIdsWithMinCount.add(staff.userId);
-            } else {
-                // Đã vượt quá minCount, dừng lại
-                break;
-            }
+
+        if (staffIds.size() == 1) {
+            return staffIds.get(0);
         }
-        
-        // Random chọn một trong số các staff có cùng số lượng hợp đồng ít nhất
-        if (staffIdsWithMinCount.size() == 1) {
-            return staffIdsWithMinCount.get(0);
-        }
-        
+
         Random random = new Random();
-        return staffIdsWithMinCount.get(random.nextInt(staffIdsWithMinCount.size()));
+        return staffIds.get(random.nextInt(staffIds.size()));
     }
-    
-    // Inner class để lưu thông tin staff và số lượng hợp đồng
-    private static class StaffContractCount {
-        Integer userId;
-        int contractCount;
-        
-        StaffContractCount(Integer userId, int contractCount) {
-            this.userId = userId;
-            this.contractCount = contractCount;
-        }
-    }
-    
-        @Override
+
+    @Override
     public BigDecimal getTotalAmount(Integer contractId) {
         String sql = "SELECT totalAmount FROM Contracts WHERE contractId = ?";
         Contracts contract = JdbcTemplateUtil.queryOne(sql, Contracts.class, contractId);

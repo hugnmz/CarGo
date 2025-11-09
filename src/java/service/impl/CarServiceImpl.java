@@ -21,6 +21,7 @@ import util.MessageUtil;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
 import util.exception.ValidationException;
+import util.exception.DataAccessException;
 
 @Service
 public class CarServiceImpl implements CarService {
@@ -222,9 +223,7 @@ public class CarServiceImpl implements CarService {
 
             return deletedCar;
         } catch (Exception e) {
-
-            e.printStackTrace();
-            return false;
+            throw new DataAccessException(MessageUtil.getError("error.dataaccess.car.delete.failed"), e);
         }
     }
 

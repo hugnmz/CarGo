@@ -69,11 +69,9 @@ public class ListContract extends HttpServlet {
                 request.getSession().setAttribute("flash_error", "Không tìm thấy hợp đồng để xóa!");
             }
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             request.getSession().setAttribute("flash_error", MessageUtil.getErrorFromException(e));
         } catch (Exception e) {
-            e.printStackTrace();
-            request.getSession().setAttribute("flash_error", MessageUtil.getError("error.system"));
+            request.getSession().setAttribute("flash_error", MessageUtil.getError("error.system.contract.management"));
         }
 
         response.sendRedirect(request.getContextPath() + "/listcontract");

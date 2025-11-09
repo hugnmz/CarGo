@@ -30,8 +30,7 @@ public class CartServlet extends HttpServlet {
             // khoi tao cart service tu di container
             cartService = DIContainer.get(CartService.class);
         } catch (Exception e) {
-            // nem loi neu khoi tao service that bai
-            throw new RuntimeException("Failed to initialize CartService", e);
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 
@@ -84,7 +83,6 @@ public class CartServlet extends HttpServlet {
             }
 
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             List<String> errors = new ArrayList<>();
             errors.add(MessageUtil.getErrorFromException(e));
             request.setAttribute("errors", errors);
@@ -94,8 +92,14 @@ public class CartServlet extends HttpServlet {
             request.setAttribute("returnLocation", request.getParameter("returnLocation"));
             request.getRequestDispatcher("/customer/booking-form.jsp").forward(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(MessageUtil.getError("error.system.cart"), e);
+            List<String> errors = new ArrayList<>();
+            errors.add(MessageUtil.getError("error.system.cart"));
+            request.setAttribute("errors", errors);
+            request.setAttribute("startDate", request.getParameter("startDate"));
+            request.setAttribute("endDate", request.getParameter("endDate"));
+            request.setAttribute("pickupLocation", request.getParameter("pickupLocation"));
+            request.setAttribute("returnLocation", request.getParameter("returnLocation"));
+            request.getRequestDispatcher("/customer/booking-form.jsp").forward(request, response);
         }
     }
 

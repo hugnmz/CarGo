@@ -29,8 +29,7 @@ public class VerifyServlet extends HttpServlet {
             // khoi tao customer service tu di container
             customerService = DIContainer.get(CustomerService.class);
         } catch (Exception e) {
-            // log loi ra console
-            e.printStackTrace();
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
     
@@ -83,11 +82,9 @@ public class VerifyServlet extends HttpServlet {
             }
             
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             req.setAttribute("errorMessage", MessageUtil.getErrorFromException(e));
         } catch (Exception e) {
-            e.printStackTrace();
-            req.setAttribute("errorMessage", MessageUtil.getError("error.system"));
+            req.setAttribute("errorMessage", MessageUtil.getError("error.system.verify"));
         }
         
         // hien thi lai trang xac thuc voi thong bao loi

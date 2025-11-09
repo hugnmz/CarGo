@@ -29,7 +29,7 @@ public class CheckoutServlet extends HttpServlet {
             // khoi tao contract service tu di container
             contractService = DIContainer.get(ContractService.class);
         } catch (Exception e) {
-            throw new ServletException(MessageUtil.getError("error.system"), e);
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 
@@ -87,12 +87,10 @@ public class CheckoutServlet extends HttpServlet {
             request.getRequestDispatcher("/customer/checkout-result.jsp").forward(request, response);
 
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getErrorFromException(e));
+            request.getSession().setAttribute("flash_error", MessageUtil.getErrorFromException(e));
             response.sendRedirect(request.getContextPath() + "/ViewCartDetail");
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.checkout.failed"));
+            request.getSession().setAttribute("flash_error", MessageUtil.getError("error.system.checkout"));
             response.sendRedirect(request.getContextPath() + "/ViewCartDetail");
         }
     }

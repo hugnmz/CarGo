@@ -35,8 +35,7 @@ public class MessageUtil {
                 errorsStream.close();
             }
         } catch (IOException e) {
-            // log loi neu co
-            e.printStackTrace();
+            throw new util.exception.ApplicationException("error.system.properties.load", e);
         }
     }
     

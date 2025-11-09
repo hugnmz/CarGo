@@ -33,7 +33,7 @@ public class ChangePasswordServlet extends HttpServlet {
             customerService = DIContainer.get(CustomerService.class);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 
@@ -64,11 +64,9 @@ public class ChangePasswordServlet extends HttpServlet {
             }
 
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             request.setAttribute("errorMess", MessageUtil.getErrorFromException(e));
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("errorMess", MessageUtil.getError("error.system"));
+            request.setAttribute("errorMess", MessageUtil.getError("error.system.change.password"));
         }
 
         request.getRequestDispatcher("/CustomerServlet").forward(request, response);

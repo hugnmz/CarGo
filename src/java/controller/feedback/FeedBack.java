@@ -22,7 +22,7 @@ public class FeedBack extends HttpServlet {
         try {
             feedbackService = DIContainer.get(FeedbackService.class);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ServletException(util.MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 
@@ -78,12 +78,16 @@ public class FeedBack extends HttpServlet {
             resp.setCharacterEncoding("UTF-8");
             resp.setContentType("text/plain; charset=UTF-8");
             resp.getWriter().write(ex.getMessage());
-        } catch (Exception ex) {
-            ex.printStackTrace(); // log ra console/server log
+        } catch (util.exception.ValidationException | util.exception.BusinessException | util.exception.DataAccessException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.setCharacterEncoding("UTF-8");
             resp.setContentType("text/plain; charset=UTF-8");
-            resp.getWriter().write(ex.getMessage() != null ? ex.getMessage() : "Internal error");
+            resp.getWriter().write(util.MessageUtil.getErrorFromException(e));
+        } catch (Exception ex) {
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.setCharacterEncoding("UTF-8");
+            resp.setContentType("text/plain; charset=UTF-8");
+            resp.getWriter().write(util.MessageUtil.getError("error.system.feedback"));
         }
     }
 

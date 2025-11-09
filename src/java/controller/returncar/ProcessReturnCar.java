@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import model.RequestReturnCar;
 import service.ContractService;
+import service.PaymentService;
 import service.ReturnCarService;
 import util.di.DIContainer;
 
@@ -25,6 +26,7 @@ import util.di.DIContainer;
 @WebServlet(name = "ProcessReturnCar", urlPatterns = {"/processreturncar"})
 public class ProcessReturnCar extends HttpServlet {
 
+    private PaymentService paymentService;
     private ContractService contractService;
     private ReturnCarService returnCarService;
 
@@ -33,10 +35,11 @@ public class ProcessReturnCar extends HttpServlet {
         super.init(config); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
 
         try {
+            paymentService = DIContainer.get(PaymentService.class);
             contractService = DIContainer.get(ContractService.class);
             returnCarService = DIContainer.get(ReturnCarService.class);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize ContractService", e);
+            throw new ServletException(util.MessageUtil.getError("error.system.dependency.injection"), e);
         }
 
     }
@@ -138,11 +141,14 @@ public class ProcessReturnCar extends HttpServlet {
             //update tổng tiền sau khi trả xe
             contractService.updateContractTotalAmount(contractId, totalAmount);
 
-            //update note vào hợp đồng
-            contractService.updateNote(note, contractId);
-            
             //update trạng thái hợp đồng
             contractService.updateContractStatus(contractId, ConstractStatus.RETURNED.name());
+
+            //update note vào hợp đồng
+            contractService.updateNote(note, contractId);
+
+            //tao paymentpending
+            paymentService.createPendingPayment(contractId, totalAmount);
 
             // Dọn dẹp: bỏ khỏi whitelist theo phiên + hàng chờ service
             pendingMap.remove(contractId);
@@ -152,9 +158,11 @@ public class ProcessReturnCar extends HttpServlet {
             session.setAttribute("flash",
                     "Đã hoàn tất trả xe #" + contractId);
             resp.sendRedirect(req.getContextPath() + "/returncar");
+        } catch (util.exception.ValidationException | util.exception.BusinessException | util.exception.DataAccessException e) {
+            session.setAttribute("flash", util.MessageUtil.getErrorFromException(e));
+            resp.sendRedirect(req.getContextPath() + "/returncar");
         } catch (Exception ex) {
-            ex.printStackTrace();
-            session.setAttribute("flash", "Có lỗi khi cập nhật. Vui lòng thử lại.");
+            session.setAttribute("flash", util.MessageUtil.getError("error.system.return.car"));
             resp.sendRedirect(req.getContextPath() + "/returncar");
         }
     }

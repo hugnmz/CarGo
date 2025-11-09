@@ -30,7 +30,7 @@ public class ContractServlet extends HttpServlet {
         try {
             contractService = DIContainer.get(ContractService.class);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize ContractService", e);
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 
@@ -135,11 +135,11 @@ public class ContractServlet extends HttpServlet {
             }
 
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
-            throw e;
+            request.getSession().setAttribute("flash_error", MessageUtil.getErrorFromException(e));
+            response.sendRedirect(request.getContextPath() + "/staff?error=contract_creation_failed");
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(MessageUtil.getError("error.system"), e);
+            request.getSession().setAttribute("flash_error", MessageUtil.getError("error.system.contract.process"));
+            response.sendRedirect(request.getContextPath() + "/staff?error=contract_creation_failed");
         }
     }
 
@@ -159,11 +159,11 @@ public class ContractServlet extends HttpServlet {
             }
 
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
-            throw e;
+            request.getSession().setAttribute("flash_error", MessageUtil.getErrorFromException(e));
+            response.sendRedirect(request.getContextPath() + "/staff?error=status_update_failed&contractId=" + request.getParameter("contractId"));
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(MessageUtil.getError("error.system"), e);
+            request.getSession().setAttribute("flash_error", MessageUtil.getError("error.system.contract.process"));
+            response.sendRedirect(request.getContextPath() + "/staff?error=status_update_failed&contractId=" + request.getParameter("contractId"));
         }
     }
 
@@ -207,11 +207,11 @@ public class ContractServlet extends HttpServlet {
             }
 
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
-            throw e;
+            request.getSession().setAttribute("flash_error", MessageUtil.getErrorFromException(e));
+            response.sendRedirect(request.getContextPath() + "/customer/payment-failed.jsp");
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(MessageUtil.getError("error.system"), e);
+            request.getSession().setAttribute("flash_error", MessageUtil.getError("error.system.contract.process"));
+            response.sendRedirect(request.getContextPath() + "/customer/payment-failed.jsp");
         }
     }
 

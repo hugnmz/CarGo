@@ -19,20 +19,13 @@ public abstract class BaseAction extends HttpServlet {
     }
 
     // chuyen huong den url
-    protected void redirect(HttpServletResponse response, String url) {
-        try {
-            response.sendRedirect(url);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    protected void redirect(HttpServletResponse response, String url) throws java.io.IOException {
+        response.sendRedirect(url);
     }
 
     // forward den url
-    protected void forward(HttpServletRequest request, HttpServletResponse response, String url) {
-        try {
-            request.getRequestDispatcher(url).forward(request, response);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    protected void forward(HttpServletRequest request, HttpServletResponse response, String url) 
+            throws jakarta.servlet.ServletException, java.io.IOException {
+        request.getRequestDispatcher(url).forward(request, response);
     }
 }

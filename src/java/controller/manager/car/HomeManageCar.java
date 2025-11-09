@@ -39,8 +39,7 @@ public class HomeManageCar extends HttpServlet {
             carService = DIContainer.get(CarService.class);
             vehicleService = DIContainer.get(VehicleService.class);
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new ServletException("Không thể khởi tạo các service: " + e.getMessage());
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 
@@ -75,12 +74,10 @@ public class HomeManageCar extends HttpServlet {
             request.getRequestDispatcher("manager/manage_cars.jsp").forward(request, response);
 
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             request.setAttribute("error", MessageUtil.getErrorFromException(e));
             request.getRequestDispatcher("manager/manage_cars.jsp").forward(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.car.load.failed"));
+            request.setAttribute("error", MessageUtil.getError("error.system.car.management"));
             request.getRequestDispatcher("manager/manage_cars.jsp").forward(request, response);
         }
     }

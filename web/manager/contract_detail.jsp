@@ -30,7 +30,8 @@
                             <div class="d-flex gap-2 mt-3 mt-md-0">
                                 <a
                                     class="btn btn-back"
-                                    href="${pageContext.request.contextPath}/listcontract"
+                                    href="javascript:void(0);"
+                                    onclick="history.back(); return false;"
                                     >
                                     <i class="fas fa-arrow-left me-2"></i> ← Quay lại
                                 </a>
@@ -112,7 +113,7 @@
                                           ><i class="fas fa-piggy-bank "></i>Ghi chú</span>
 
                                     <div> <p class="info-text">
-                                           ${not empty ccontract.note?contract.note:'Trống'}
+                                            ${not empty ccontract.note?contract.note:'Trống'}
                                         </p></div>
 
 

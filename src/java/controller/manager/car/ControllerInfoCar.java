@@ -77,9 +77,10 @@ public class ControllerInfoCar extends HttpServlet {
                 request.setAttribute("error", "Không lấy được ID xe sau khi thêm!");
             }
 
+        } catch (util.exception.ValidationException | util.exception.BusinessException | util.exception.DataAccessException e) {
+            request.setAttribute("error", util.MessageUtil.getErrorFromException(e));
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Lỗi khi thêm xe: " + e.getMessage());
+            request.setAttribute("error", util.MessageUtil.getError("error.system.car.management"));
         }
 
         request.getRequestDispatcher("managecar").forward(request, response);
@@ -161,9 +162,10 @@ public class ControllerInfoCar extends HttpServlet {
             } else {
                 request.setAttribute("error", "Cập nhật xe thất bại!");
             }
+        } catch (util.exception.ValidationException | util.exception.BusinessException | util.exception.DataAccessException e) {
+            request.setAttribute("error", util.MessageUtil.getErrorFromException(e));
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Lỗi khi cập nhật xe: " + e.getMessage());
+            request.setAttribute("error", util.MessageUtil.getError("error.system.car.management"));
         }
 
         request.getRequestDispatcher("managecar").forward(request, response);
@@ -200,9 +202,11 @@ public class ControllerInfoCar extends HttpServlet {
             } else {
                 response.sendRedirect("managecar");
             }
+        } catch (util.exception.ValidationException | util.exception.BusinessException | util.exception.DataAccessException e) {
+            request.setAttribute("error", util.MessageUtil.getErrorFromException(e));
+            request.getRequestDispatcher("managecar").forward(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Lỗi khi tải form chỉnh sửa: " + e.getMessage());
+            request.setAttribute("error", util.MessageUtil.getError("error.system.car.management"));
             request.getRequestDispatcher("managecar").forward(request, response);
         }
     }
@@ -285,9 +289,11 @@ public class ControllerInfoCar extends HttpServlet {
             } else {
                 response.sendRedirect("managecar");
             }
+        } catch (util.exception.ValidationException | util.exception.BusinessException | util.exception.DataAccessException e) {
+            request.setAttribute("error", util.MessageUtil.getErrorFromException(e));
+            request.getRequestDispatcher("managecar").forward(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Lỗi khi tải form chỉnh sửa: " + e.getMessage());
+            request.setAttribute("error", util.MessageUtil.getError("error.system.car.management"));
             request.getRequestDispatcher("managecar").forward(request, response);
         }
     }

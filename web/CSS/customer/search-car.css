@@ -99,24 +99,97 @@ body {
   color: #9ca3af;
 }
 
-/* Car Cards */
-.car-card {
+/* Car Cards - Modern Style from home.css */
+.car-card-modern {
   border: none;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
   transition: all 0.3s;
   background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   height: 100%;
 }
 
-.car-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+.car-card-modern:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
 .car-card-clickable {
   cursor: pointer;
+}
+
+.car-card-modern .card-img-top {
+  height: 220px;
+  object-fit: cover;
+  transition: all 0.3s;
+}
+
+.car-card-modern:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+.car-card-modern .badge-modern {
+  background: var(--primary);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Special icon */
+.special-icon {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.5rem;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  z-index: 2;
+}
+
+/* Discount badge */
+.discount-badge {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 2;
+}
+
+/* Button styles */
+.btn-primary-custom {
+  background: var(--primary);
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  transition: all 0.3s;
+}
+
+.btn-primary-custom:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  color: white;
+}
+
+/* Legacy car-card class for backward compatibility */
+.car-card {
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  height: 100%;
+}
+
+.car-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
 .car-image-container {
@@ -133,17 +206,6 @@ body {
 
 .car-card:hover .car-image {
   transform: scale(1.05);
-}
-
-.special-icon {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 0.5rem;
-  border-radius: 50%;
-  font-size: 1.2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .car-specs {
@@ -180,6 +242,22 @@ body {
   border-top: 1px solid #e5e7eb;
   padding-top: 1rem;
   margin-top: 0.5rem;
+}
+
+/* Price styling - match home.css */
+.price-modern {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.2;
+}
+
+.price-old {
+  text-decoration: line-through;
+  color: var(--gray);
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+  display: block;
 }
 
 .card-title {

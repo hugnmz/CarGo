@@ -68,12 +68,10 @@ public class UpdateInfor extends HttpServlet {
             request.setAttribute("message", MessageUtil.getError("error.user.update.success"));
             request.getRequestDispatcher("profile").forward(request, response);
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             request.setAttribute("error", MessageUtil.getErrorFromException(e));
             request.getRequestDispatcher("profile").forward(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.user.update.error"));
+            request.setAttribute("error", MessageUtil.getError("error.system.manager.update"));
             request.getRequestDispatcher("profile").forward(request, response);
         }
     }

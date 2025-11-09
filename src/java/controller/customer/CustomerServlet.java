@@ -49,8 +49,7 @@ public class CustomerServlet extends HttpServlet {
 
             locationService = DIContainer.get(LocationService.class);
         } catch (Exception e) {
-            // log loi khi khoi tao service
-            e.printStackTrace();
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 
@@ -86,13 +85,11 @@ public class CustomerServlet extends HttpServlet {
             request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
 
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             request.setAttribute("error", MessageUtil.getErrorFromException(e));
             request.setAttribute("listContract", new ArrayList<>());
             request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.system"));
+            request.setAttribute("error", MessageUtil.getError("error.system.customer"));
             request.setAttribute("listContract", new ArrayList<>());
             request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
         }
@@ -162,20 +159,18 @@ public class CustomerServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/CustomerServlet?success=1");
             } else {
                 // neu cap nhat that bai thi them loi vao danh sach
-                errors.add("Có lỗi xảy ra khi cập nhật thông tin. Vui lòng thử lại.");
+                errors.add(MessageUtil.getError("error.customer.update.failed"));
                 request.setAttribute("errors", errors);
                 // hien thi lai trang profile voi thong bao loi
                 request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
             }
 
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             errors.add(MessageUtil.getErrorFromException(e));
             request.setAttribute("errors", errors);
             request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
-            errors.add(MessageUtil.getError("error.system"));
+            errors.add(MessageUtil.getError("error.system.customer"));
             request.setAttribute("errors", errors);
             request.getRequestDispatcher("/customer/profile.jsp").forward(request, response);
         }

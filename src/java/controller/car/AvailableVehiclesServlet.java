@@ -12,7 +12,12 @@ import java.util.List;
 import dto.VehicleDTO;
 import service.VehicleService;
 import util.di.DIContainer;
-
+import util.MessageUtil;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
+import util.exception.DataAccessException;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 @WebServlet(name = "AvailableVehiclesServlet", urlPatterns = {"/api/available-vehicles"})
 public class AvailableVehiclesServlet extends HttpServlet {
@@ -27,14 +32,13 @@ public class AvailableVehiclesServlet extends HttpServlet {
             // khoi tao vehicle service tu di container
             vehicleService = DIContainer.get(VehicleService.class);
         } catch (Exception e) {
-            // nem loi neu khoi tao service that bai
-            throw new RuntimeException(e);
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 
-
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
         // dat content type la json
         response.setContentType("application/json; charset=UTF-8");
 
@@ -47,7 +51,9 @@ public class AvailableVehiclesServlet extends HttpServlet {
         if (carIdStr == null || pickupDate == null || returnDate == null ||
             carIdStr.isBlank() || pickupDate.isBlank() || returnDate.isBlank()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("{\"error\":\"missing_params\"}");
+            JSONObject error = new JSONObject();
+            error.put("error", "missing_params");
+            response.getWriter().write(error.toString());
             return;
         }
 
@@ -64,40 +70,37 @@ public class AvailableVehiclesServlet extends HttpServlet {
             // kiem tra khoang thoi gian hop le
             if (!end.isAfter(start)) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().write("{\"error\":\"invalid_range\"}");
+                JSONObject error = new JSONObject();
+                error.put("error", "invalid_range");
+                response.getWriter().write(error.toString());
                 return;
             }
 
             // lay danh sach phuong tien co san tu database
             List<VehicleDTO> list = vehicleService.getAvailableVehiclesByCar(carId, start, end);
 
-            // tao json response
-            StringBuilder sb = new StringBuilder();
-            sb.append('[');
-            for (int i = 0; i < list.size(); i++) {
-                VehicleDTO v = list.get(i);
-                if (i > 0) sb.append(',');
-                sb.append('{')
-                  .append("\"vehicleId\":").append(v.getVehicleId()).append(',')
-                  .append("\"plateNumber\":\"").append(escape(v.getPlateNumber())).append("\",")
-                  .append("\"city\":\"").append(escape(v.getCity())).append("\"")
-                  .append('}');
+            // tao json response bang JSONArray
+            JSONArray jsonArray = new JSONArray();
+            for (VehicleDTO v : list) {
+                JSONObject vehicle = new JSONObject();
+                vehicle.put("vehicleId", v.getVehicleId());
+                vehicle.put("plateNumber", v.getPlateNumber() != null ? v.getPlateNumber() : "");
+                vehicle.put("city", v.getCity() != null ? v.getCity() : "");
+                jsonArray.put(vehicle);
             }
-            sb.append(']');
-            response.getWriter().write(sb.toString());
-        } catch (Exception ex) {
-            // neu co loi thi tra ve loi server
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"error\":\"server_error\"}");
-        }
-    }
 
-    /**
-     * method escape ky tu dac biet trong json
-     * - thay the ky tu dac biet de tranh loi json
-     */
-    private static String escape(String s) {
-        if (s == null) return "";
-        return s.replace("\\", "\\\\").replace("\"", "\\\"");
+            // tra ve json array
+            response.getWriter().write(jsonArray.toString());
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            JSONObject error = new JSONObject();
+            error.put("error", MessageUtil.getErrorFromException(e));
+            response.getWriter().write(error.toString());
+        } catch (Exception ex) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            JSONObject error = new JSONObject();
+            error.put("error", MessageUtil.getError("error.system.available.vehicles"));
+            response.getWriter().write(error.toString());
+        }
     }
 }

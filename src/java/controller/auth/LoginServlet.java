@@ -94,13 +94,17 @@ public class LoginServlet extends HttpServlet {
 
             //3. Cả customer và user đều login thất bại
             request.setAttribute("username", username);
-            request.setAttribute("errors", MessageUtil.getError("error.login.invalid"));
-            request.getRequestDispatcher("auth/login.jsp").forward(request, response);
+            java.util.List<String> errorList = new java.util.ArrayList<>();
+            errorList.add(MessageUtil.getError("error.login.invalid"));
+            request.setAttribute("errors", errorList);
+            request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
 
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("errors", MessageUtil.getError("error.system.login"));
-            request.getRequestDispatcher("auth/login.jsp").forward(request, response);
+            request.setAttribute("username", username);
+            java.util.List<String> errorList = new java.util.ArrayList<>();
+            errorList.add(MessageUtil.getError("error.system.login"));
+            request.setAttribute("errors", errorList);
+            request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
         }
     }
 

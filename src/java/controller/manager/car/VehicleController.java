@@ -26,7 +26,7 @@ public class VehicleController extends HttpServlet {
             vehicleService = DIContainer.get(VehicleService.class);
             carService = DIContainer.get(CarService.class);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 
@@ -50,11 +50,9 @@ public class VehicleController extends HttpServlet {
             request.setAttribute("message", MessageUtil.getError("error.vehicle.add.success"));
 
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             request.setAttribute("error", MessageUtil.getErrorFromException(e));
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.vehicle.add.failed"));
+            request.setAttribute("error", MessageUtil.getError("error.system.vehicle.management"));
         }
         request.getRequestDispatcher("controllerinformationcar?action=detail&carId="
                 + Integer.parseInt(request.getParameter("carId")))
@@ -84,11 +82,9 @@ public class VehicleController extends HttpServlet {
             request.setAttribute("message", MessageUtil.getError("error.vehicle.update.success"));
 
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             request.setAttribute("error", MessageUtil.getErrorFromException(e));
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.vehicle.update.failed"));
+            request.setAttribute("error", MessageUtil.getError("error.system.vehicle.management"));
         }
 
         request.getRequestDispatcher("controllerinformationcar?action=detail&carId="
@@ -114,14 +110,12 @@ public class VehicleController extends HttpServlet {
                     .forward(request, response);
 
         } catch (ValidationException | BusinessException | DataAccessException e) {
-            e.printStackTrace();
             request.setAttribute("error", MessageUtil.getErrorFromException(e));
             request.getRequestDispatcher("controllerinformationcar?action=detail&carId="
                     + Integer.parseInt(request.getParameter("carId")))
                     .forward(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", MessageUtil.getError("error.vehicle.delete.error"));
+            request.setAttribute("error", MessageUtil.getError("error.system.vehicle.management"));
             request.getRequestDispatcher("controllerinformationcar?action=detail&carId="
                     + Integer.parseInt(request.getParameter("carId")))
                     .forward(request, response);

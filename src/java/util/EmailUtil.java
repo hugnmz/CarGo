@@ -30,8 +30,7 @@ public class EmailUtil {
                 // neu khong tim thay file thi bo qua
             }
         } catch (IOException e) {
-            // log loi neu co
-            throw new RuntimeException("error.email.send.failed", e);
+            throw new util.exception.ApplicationException("error.system.properties.load", e);
         }
     }
 
@@ -129,8 +128,7 @@ public class EmailUtil {
             Transport.send(message);
             System.out.println("[EmailUtil] Mail sent to " + toEmail);
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("[EmailUtil] Lỗi gửi email: " + e.getMessage());
+            throw new util.exception.BusinessException("error.system.email.send", e);
         }
     }
 }

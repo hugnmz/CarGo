@@ -9,6 +9,8 @@ import model.Locations;
 import service.LocationService;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
+import util.MessageUtil;
+import util.exception.DataAccessException;
 
 @Service
 public class LocationServiceImpl implements LocationService {
@@ -31,8 +33,7 @@ public class LocationServiceImpl implements LocationService {
             
             return dtoList;
         } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList<>();
+            throw new DataAccessException(MessageUtil.getError("error.system.location.load"), e);
         }
     }
 }

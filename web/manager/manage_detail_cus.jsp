@@ -359,7 +359,9 @@
                                                     <div class="booking-price">
                                                         <h6 class="text-success"><fmt:formatNumber value="${contract.totalAmount}" pattern="#,###" /> VNĐ</h6>
                                                         <p class="text-muted small">Cọc: <fmt:formatNumber value="${contract.depositAmount}" pattern="#,###" /> VNĐ</p>
-                                                        <button class="btn btn-sm btn-outline-primary">Chi tiết</button>
+                                                        <a href="contractdetail?contractId=${contract.contractId}" class="btn btn-info btn-sm text-white">
+                                                            <i class="fa-solid fa-circle-info"></i> Chi tiết
+                                                        </a>
                                                     </div>
                                                 </div>
                                             </c:forEach>

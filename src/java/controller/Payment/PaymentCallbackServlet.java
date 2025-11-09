@@ -1,5 +1,6 @@
 package controller.payment;
 
+import constant.ConstractStatus;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -9,12 +10,14 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.json.JSONObject;
+import service.ContractService;
 import service.PaymentService;
 import util.di.DIContainer;
 
 @WebServlet("/paymentCallback")
 public class PaymentCallbackServlet extends HttpServlet {
 
+    private ContractService contractService;
     private PaymentService paymentService;
 
     @Override
@@ -22,8 +25,10 @@ public class PaymentCallbackServlet extends HttpServlet {
         super.init();
         try {
             paymentService = DIContainer.get(PaymentService.class);
+            contractService = DIContainer.get(ContractService.class);
+
         } catch (Exception e) {
-            throw new RuntimeException("Dependency injection error", e);
+            throw new ServletException(util.MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 
@@ -84,7 +89,23 @@ public class PaymentCallbackServlet extends HttpServlet {
                 boolean updatedPayment = paymentService.completePaymentById(pendingPayment.get().getPaymentId());
 
                 System.out.println("[CALLBACK] UpdatedPayment=" + updatedPayment);
-
+                if (updatedPayment) {
+                    // Chỉ update COMPLETED khi đã thanh toán đủ totalAmount
+                    BigDecimal totalPaid = paymentService.getTotalPaidAmount(contractId);
+                    Optional<dto.ContractDTO> contractOpt = contractService.getContractById(contractId);
+                    
+                    if (contractOpt.isPresent()) {
+                        dto.ContractDTO contract = contractOpt.get();
+                        BigDecimal totalAmount = contract.getTotalAmount();
+                        
+                        if (totalAmount != null && totalPaid.compareTo(totalAmount) >= 0) {
+                            contractService.updateContractStatus(contractId, ConstractStatus.COMPLETED.name());
+                            System.out.println("[CALLBACK] Contract status updated to COMPLETED for contractId=" + contractId);
+                        } else {
+                            System.out.println("[CALLBACK] Payment completed but contract not fully paid. TotalPaid=" + totalPaid + ", TotalAmount=" + totalAmount);
+                        }
+                    }
+                }
                 System.out.println("Payment updated: " + updatedPayment);
 
                 String statusNow = paymentService.getPaymentStatus(contractId);
@@ -102,9 +123,8 @@ public class PaymentCallbackServlet extends HttpServlet {
             System.out.println("=== CALLBACK END ===");
 
         } catch (Exception e) {
-            e.printStackTrace();
             responseJson.put("status", "error");
-            responseJson.put("message", "Internal server error while processing callback");
+            responseJson.put("message", util.MessageUtil.getError("error.system.payment.callback"));
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().write(responseJson.toString());
         }
@@ -112,8 +132,8 @@ public class PaymentCallbackServlet extends HttpServlet {
 
     private int extractContractId(String description) {
         try {
-            // Chỉ match "Thanh toan hop dong <số>"
-            Pattern p = Pattern.compile("Thanh toan hop dong (\\d+)", Pattern.CASE_INSENSITIVE);
+            // Match cả "Thanh toan hop dong <số>" và "Dat coc hop dong <số>"
+            Pattern p = Pattern.compile("(?:Thanh toan|Dat coc) hop dong (\\d+)", Pattern.CASE_INSENSITIVE);
             Matcher m = p.matcher(description);
             if (m.find()) {
                 return Integer.parseInt(m.group(1));
