@@ -1,9 +1,11 @@
 package controller;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.io.IOException;
 
 // lop co so cho cac action servlet
 public abstract class BaseAction extends HttpServlet {
@@ -19,13 +21,13 @@ public abstract class BaseAction extends HttpServlet {
     }
 
     // chuyen huong den url
-    protected void redirect(HttpServletResponse response, String url) throws java.io.IOException {
+    protected void redirect(HttpServletResponse response, String url) throws IOException {
         response.sendRedirect(url);
     }
 
     // forward den url
     protected void forward(HttpServletRequest request, HttpServletResponse response, String url) 
-            throws jakarta.servlet.ServletException, java.io.IOException {
+            throws ServletException, IOException {
         request.getRequestDispatcher(url).forward(request, response);
     }
 }

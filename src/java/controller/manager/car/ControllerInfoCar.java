@@ -14,6 +14,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.*;
 import util.di.DIContainer;
+import util.MessageUtil;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
+import util.exception.DataAccessException;
 import dto.CarDTO;
 import dto.CategoryDTO;
 import dto.FuelDTO;
@@ -77,10 +81,10 @@ public class ControllerInfoCar extends HttpServlet {
                 request.setAttribute("error", "Không lấy được ID xe sau khi thêm!");
             }
 
-        } catch (util.exception.ValidationException | util.exception.BusinessException | util.exception.DataAccessException e) {
-            request.setAttribute("error", util.MessageUtil.getErrorFromException(e));
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
         } catch (Exception e) {
-            request.setAttribute("error", util.MessageUtil.getError("error.system.car.management"));
+            request.setAttribute("error", MessageUtil.getError("error.system.car.management"));
         }
 
         request.getRequestDispatcher("managecar").forward(request, response);
@@ -162,10 +166,10 @@ public class ControllerInfoCar extends HttpServlet {
             } else {
                 request.setAttribute("error", "Cập nhật xe thất bại!");
             }
-        } catch (util.exception.ValidationException | util.exception.BusinessException | util.exception.DataAccessException e) {
-            request.setAttribute("error", util.MessageUtil.getErrorFromException(e));
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
         } catch (Exception e) {
-            request.setAttribute("error", util.MessageUtil.getError("error.system.car.management"));
+            request.setAttribute("error", MessageUtil.getError("error.system.car.management"));
         }
 
         request.getRequestDispatcher("managecar").forward(request, response);

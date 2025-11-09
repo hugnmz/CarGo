@@ -18,6 +18,10 @@ import service.ContractService;
 import service.PaymentService;
 import service.ReturnCarService;
 import util.di.DIContainer;
+import util.MessageUtil;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
+import util.exception.DataAccessException;
 
 /**
  *
@@ -39,7 +43,7 @@ public class ProcessReturnCar extends HttpServlet {
             contractService = DIContainer.get(ContractService.class);
             returnCarService = DIContainer.get(ReturnCarService.class);
         } catch (Exception e) {
-            throw new ServletException(util.MessageUtil.getError("error.system.dependency.injection"), e);
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
 
     }
@@ -158,11 +162,11 @@ public class ProcessReturnCar extends HttpServlet {
             session.setAttribute("flash",
                     "Đã hoàn tất trả xe #" + contractId);
             resp.sendRedirect(req.getContextPath() + "/returncar");
-        } catch (util.exception.ValidationException | util.exception.BusinessException | util.exception.DataAccessException e) {
-            session.setAttribute("flash", util.MessageUtil.getErrorFromException(e));
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            session.setAttribute("flash", MessageUtil.getErrorFromException(e));
             resp.sendRedirect(req.getContextPath() + "/returncar");
         } catch (Exception ex) {
-            session.setAttribute("flash", util.MessageUtil.getError("error.system.return.car"));
+            session.setAttribute("flash", MessageUtil.getError("error.system.return.car"));
             resp.sendRedirect(req.getContextPath() + "/returncar");
         }
     }

@@ -20,7 +20,9 @@ import service.ContractService;
 import util.di.DIContainer;
 import service.CustomerService;
 import util.MessageUtil;
-import util.exception.*;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
+import util.exception.DataAccessException;
 
 /**
  *
@@ -39,7 +41,7 @@ public class ControllerInforCustomer extends HttpServlet {
             customerService = DIContainer.get(CustomerService.class);
             contractService = DIContainer.get(ContractService.class);
         } catch (Exception e) {
-            throw new ServletException(util.MessageUtil.getError("error.system.dependency.injection"), e);
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 

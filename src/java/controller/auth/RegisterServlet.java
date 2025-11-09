@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import util.MessageUtil;
 import service.CustomerService;
 import service.LocationService;
@@ -53,11 +54,11 @@ public class RegisterServlet extends HttpServlet {
 
             // chuyen huong den trang dang ky
             request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
-        } catch (ApplicationException | DataAccessException e) {
-            request.setAttribute("errors", java.util.Arrays.asList(MessageUtil.getErrorFromException((e))));
+        } catch (ApplicationException e) {
+            request.setAttribute("errors", Arrays.asList(MessageUtil.getErrorFromException(e)));
             request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
         } catch (Exception e) {
-            request.setAttribute("errors", java.util.Arrays.asList(MessageUtil.getError("error.system.register")));
+            request.setAttribute("errors", Arrays.asList(MessageUtil.getError("error.system.register")));
             request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
         }
     }

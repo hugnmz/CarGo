@@ -9,6 +9,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import service.ContractService;
 import util.di.DIContainer;
+import util.MessageUtil;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
+import util.exception.DataAccessException;
 import java.io.IOException;
 import java.util.List;
 
@@ -23,7 +27,7 @@ public class SatffServlet extends HttpServlet {
         try {
             contractService = DIContainer.get(ContractService.class);
         } catch (Exception e) {
-            throw new ServletException(util.MessageUtil.getError("error.system.dependency.injection"), e);
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 
@@ -39,11 +43,11 @@ public class SatffServlet extends HttpServlet {
             request.setAttribute("contracts", contracts);
             request.getRequestDispatcher("/staff/staff.jsp").forward(request, response);
 
-        } catch (util.exception.ValidationException | util.exception.BusinessException | util.exception.DataAccessException e) {
-            request.setAttribute("error", util.MessageUtil.getErrorFromException(e));
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
             request.getRequestDispatcher("/staff/staff.jsp").forward(request, response);
         } catch (Exception e) {
-            request.setAttribute("error", util.MessageUtil.getError("error.system.staff"));
+            request.setAttribute("error", MessageUtil.getError("error.system.staff"));
             request.getRequestDispatcher("/staff/staff.jsp").forward(request, response);
         }
     }

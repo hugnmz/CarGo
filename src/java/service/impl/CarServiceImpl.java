@@ -10,6 +10,7 @@ import dto.SeatingDTO;
 import dto.VehicleDTO;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -118,8 +119,8 @@ public class CarServiceImpl implements CarService {
             carPrice.setDailyPrice(BigDecimal.valueOf(price));
             carPrice.setDepositAmount(BigDecimal.valueOf(deposit));
 
-            carPrice.setStartDate(java.time.LocalDate.now());
-            carPrice.setCreateAt(java.time.LocalDateTime.now());
+            carPrice.setStartDate(LocalDate.now());
+            carPrice.setCreateAt(LocalDateTime.now());
 
             return carPricesDAO.addCarPrice(carPrice);
         } catch (Exception e) {
@@ -177,8 +178,8 @@ public class CarServiceImpl implements CarService {
                     newPrice.setCarId(carDTO.getCarId());
                     newPrice.setDailyPrice(newDailyPrice);
                     newPrice.setDepositAmount(newDeposit);
-                    newPrice.setStartDate(java.time.LocalDate.now());
-                    newPrice.setCreateAt(java.time.LocalDateTime.now());
+                    newPrice.setStartDate(LocalDate.now());
+                    newPrice.setCreateAt(LocalDateTime.now());
 
                     carPricesDAO.addCarPrice(newPrice);
                 }
@@ -187,8 +188,8 @@ public class CarServiceImpl implements CarService {
                 newPrice.setCarId(carDTO.getCarId());
                 newPrice.setDailyPrice(newDailyPrice);
                 newPrice.setDepositAmount(newDeposit);
-                newPrice.setStartDate(java.time.LocalDate.now());
-                newPrice.setCreateAt(java.time.LocalDateTime.now());
+                newPrice.setStartDate(LocalDate.now());
+                newPrice.setCreateAt(LocalDateTime.now());
 
                 carPricesDAO.addCarPrice(newPrice);
             }

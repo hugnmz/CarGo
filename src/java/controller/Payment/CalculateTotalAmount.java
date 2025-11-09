@@ -1,4 +1,4 @@
-package controller.payment;
+package controller.Payment;
 
 import java.io.IOException;
 import jakarta.servlet.ServletException;

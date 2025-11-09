@@ -24,7 +24,10 @@ import service.ReturnCarService;
 import util.di.DIContainer;
 import util.AuthUtil;
 import util.MessageUtil;
-import util.exception.*;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
+import util.exception.DataAccessException;
+import java.util.UUID;
 
 /**
  *
@@ -44,7 +47,7 @@ public class ReturnCar extends HttpServlet {
             contractService = DIContainer.get(ContractService.class);
             returnCarService = DIContainer.get(ReturnCarService.class);
         } catch (Exception e) {
-            throw new ServletException(util.MessageUtil.getError("error.system.dependency.injection"), e);
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
 
     }
@@ -56,7 +59,7 @@ public class ReturnCar extends HttpServlet {
         req.setAttribute("requests", requests);
 
         //tạo mã csrf để bảo mật
-        String csrf = java.util.UUID.randomUUID().toString();
+        String csrf = UUID.randomUUID().toString();
         req.getSession().setAttribute("csrf", csrf);
         // Tạo session whitelist: chỉ những contractId này mới được phép xử lý
         Map<Integer, RequestReturnCar> pendingMap = new LinkedHashMap<>();

@@ -123,7 +123,7 @@ public class ControllerAdmin extends HttpServlet {
                 }
 
                 if (email != null && !email.isEmpty()) {
-                    util.EmailUtil.sendCredentials(email, fullname, username, password, roleName);
+                    EmailUtil.sendCredentials(email, fullname, username, password, roleName);
                 }
             } catch (Exception e) {
                 request.setAttribute("error", MessageUtil.getError("error.system.email.send"));

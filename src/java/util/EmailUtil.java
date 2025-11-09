@@ -12,6 +12,8 @@ import jakarta.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import util.exception.ApplicationException;
+import util.exception.BusinessException;
 
 // class xu ly gui email
 public class EmailUtil {
@@ -30,7 +32,7 @@ public class EmailUtil {
                 // neu khong tim thay file thi bo qua
             }
         } catch (IOException e) {
-            throw new util.exception.ApplicationException("error.system.properties.load", e);
+            throw new ApplicationException("error.system.properties.load", e);
         }
     }
 
@@ -128,7 +130,7 @@ public class EmailUtil {
             Transport.send(message);
             System.out.println("[EmailUtil] Mail sent to " + toEmail);
         } catch (Exception e) {
-            throw new util.exception.BusinessException("error.system.email.send", e);
+            throw new BusinessException("error.system.email.send", e);
         }
     }
 }

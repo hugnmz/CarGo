@@ -10,6 +10,10 @@ import java.io.IOException;
 import java.util.List;
 import service.CarService;
 import util.di.DIContainer;
+import util.MessageUtil;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
+import util.exception.DataAccessException;
 
 
 @WebServlet(name = "CarsServlet", urlPatterns = {"/cars"})
@@ -25,7 +29,7 @@ public class CarsServlet extends HttpServlet {
             // khoi tao car service tu di container
             carService = DIContainer.get(CarService.class);
         } catch (Exception e) {
-            throw new ServletException(util.MessageUtil.getError("error.system.dependency.injection"), e);
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 
@@ -40,11 +44,11 @@ public class CarsServlet extends HttpServlet {
             request.setAttribute("allCars", allCars);
             // chuyen huong den trang danh sach xe
             request.getRequestDispatcher("/customer/cars.jsp").forward(request, response);
-        } catch (util.exception.ValidationException | util.exception.BusinessException | util.exception.DataAccessException e) {
-            request.setAttribute("error", util.MessageUtil.getErrorFromException(e));
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
             request.getRequestDispatcher("/customer/cars.jsp").forward(request, response);
         } catch (Exception e) {
-            request.setAttribute("error", util.MessageUtil.getError("error.system.cars.list"));
+            request.setAttribute("error", MessageUtil.getError("error.system.cars.list"));
             request.getRequestDispatcher("/customer/cars.jsp").forward(request, response);
         }
     }

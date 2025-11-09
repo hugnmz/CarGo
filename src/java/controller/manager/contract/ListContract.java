@@ -36,7 +36,7 @@ public class ListContract extends HttpServlet {
         try {
             contractService = DIContainer.get(ContractService.class);
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
 
     }

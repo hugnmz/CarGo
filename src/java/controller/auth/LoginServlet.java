@@ -7,7 +7,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.Optional;
-
+import java.util.List;
+import java.util.ArrayList;
 import service.CustomerService;
 import service.UserService;
 import util.di.DIContainer;
@@ -94,14 +95,14 @@ public class LoginServlet extends HttpServlet {
 
             //3. Cả customer và user đều login thất bại
             request.setAttribute("username", username);
-            java.util.List<String> errorList = new java.util.ArrayList<>();
+            List<String> errorList = new ArrayList<>();
             errorList.add(MessageUtil.getError("error.login.invalid"));
             request.setAttribute("errors", errorList);
             request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
 
         } catch (Exception e) {
             request.setAttribute("username", username);
-            java.util.List<String> errorList = new java.util.ArrayList<>();
+            List<String> errorList = new ArrayList<>();
             errorList.add(MessageUtil.getError("error.system.login"));
             request.setAttribute("errors", errorList);
             request.getRequestDispatcher("/auth/login.jsp").forward(request, response);

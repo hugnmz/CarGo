@@ -1,4 +1,4 @@
-package controller.payment;
+package controller.Payment;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.json.JSONObject;
 import service.PaymentService;
 import util.di.DIContainer;
+import util.MessageUtil;
 
 @WebServlet("/checkPayment")
 public class CheckPaymentServlet extends HttpServlet {
@@ -19,7 +20,7 @@ public class CheckPaymentServlet extends HttpServlet {
         try {
             paymentService = DIContainer.get(PaymentService.class);
         } catch (Exception e) {
-            throw new ServletException(util.MessageUtil.getError("error.system.dependency.injection"), e);
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 

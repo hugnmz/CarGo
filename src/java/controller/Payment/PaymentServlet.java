@@ -1,4 +1,4 @@
-package controller.payment;
+package controller.Payment;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -7,11 +7,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import service.PaymentService;
 import service.ContractService;
 import util.di.DIContainer;
-import java.util.Optional;
+import util.MessageUtil;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
+import util.exception.DataAccessException;
 import dto.ContractDTO;
+import dto.PaymentDTO;
 
 @WebServlet("/paymentServlet")
 public class PaymentServlet extends HttpServlet {
@@ -32,7 +39,7 @@ public class PaymentServlet extends HttpServlet {
             paymentService = DIContainer.get(PaymentService.class);
             contractService = DIContainer.get(ContractService.class);
         } catch (Exception e) {
-            throw new ServletException(util.MessageUtil.getError("error.system.dependency.injection"), e);
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 
@@ -97,7 +104,7 @@ public class PaymentServlet extends HttpServlet {
             }
             
             // Tạo pending payment nếu chưa có (để callback có thể match)
-            Optional<dto.PaymentDTO> existingPending = paymentService.findPendingPayment(contractId, amountToPay);
+            Optional<PaymentDTO> existingPending = paymentService.findPendingPayment(contractId, amountToPay);
             if (!existingPending.isPresent()) {
                 paymentService.createPendingPayment(contractId, amountToPay);
             }
@@ -105,18 +112,18 @@ public class PaymentServlet extends HttpServlet {
             // CHƯA THANH TOÁN (PENDING/NONE) → render QR + bật polling
             String qr = "https://img.vietqr.io/image/" + BANK_ID + "-" + ACCOUNT_NO + "-" + TEMPLATE + ".jpg"
                     + "?amount=" + amountToPay.intValue()
-                    + "&addInfo=" + java.net.URLEncoder.encode(description, "UTF-8")
-                    + "&accountName=" + java.net.URLEncoder.encode(ACCOUNT_NAME, "UTF-8");
+                    + "&addInfo=" + URLEncoder.encode(description, StandardCharsets.UTF_8)
+                    + "&accountName=" + URLEncoder.encode(ACCOUNT_NAME, StandardCharsets.UTF_8);
 
             req.setAttribute("qrUrl", qr);
             req.setAttribute("initialStatus", "PENDING");
             req.getRequestDispatcher("/payment/payment.jsp").forward(req, resp);
 
-        } catch (util.exception.ValidationException | util.exception.BusinessException | util.exception.DataAccessException e) {
-            req.setAttribute("error", util.MessageUtil.getErrorFromException(e));
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            req.setAttribute("error", MessageUtil.getErrorFromException(e));
             req.getRequestDispatcher("/payment/payment.jsp").forward(req, resp);
         } catch (Exception ex) {
-            req.setAttribute("error", util.MessageUtil.getError("error.system.payment.processing"));
+            req.setAttribute("error", MessageUtil.getError("error.system.payment.processing"));
             req.getRequestDispatcher("/payment/payment.jsp").forward(req, resp);
         }
     }

@@ -2,7 +2,9 @@ package util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Properties;
+import util.exception.ApplicationException;
 
 // class xu ly thong bao va loi tu file properties
 public class MessageUtil {
@@ -23,7 +25,7 @@ public class MessageUtil {
             messages = new Properties();
             InputStream messagesStream = MessageUtil.class.getClassLoader().getResourceAsStream("messages.properties");
             if (messagesStream != null) {
-                messages.load(new java.io.InputStreamReader(messagesStream, "UTF-8"));
+                messages.load(new InputStreamReader(messagesStream, "UTF-8"));
                 messagesStream.close();
             }
             
@@ -31,11 +33,11 @@ public class MessageUtil {
             errors = new Properties();
             InputStream errorsStream = MessageUtil.class.getClassLoader().getResourceAsStream("errors.properties");
             if (errorsStream != null) {
-                errors.load(new java.io.InputStreamReader(errorsStream, "UTF-8"));
+                errors.load(new InputStreamReader(errorsStream, "UTF-8"));
                 errorsStream.close();
             }
         } catch (IOException e) {
-            throw new util.exception.ApplicationException("error.system.properties.load", e);
+            throw new ApplicationException("error.system.properties.load", e);
         }
     }
     

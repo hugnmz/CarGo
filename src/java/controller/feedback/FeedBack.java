@@ -7,7 +7,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import service.FeedbackService;
 import util.di.DIContainer;
-
+import util.MessageUtil;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
+import util.exception.DataAccessException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -22,7 +25,7 @@ public class FeedBack extends HttpServlet {
         try {
             feedbackService = DIContainer.get(FeedbackService.class);
         } catch (Exception e) {
-            throw new ServletException(util.MessageUtil.getError("error.system.dependency.injection"), e);
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 
@@ -78,16 +81,16 @@ public class FeedBack extends HttpServlet {
             resp.setCharacterEncoding("UTF-8");
             resp.setContentType("text/plain; charset=UTF-8");
             resp.getWriter().write(ex.getMessage());
-        } catch (util.exception.ValidationException | util.exception.BusinessException | util.exception.DataAccessException e) {
+        } catch (ValidationException | BusinessException | DataAccessException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.setCharacterEncoding("UTF-8");
             resp.setContentType("text/plain; charset=UTF-8");
-            resp.getWriter().write(util.MessageUtil.getErrorFromException(e));
+            resp.getWriter().write(MessageUtil.getErrorFromException(e));
         } catch (Exception ex) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.setCharacterEncoding("UTF-8");
             resp.setContentType("text/plain; charset=UTF-8");
-            resp.getWriter().write(util.MessageUtil.getError("error.system.feedback"));
+            resp.getWriter().write(MessageUtil.getError("error.system.feedback"));
         }
     }
 

@@ -13,6 +13,10 @@ import java.util.Optional;
 import service.CarService;
 import service.VehicleService;
 import util.di.DIContainer;
+import util.MessageUtil;
+import util.exception.ValidationException;
+import util.exception.BusinessException;
+import util.exception.DataAccessException;
 
 
 @WebServlet(name = "CarDetailServlet", urlPatterns = {"/car-detail"})
@@ -32,7 +36,7 @@ public class CarDetailServlet extends HttpServlet {
             // khoi tao vehicle service tu di container
             vehicleService = DIContainer.get(VehicleService.class);
         } catch (Exception e) {
-            throw new ServletException(util.MessageUtil.getError("error.system.dependency.injection"), e);
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 
@@ -58,7 +62,7 @@ public class CarDetailServlet extends HttpServlet {
             Optional<CarDTO> carDTO = carService.getCarById(carId);
             if (!carDTO.isPresent()) {
                 // neu khong tim thay xe thi dat thong bao loi
-                request.setAttribute("error", util.MessageUtil.getError("error.car.not.found"));
+                request.setAttribute("error", MessageUtil.getError("error.car.not.found"));
                 request.getRequestDispatcher("/customer/car-detail.jsp").forward(request, response);
                 return;
             }
@@ -73,11 +77,11 @@ public class CarDetailServlet extends HttpServlet {
 
             // chuyen huong den trang chi tiet xe
             request.getRequestDispatcher("/customer/car-detail.jsp").forward(request, response);
-        } catch (util.exception.ValidationException | util.exception.BusinessException | util.exception.DataAccessException e) {
-            request.setAttribute("error", util.MessageUtil.getErrorFromException(e));
+        } catch (ValidationException | BusinessException | DataAccessException e) {
+            request.setAttribute("error", MessageUtil.getErrorFromException(e));
             request.getRequestDispatcher("/customer/car-detail.jsp").forward(request, response);
         } catch (Exception e) {
-            request.setAttribute("error", util.MessageUtil.getError("error.system.car.detail"));
+            request.setAttribute("error", MessageUtil.getError("error.system.car.detail"));
             request.getRequestDispatcher("/customer/car-detail.jsp").forward(request, response);
         }
     }

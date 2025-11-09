@@ -1,4 +1,4 @@
-package controller.payment;
+package controller.Payment;
 
 import constant.ConstractStatus;
 import jakarta.servlet.ServletException;
@@ -13,6 +13,9 @@ import org.json.JSONObject;
 import service.ContractService;
 import service.PaymentService;
 import util.di.DIContainer;
+import util.MessageUtil;
+import dto.ContractDTO;
+import dto.PaymentDTO;
 
 @WebServlet("/paymentCallback")
 public class PaymentCallbackServlet extends HttpServlet {
@@ -28,7 +31,7 @@ public class PaymentCallbackServlet extends HttpServlet {
             contractService = DIContainer.get(ContractService.class);
 
         } catch (Exception e) {
-            throw new ServletException(util.MessageUtil.getError("error.system.dependency.injection"), e);
+            throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }
     }
 
@@ -82,7 +85,7 @@ public class PaymentCallbackServlet extends HttpServlet {
             }
 
             // Kiểm tra pending payment
-            Optional<dto.PaymentDTO> pendingPayment = paymentService.findPendingPayment(contractId, amount);
+            Optional<PaymentDTO> pendingPayment = paymentService.findPendingPayment(contractId, amount);
             System.out.println("Pending payment found: " + pendingPayment.isPresent());
 
             if (pendingPayment.isPresent() && !paymentService.isPaymentCompleted(pendingPayment.get().getPaymentId())) {
@@ -92,10 +95,10 @@ public class PaymentCallbackServlet extends HttpServlet {
                 if (updatedPayment) {
                     // Chỉ update COMPLETED khi đã thanh toán đủ totalAmount
                     BigDecimal totalPaid = paymentService.getTotalPaidAmount(contractId);
-                    Optional<dto.ContractDTO> contractOpt = contractService.getContractById(contractId);
+                    Optional<ContractDTO> contractOpt = contractService.getContractById(contractId);
                     
                     if (contractOpt.isPresent()) {
-                        dto.ContractDTO contract = contractOpt.get();
+                        ContractDTO contract = contractOpt.get();
                         BigDecimal totalAmount = contract.getTotalAmount();
                         
                         if (totalAmount != null && totalPaid.compareTo(totalAmount) >= 0) {
@@ -124,7 +127,7 @@ public class PaymentCallbackServlet extends HttpServlet {
 
         } catch (Exception e) {
             responseJson.put("status", "error");
-            responseJson.put("message", util.MessageUtil.getError("error.system.payment.callback"));
+            responseJson.put("message", MessageUtil.getError("error.system.payment.callback"));
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().write(responseJson.toString());
         }
