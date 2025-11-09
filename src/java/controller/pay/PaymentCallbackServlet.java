@@ -1,4 +1,4 @@
-package controller.Payment;
+package controller.pay;
 
 import constant.ConstractStatus;
 import jakarta.servlet.ServletException;
@@ -93,19 +93,24 @@ public class PaymentCallbackServlet extends HttpServlet {
 
                 System.out.println("[CALLBACK] UpdatedPayment=" + updatedPayment);
                 if (updatedPayment) {
-                    // Chỉ update COMPLETED khi đã thanh toán đủ totalAmount
                     BigDecimal totalPaid = paymentService.getTotalPaidAmount(contractId);
                     Optional<ContractDTO> contractOpt = contractService.getContractById(contractId);
-                    
+
                     if (contractOpt.isPresent()) {
                         ContractDTO contract = contractOpt.get();
                         BigDecimal totalAmount = contract.getTotalAmount();
-                        
+                        BigDecimal depositAmount = contract.getDepositAmount();
+
                         if (totalAmount != null && totalPaid.compareTo(totalAmount) >= 0) {
                             contractService.updateContractStatus(contractId, ConstractStatus.COMPLETED.name());
                             System.out.println("[CALLBACK] Contract status updated to COMPLETED for contractId=" + contractId);
+                        } else if (depositAmount != null && totalPaid.compareTo(depositAmount) >= 0
+                                && totalPaid.compareTo(totalAmount) < 0
+                                && "ACCEPTED".equals(contract.getStatus())) {
+                            contractService.updateContractStatus(contractId, ConstractStatus.DEPOSIT_PAID.name());
+                            System.out.println("[CALLBACK] Contract status updated to DEPOSIT_PAID for contractId=" + contractId);
                         } else {
-                            System.out.println("[CALLBACK] Payment completed but contract not fully paid. TotalPaid=" + totalPaid + ", TotalAmount=" + totalAmount);
+                            System.out.println("[CALLBACK] Payment completed but no status update needed. TotalPaid=" + totalPaid + ", TotalAmount=" + totalAmount + ", DepositAmount=" + depositAmount);
                         }
                     }
                 }

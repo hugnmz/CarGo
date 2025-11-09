@@ -7,7 +7,6 @@ package controller.manager.contract;
 import dto.ContractDTO;
 import jakarta.servlet.ServletConfig;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -58,15 +57,36 @@ public class ListContract extends HttpServlet {
             throws ServletException, IOException {
         try {
             String idStr = request.getParameter("contractId");
-            // Xóa check - service sẽ check và throw WebException
-            int contractId = (idStr != null && !idStr.trim().isEmpty()) 
-                ? Integer.parseInt(idStr.trim()) : 0;
-            //gọi service xoá hợp đồng - service sẽ check và throw WebException
+            
+            // Validate contractId
+            if (idStr == null || idStr.trim().isEmpty()) {
+                request.getSession().setAttribute("flash_error", MessageUtil.getError("error.validation.contract.id.missing"));
+                response.sendRedirect(request.getContextPath() + "/listcontract");
+                return;
+            }
+            
+            Integer contractId;
+            try {
+                contractId = Integer.parseInt(idStr.trim());
+            } catch (NumberFormatException e) {
+                request.getSession().setAttribute("flash_error", MessageUtil.getError("error.validation.contract.id.invalid"));
+                response.sendRedirect(request.getContextPath() + "/listcontract");
+                return;
+            }
+            
+            // Validate contractId > 0
+            if (contractId <= 0) {
+                request.getSession().setAttribute("flash_error", MessageUtil.getError("error.validation.contract.id.invalid"));
+                response.sendRedirect(request.getContextPath() + "/listcontract");
+                return;
+            }
+            
+            // Gọi service xóa hợp đồng - service sẽ check và throw exception nếu có lỗi
             boolean deleted = contractService.deleteContract(contractId);
             if (deleted) {
-                request.getSession().setAttribute("flash_message", "Xóa hợp đồng thành công!");
+                request.getSession().setAttribute("flash_message", MessageUtil.getMessage("message.contract.delete.success"));
             } else {
-                request.getSession().setAttribute("flash_error", "Không tìm thấy hợp đồng để xóa!");
+                request.getSession().setAttribute("flash_error", MessageUtil.getError("error.contract.not.found"));
             }
         } catch (ValidationException | BusinessException | DataAccessException e) {
             request.getSession().setAttribute("flash_error", MessageUtil.getErrorFromException(e));

@@ -1,6 +1,13 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %> <%@ page
-contentType="text/html; charset=UTF-8" language="java" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page contentType="text/html; charset=UTF-8" language="java" 
+    import="java.util.Set,
+            java.util.LinkedHashSet,
+            java.util.Map,
+            java.util.LinkedHashMap,
+            java.util.List,
+            java.util.ArrayList,
+            java.lang.reflect.Method" %>
 <!DOCTYPE html>
 <html lang="vi">
   <head>
@@ -18,16 +25,16 @@ contentType="text/html; charset=UTF-8" language="java" %>
         
         <%-- Đếm số nhóm ngày khác nhau --%>
         <%
-            java.util.Set<String> uniqueDates = new java.util.LinkedHashSet<>();
-            java.util.Map<String, java.util.List> dateGroupsMap = new java.util.LinkedHashMap<>();
+            Set<String> uniqueDates = new LinkedHashSet<>();
+            Map<String, List> dateGroupsMap = new LinkedHashMap<>();
             
-            java.util.List cartItems = (java.util.List) request.getAttribute("cartItems");
+            List cartItems = (List) request.getAttribute("cartItems");
             if (cartItems != null) {
                 for (Object obj : cartItems) {
                     try {
                         // Sử dụng reflection để lấy rentStartDate và rentEndDate
-                        java.lang.reflect.Method getStart = obj.getClass().getMethod("getRentStartDate");
-                        java.lang.reflect.Method getEnd = obj.getClass().getMethod("getRentEndDate");
+                        Method getStart = obj.getClass().getMethod("getRentStartDate");
+                        Method getEnd = obj.getClass().getMethod("getRentEndDate");
                         Object startDate = getStart.invoke(obj);
                         Object endDate = getEnd.invoke(obj);
                         
@@ -36,7 +43,7 @@ contentType="text/html; charset=UTF-8" language="java" %>
                         
                         // Nhóm items theo dateKey
                         if (!dateGroupsMap.containsKey(dateKey)) {
-                            dateGroupsMap.put(dateKey, new java.util.ArrayList());
+                            dateGroupsMap.put(dateKey, new ArrayList());
                         }
                         dateGroupsMap.get(dateKey).add(obj);
                     } catch (Exception e) {
@@ -131,6 +138,23 @@ contentType="text/html; charset=UTF-8" language="java" %>
           </table>
           
           <div class="actions">
+            <c:choose>
+              <c:when test="${not empty refererUrl}">
+                <a class="btn btn-outline-secondary" href="${refererUrl}">
+                  <i class="fas fa-arrow-left me-1"></i>Quay lại
+                </a>
+              </c:when>
+              <c:when test="${not empty carId}">
+                <a class="btn btn-outline-secondary" href="${pageContext.request.contextPath}/car-detail?carId=${carId}">
+                  <i class="fas fa-arrow-left me-1"></i>Quay lại xem xe
+                </a>
+              </c:when>
+              <c:otherwise>
+                <button type="button" class="btn btn-outline-secondary" onclick="window.history.back();">
+                  <i class="fas fa-arrow-left me-1"></i>Quay lại
+                </button>
+              </c:otherwise>
+            </c:choose>
             <button type="submit" class="btn" name="action" value="remove" onclick="return confirm('Bạn có chắc muốn xóa các mục đã chọn?')">
               <i class="fas fa-trash me-1"></i>Xóa mục đã chọn
             </button>
@@ -152,6 +176,12 @@ contentType="text/html; charset=UTF-8" language="java" %>
             <p class="text-muted mb-4">Bạn chưa có sản phẩm nào trong giỏ hàng</p>
             <div class="d-flex justify-content-center gap-3">
               <c:choose>
+                <c:when test="${not empty refererUrl}">
+                  <a class="btn btn-primary" href="${refererUrl}">
+                    <i class="fa fa-arrow-left me-1"></i>
+                    Quay lại
+                  </a>
+                </c:when>
                 <c:when test="${not empty carId}">
                   <a class="btn btn-primary" href="${pageContext.request.contextPath}/car-detail?carId=${carId}">
                     <i class="fa fa-arrow-left me-1"></i>
@@ -159,10 +189,10 @@ contentType="text/html; charset=UTF-8" language="java" %>
                   </a>
                 </c:when>
                 <c:otherwise>
-                  <a class="btn btn-primary" href="${pageContext.request.contextPath}/home">
+                  <button type="button" class="btn btn-primary" onclick="window.history.back();">
                     <i class="fa fa-arrow-left me-1"></i>
-                    Về trang chủ
-                  </a>
+                    Quay lại
+                  </button>
                 </c:otherwise>
               </c:choose>
               <a class="btn btn-outline-primary" href="${pageContext.request.contextPath}/home">

@@ -55,6 +55,12 @@ public class ViewCartDetail extends HttpServlet {
             request.setAttribute("vehicleId", vehicleId);
         }
         
+        // lay referer URL de quay lai trang truoc do
+        String referer = request.getHeader("Referer");
+        if (referer != null && !referer.trim().isEmpty()) {
+            request.setAttribute("refererUrl", referer);
+        }
+        
         // chuyen huong den trang cart.jsp
         request.getRequestDispatcher("/customer/cart.jsp").forward(request, response);
     }
@@ -105,6 +111,12 @@ public class ViewCartDetail extends HttpServlet {
         }
         if (vehicleId != null && !vehicleId.trim().isEmpty()) {
             request.setAttribute("vehicleId", vehicleId);
+        }
+        
+        // lay referer URL de quay lai trang truoc do
+        String referer = request.getHeader("Referer");
+        if (referer != null && !referer.trim().isEmpty()) {
+            request.setAttribute("refererUrl", referer);
         }
         
         // chuyen huong lai trang cart.jsp
