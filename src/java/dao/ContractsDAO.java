@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import model.Contracts;
+import model.Contract;
 
 /**
  *
@@ -16,25 +16,25 @@ import model.Contracts;
  */
 public interface ContractsDAO {
 
-    List<Contracts> getAllContracts();
+    List<Contract> getAllContracts();
 
-    Optional<Contracts> getContractById(Integer contractId);
+    Optional<Contract> getContractById(Integer contractId);
 
-    boolean addContract(Contracts contract);
+    boolean addContract(Contract contract);
 
-    boolean updateContract(Contracts contract);
+    boolean updateContract(Contract contract);
 
     boolean deleteContract(Integer contractId);
 
     boolean updateContractStatus(Integer contractId, String status);
 
-    List<Contracts> getContractByCustomer(Integer customerId);
+    List<Contract> getContractByCustomer(Integer customerId);
 
-    List<Contracts> getContractByStaff(Integer staffId);
+    List<Contract> getContractByStaff(Integer staffId);
 
-    List<Contracts> getContractByDateRange(LocalDateTime startDate, LocalDateTime endDate);
+    List<Contract> getContractByDateRange(LocalDateTime startDate, LocalDateTime endDate);
 
-    List<Contracts> getContractByStatus(String status);
+    List<Contract> getContractByStatus(String status);
 
     public boolean updateContractTotalAmount(Integer contractId, BigDecimal totalAmount);
 

@@ -1,7 +1,7 @@
 package dao.impl;
 
 import dao.FeedbacksDAO;
-import model.Feedbacks;
+import model.Feedback;
 import util.JdbcTemplateUtil;
 import util.di.annotation.Repository;
 
@@ -11,37 +11,37 @@ import java.util.List;
 public class FeedbacksDAOImpl implements FeedbacksDAO {
 
     @Override
-    public List<Feedbacks> getAllFeedbacks() {
+    public List<Feedback> getAllFeedbacks() {
         String sql = "SELECT * FROM dbo.Feedbacks ORDER BY createAt DESC";
-        return JdbcTemplateUtil.query(sql, Feedbacks.class);
+        return JdbcTemplateUtil.query(sql, Feedback.class);
     }
 
     @Override
-    public Feedbacks getFeedbackById(Integer feedbackId) {
+    public Feedback getFeedbackById(Integer feedbackId) {
         String sql = "SELECT * FROM dbo.Feedbacks WHERE feedbackId = ?";
-        return JdbcTemplateUtil.queryOne(sql, Feedbacks.class, feedbackId);
+        return JdbcTemplateUtil.queryOne(sql, Feedback.class, feedbackId);
     }
 
     @Override
-    public List<Feedbacks> getFeedbacksByCustomer(Integer customerId) {
+    public List<Feedback> getFeedbacksByCustomer(Integer customerId) {
         String sql = "SELECT * FROM dbo.Feedbacks WHERE customerId = ? ORDER BY createAt DESC";
-        return JdbcTemplateUtil.query(sql, Feedbacks.class, customerId);
+        return JdbcTemplateUtil.query(sql, Feedback.class, customerId);
     }
 
     @Override
-    public List<Feedbacks> getFeedbacksByVehicle(Integer vehicleId) {
+    public List<Feedback> getFeedbacksByVehicle(Integer vehicleId) {
         String sql = "SELECT * FROM dbo.Feedbacks WHERE vehicleId = ? ORDER BY createAt DESC";
-        return JdbcTemplateUtil.query(sql, Feedbacks.class, vehicleId);
+        return JdbcTemplateUtil.query(sql, Feedback.class, vehicleId);
     }
 
     @Override
-    public List<Feedbacks> getFeedbacksByCustomerAndVehicle(Integer customerId, Integer vehicleId) {
+    public List<Feedback> getFeedbacksByCustomerAndVehicle(Integer customerId, Integer vehicleId) {
         String sql = "SELECT * FROM dbo.Feedbacks WHERE customerId = ? AND vehicleId = ? ORDER BY createAt DESC";
-        return JdbcTemplateUtil.query(sql, Feedbacks.class, customerId, vehicleId);
+        return JdbcTemplateUtil.query(sql, Feedback.class, customerId, vehicleId);
     }
 
 @Override
-public boolean addFeedback(Feedbacks feedback) {
+public boolean addFeedback(Feedback feedback) {
     int newId;
     if (feedback.getVehicleId() == null) {
         String sql = "INSERT INTO dbo.Feedbacks (customerId, comment, createAt) VALUES (?,?,?)";
@@ -69,7 +69,7 @@ public boolean addFeedback(Feedbacks feedback) {
 }
 
     @Override
-    public boolean updateFeedback(Feedbacks feedback) {
+    public boolean updateFeedback(Feedback feedback) {
         String sql = "UPDATE dbo.Feedbacks SET comment = ? WHERE feedbackId = ?";
         int affected = JdbcTemplateUtil.update(sql, feedback.getComment(), feedback.getFeedbackId());
         return affected > 0;
@@ -83,20 +83,20 @@ public boolean addFeedback(Feedbacks feedback) {
     }
 
     @Override
-    public List<Feedbacks> getRecentFeedbacks(int limit) {
+    public List<Feedback> getRecentFeedbacks(int limit) {
         String sql = "SELECT * FROM dbo.Feedbacks ORDER BY createAt DESC OFFSET 0 ROWS FETCH NEXT ? ROWS ONLY";
-        return JdbcTemplateUtil.query(sql, Feedbacks.class, limit);
+        return JdbcTemplateUtil.query(sql, Feedback.class, limit);
     }
 
     @Override
-    public List<Feedbacks> getFeedbacksByDateRange(java.time.LocalDateTime startDate, java.time.LocalDateTime endDate) {
+    public List<Feedback> getFeedbacksByDateRange(java.time.LocalDateTime startDate, java.time.LocalDateTime endDate) {
         String sql = "SELECT * FROM dbo.Feedbacks WHERE createAt BETWEEN ? AND ? ORDER BY createAt DESC";
-        return JdbcTemplateUtil.query(sql, Feedbacks.class, startDate, endDate);
+        return JdbcTemplateUtil.query(sql, Feedback.class, startDate, endDate);
     }
 
     @Override
-    public List<Feedbacks> getRecentFeedbacksPaged(int offset, int limit) {
+    public List<Feedback> getRecentFeedbacksPaged(int offset, int limit) {
         String sql = "SELECT * FROM dbo.Feedbacks ORDER BY createAt DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        return JdbcTemplateUtil.query(sql, Feedbacks.class, offset, limit);
+        return JdbcTemplateUtil.query(sql, Feedback.class, offset, limit);
     }
 }

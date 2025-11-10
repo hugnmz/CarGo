@@ -1,19 +1,19 @@
 package mapper;
 
 import dto.VehicleDTO;
-import model.Vehicles;
+import model.Vehicle;
 import model.Cars;
-import model.Locations;
+import model.Location;
 import util.di.annotation.Component;
 
 /**
- * VehicleMapper - Chuyển đổi giữa VehicleDTO và Vehicles Model
+ * VehicleMapper - Chuyển đổi giữa VehicleDTO và Vehicle Model
  */
 @Component
 public class VehicleMapper {
 
     // Chuyen tu Model sang DTO
-    public VehicleDTO toDTO(Vehicles vehicle) {
+    public VehicleDTO toDTO(Vehicle vehicle) {
         // Kiem tra null
         if (vehicle == null) {
             return null;
@@ -64,7 +64,7 @@ public class VehicleMapper {
 
         // Location information (nested)
         if (vehicle.getLocation() != null) {
-            Locations location = vehicle.getLocation();
+            Location location = vehicle.getLocation();
             dto.setCity(location.getCity());
         }
 
@@ -72,13 +72,13 @@ public class VehicleMapper {
     }
 
     // Chuyen tu DTO sang Model
-    public Vehicles toModel(VehicleDTO dto) {
+    public Vehicle toModel(VehicleDTO dto) {
         // Kiem tra null
         if (dto == null) {
             return null;
         }
 
-        Vehicles vehicle = new Vehicles();
+        Vehicle vehicle = new Vehicle();
         
         // Gan cac truong co ban cua xe
         vehicle.setVehicleId(dto.getVehicleId());
@@ -100,7 +100,7 @@ public class VehicleMapper {
 
         // Create nested Location object if location info is provided
         if (dto.getCity() != null) {
-            Locations location = new Locations();
+            Location location = new Location();
             location.setLocationId(dto.getLocationId());
             location.setCity(dto.getCity());
             vehicle.setLocation(location);

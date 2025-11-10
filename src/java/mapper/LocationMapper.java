@@ -1,14 +1,14 @@
 package mapper;
 
 import dto.LocationDTO;
-import model.Locations;
+import model.Location;
 import util.di.annotation.Component;
 
 @Component
 public class LocationMapper {
 
     // Chuyen tu Model sang DTO
-    public LocationDTO toDTO(Locations location) {
+    public LocationDTO toDTO(Location location) {
         // Kiem tra null
         if (location == null) {
             return null;
@@ -25,13 +25,13 @@ public class LocationMapper {
     }
 
     // Chuyen tu DTO sang Model
-    public Locations toModel(LocationDTO dto) {
+    public Location toModel(LocationDTO dto) {
         // Kiem tra null
         if (dto == null) {
             return null;
         }
 
-        Locations location = new Locations();
+        Location location = new Location();
 
         // Gan cac truong co ban cua dia diem
         location.setLocationId(dto.getLocationId());

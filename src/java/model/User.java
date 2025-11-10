@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import util.di.annotation.Column;
 import util.di.annotation.Nested;
 
-public class Users {
+public class User {
 
     @Column(name = "userId")
     private Integer userId;
@@ -43,17 +43,17 @@ public class Users {
 
     // QUAN HỆ 1-1 (User -> Location)
     @Nested
-    private Locations location;
+    private Location location;
 
-    // QUAN HỆ 1-N (Role -> Users)
+    // QUAN HỆ 1-N (Role -> User)
     @Nested
     private Roles role;
 
     // CONSTRUCTOR
-    public Users() {
+    public User() {
     }
 
-    public Users(String username, String fullName, String phone, String email) {
+    public User(String username, String fullName, String phone, String email) {
         this.username = username;
         this.fullName = fullName;
         this.phone = phone;
@@ -150,11 +150,11 @@ public class Users {
         this.roleId = roleId;
     }
 
-    public Locations getLocation() {
+    public Location getLocation() {
         return location;
     }
 
-    public void setLocation(Locations location) {
+    public void setLocation(Location location) {
         this.location = location;
     }
 

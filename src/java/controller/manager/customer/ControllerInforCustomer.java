@@ -18,11 +18,11 @@ import java.util.List;
 import java.util.Optional;
 import service.ContractService;
 import util.di.DIContainer;
-import service.CustomerService;
 import util.MessageUtil;
 import util.exception.ValidationException;
 import util.exception.BusinessException;
 import util.exception.DataAccessException;
+import service.CustomersService;
 
 /**
  *
@@ -31,14 +31,14 @@ import util.exception.DataAccessException;
 @WebServlet(name = "ControllerInforCustomer", urlPatterns = {"/controllerinformationcustomer"})
 public class ControllerInforCustomer extends HttpServlet {
 
-    private CustomerService customerService;
+    private CustomersService customerService;
     private ContractService contractService;
 
     @Override
     public void init() throws ServletException {
         super.init();
         try {
-            customerService = DIContainer.get(CustomerService.class);
+            customerService = DIContainer.get(CustomersService.class);
             contractService = DIContainer.get(ContractService.class);
         } catch (Exception e) {
             throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);

@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import util.di.annotation.Column;
 import util.di.annotation.Nested;
 
-public class Feedbacks {
+public class Feedback {
 
     @Column
     private Integer feedbackId;    // ID phản hồi
@@ -23,15 +23,15 @@ public class Feedbacks {
 
     @Nested
     // Các đối tượng liên quan
-    private Customers customer;       // Khách hàng
+    private Customer customer;       // Khách hàng
     @Nested
-    private Vehicles vehicle;        // Xe
+    private Vehicle vehicle;        // Xe
 
     // Constructors
-    public Feedbacks() {
+    public Feedback() {
     }
 
-    public Feedbacks(Integer customerId, Integer vehicleId, String comment) {
+    public Feedback(Integer customerId, Integer vehicleId, String comment) {
         this.customerId = customerId;
         this.vehicleId = vehicleId;
         this.comment = comment;
@@ -79,19 +79,19 @@ public class Feedbacks {
         this.createAt = createAt;
     }
 
-    public Customers getCustomer() {
+    public Customer getCustomer() {
         return customer;
     }
 
-    public void setCustomer(Customers customer) {
+    public void setCustomer(Customer customer) {
         this.customer = customer;
     }
 
-    public Vehicles getVehicle() {
+    public Vehicle getVehicle() {
         return vehicle;
     }
 
-    public void setVehicle(Vehicles vehicle) {
+    public void setVehicle(Vehicle vehicle) {
         this.vehicle = vehicle;
     }
 }

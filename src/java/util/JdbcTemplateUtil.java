@@ -4,7 +4,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import model.Locations;
+import model.Location;
 
 // class xu ly cac cau lenh sql
 // trong dao chi can viet cau sql roi nhet tham so placeholder vao trong may ham nay

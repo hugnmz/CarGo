@@ -23,7 +23,7 @@ public class Payments {
     
     // Các đối tượng liên quan
     @Nested()
-    private Contracts contract;      // Hợp đồng
+    private Contract contract;      // Hợp đồng
     @Nested()
     private PaymentMethods paymentMethod; // Phương thức thanh toán
     @Nested()
@@ -66,8 +66,8 @@ public class Payments {
     public LocalDateTime getPaymentDate() { return paymentDate; }
     public void setPaymentDate(LocalDateTime paymentDate) { this.paymentDate = paymentDate; }
     
-    public Contracts getContract() { return contract; }
-    public void setContract(Contracts contract) { this.contract = contract; }
+    public Contract getContract() { return contract; }
+    public void setContract(Contract contract) { this.contract = contract; }
     
     public PaymentMethods getPaymentMethod() { return paymentMethod; }
     public void setPaymentMethod(PaymentMethods paymentMethod) { this.paymentMethod = paymentMethod; }

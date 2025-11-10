@@ -1,13 +1,11 @@
 package service.impl;
 
-import dao.LocationsDAO;
-import dao.UsersDAO;
 import dto.LocationDTO;
 import dto.UserDTO;
 import java.util.List;
 import java.util.Optional;
 import mapper.UserMapper;
-import model.Users;
+import model.User;
 import service.UserService;
 import util.PasswordUtil;
 import util.MessageUtil;
@@ -17,27 +15,29 @@ import util.exception.ApplicationException;
 import util.exception.DataAccessException;
 import util.exception.ValidationException;
 import util.exception.BusinessException;
+import dao.UserDAO;
+import dao.LocationDAO;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    private UsersDAO usersDAO;
+    private UserDAO usersDAO;
 
     @Autowired
     private UserMapper userMapper;
 
     @Autowired
-    private LocationsDAO locationsDAO;
+    private LocationDAO locationsDAO;
 
     @Override
     public Optional<UserDTO> loginUser(String username, String password) {
-        Optional<Users> userOpt = usersDAO.getUserByUsername(username);
+        Optional<User> userOpt = usersDAO.getUserByUsername(username);
         if (userOpt.isEmpty()) {
             throw new ValidationException(MessageUtil.getError("error.login.invalid"));
         }
 
-        Users user = userOpt.get();
+        User user = userOpt.get();
 
         boolean valid = PasswordUtil.verifyPassword(
                 password,
@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
 
     // Nếu bạn cần kiểm tra quyền admin
     private boolean hasAdminRole(Integer userId) {
-        // bạn có thể viết thêm query ở UsersDAO để kiểm tra role admin
+        // bạn có thể viết thêm query ở UserDAO để kiểm tra role admin
         // ví dụ SELECT COUNT(*) FROM UserRoles ur 
         // JOIN Roles r ON ur.roleId = r.roleId 
         // WHERE ur.userId = ? AND r.roleName = 'ADMIN'
@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
             byte[] passwordSalt = hashResult[1];
 
             // 4️⃣ Chuyển DTO → Model
-            Users user = userMapper.toModel(userDTO);
+            User user = userMapper.toModel(userDTO);
             user.setPasswordHash(passwordHash);
             user.setPasswordSalt(passwordSalt);
             user.setLocationId(locationId);
@@ -122,13 +122,13 @@ public class UserServiceImpl implements UserService {
     public void updateUser(UserDTO userDTO) {
         try {
             // Kiểm tra người dùng có tồn tại chưa
-            Optional<Users> existingUser = usersDAO.getUserById(userDTO.getUserId());
+            Optional<User> existingUser = usersDAO.getUserById(userDTO.getUserId());
             if (existingUser.isEmpty()) {
                 throw new ValidationException(MessageUtil.getError("error.validation.user.not.found"));
             }
 
             // Kiểm tra email, phone (nếu có thay đổi)
-            Users oldUser = existingUser.get();
+            User oldUser = existingUser.get();
 
             // Kiểm tra trùng email nếu có thay đổi
             if (!oldUser.getEmail().equals(userDTO.getEmail())
@@ -150,7 +150,7 @@ public class UserServiceImpl implements UserService {
             }
 
             // Chuyển đổi sang model
-            Users user = userMapper.toModel(userDTO);
+            User user = userMapper.toModel(userDTO);
             user.setLocationId(locationId);
 
             boolean success = usersDAO.updateUser(user);
@@ -207,12 +207,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO getUserById(Integer userId) {
         try {
-            Optional<Users> optionalUser = usersDAO.getUserById(userId);
+            Optional<User> optionalUser = usersDAO.getUserById(userId);
             if (optionalUser.isEmpty()) {
                 throw new ValidationException(MessageUtil.getError("error.validation.user.not.found"));
             }
 
-            Users user = optionalUser.get();
+            User user = optionalUser.get();
             UserDTO dto = new UserDTO();
 
             dto.setUserId(user.getUserId());
@@ -242,12 +242,12 @@ public class UserServiceImpl implements UserService {
             }
 
             // Lấy thông tin user từ database
-            Optional<Users> ou = usersDAO.getUserById(userId);
+            Optional<User> ou = usersDAO.getUserById(userId);
             if (!ou.isPresent()) {
                 throw new ValidationException(MessageUtil.getError("error.validation.user.not.found"));
             }
 
-            Users user = ou.get();
+            User user = ou.get();
 
             // Xác thực mật khẩu cũ
             if (!PasswordUtil.verifyPassword(oldPassword,

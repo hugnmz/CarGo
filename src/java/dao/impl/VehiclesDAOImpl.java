@@ -4,7 +4,7 @@ import dao.VehiclesDAO;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import model.Vehicles;
+import model.Vehicle;
 import util.JdbcTemplateUtil;
 import util.di.annotation.Repository;
 
@@ -12,43 +12,43 @@ import util.di.annotation.Repository;
 public class VehiclesDAOImpl implements VehiclesDAO {
 
     @Override
-    public List<Vehicles> getAllVehicles() {
+    public List<Vehicle> getAllVehicles() {
         String sql = "SELECT v.*, l.city, c.name, c.year FROM dbo.Vehicles v "
                 + "LEFT JOIN dbo.Locations l ON l.locationId = v.locationId "
                 + "LEFT JOIN dbo.Cars c ON c.carId = v.carId";
-        return JdbcTemplateUtil.query(sql, Vehicles.class);
+        return JdbcTemplateUtil.query(sql, Vehicle.class);
     }
 
     public static void main(String[] args) {
         VehiclesDAOImpl v = new VehiclesDAOImpl();
-        List<Vehicles> list = v.getAllVehicles();
-        for (Vehicles vehicles : list) {
+        List<Vehicle> list = v.getAllVehicles();
+        for (Vehicle vehicles : list) {
             
         }
     }
 
     @Override
-    public Optional<Vehicles> getVehicleById(Integer vehicleId) {
+    public Optional<Vehicle> getVehicleById(Integer vehicleId) {
         String sql = "SELECT v.*, l.city, c.name, c.year FROM dbo.Vehicles v "
                 + "	LEFT JOIN dbo.Locations l ON l.locationId = v.locationId LEFT JOIN dbo.Cars c ON c.carId = v.carId "
                 + "	WHERE v.vehicleId = ?";
 
-        Vehicles v = JdbcTemplateUtil.queryOne(sql, Vehicles.class, vehicleId);
+        Vehicle v = JdbcTemplateUtil.queryOne(sql, Vehicle.class, vehicleId);
         return Optional.ofNullable(v);
     }
 
     @Override
-    public Optional<Vehicles> getVehicleyPlateNumber(String plateNumber) {
+    public Optional<Vehicle> getVehicleyPlateNumber(String plateNumber) {
         String sql = "SELECT v.*, l.city, c.name, c.year FROM dbo.Vehicles v "
                 + "LEFT JOIN dbo.Locations l ON l.locationId = v.locationId LEFT JOIN dbo.Cars c ON c.carId = v.carId "
                 + "WHERE v.plateNumber = ?";
 
-        Vehicles v = JdbcTemplateUtil.queryOne(sql, Vehicles.class, plateNumber);
+        Vehicle v = JdbcTemplateUtil.queryOne(sql, Vehicle.class, plateNumber);
         return Optional.ofNullable(v);
     }
 
     @Override
-    public boolean addVehicle(Vehicles vehicle) {
+    public boolean addVehicle(Vehicle vehicle) {
         String sql = "INSERT INTO dbo.Vehicles(carId,plateNumber,isActive,locationId) VALUES (?,?,?,?)";
 
         int result = JdbcTemplateUtil.insertAndReturnKey(sql,
@@ -60,7 +60,7 @@ public class VehiclesDAOImpl implements VehiclesDAO {
     }
 
     @Override
-    public boolean updateVehicle(Vehicles vehicle) {
+    public boolean updateVehicle(Vehicle vehicle) {
         String sql = "UPDATE dbo.Vehicles "
                 + "SET carId = ?, plateNumber = ?, isActive = ?, locationId = ? "
                 + "WHERE vehicleId = ?";
@@ -95,7 +95,7 @@ public class VehiclesDAOImpl implements VehiclesDAO {
     }
 
     @Override
-    public List<Vehicles> getVehiclesByCar(Integer CarId) {
+    public List<Vehicle> getVehiclesByCar(Integer CarId) {
         String sql = "SELECT "
                 + "v.vehicleId, v.carId, v.plateNumber, v.isActive, v.locationId, "
                 + "c.carId as c_carId, c.name as c_name, c.year as c_year, c.description as c_description, c.image as c_image, "
@@ -115,11 +115,11 @@ public class VehiclesDAOImpl implements VehiclesDAO {
                 + "LEFT JOIN dbo.CarPrices cp ON c.carId = cp.carId AND cp.endDate IS NULL "
                 + "WHERE v.carId = ?";
 
-        return JdbcTemplateUtil.query(sql, Vehicles.class, CarId);
+        return JdbcTemplateUtil.query(sql, Vehicle.class, CarId);
     }
 
     @Override
-    public List<Vehicles> getAvailableVehiclesByCar(Integer carId, LocalDateTime startDate, LocalDateTime endDate) {
+    public List<Vehicle> getAvailableVehiclesByCar(Integer carId, LocalDateTime startDate, LocalDateTime endDate) {
         String sql = "SELECT v.*, l.city, c.name, c.year FROM dbo.Vehicles v "
                 + "LEFT JOIN dbo.Locations l ON l.locationId = v.locationId "
                 + "LEFT JOIN dbo.Cars c ON c.carId = v.carId "
@@ -133,7 +133,7 @@ public class VehiclesDAOImpl implements VehiclesDAO {
                 + "    )"
                 + ")";
 
-        return JdbcTemplateUtil.query(sql, Vehicles.class, carId, endDate, startDate);
+        return JdbcTemplateUtil.query(sql, Vehicle.class, carId, endDate, startDate);
     }
 
     @Override

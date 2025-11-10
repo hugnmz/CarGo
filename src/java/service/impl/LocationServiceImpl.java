@@ -1,22 +1,22 @@
 package service.impl;
 
-import dao.LocationsDAO;
 import dto.LocationDTO;
 import java.util.ArrayList;
 import java.util.List;
 import mapper.LocationMapper;
-import model.Locations;
+import model.Location;
 import service.LocationService;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
 import util.MessageUtil;
 import util.exception.DataAccessException;
+import dao.LocationDAO;
 
 @Service
 public class LocationServiceImpl implements LocationService {
     
     @Autowired
-    private LocationsDAO locationsDAO;
+    private LocationDAO locationsDAO;
     
     @Autowired
     private LocationMapper locationMapper;
@@ -24,10 +24,10 @@ public class LocationServiceImpl implements LocationService {
     @Override
     public List<LocationDTO> getAllLocations() {
         try {
-            List<Locations> locations = locationsDAO.getAllLocations();
+            List<Location> locations = locationsDAO.getAllLocations();
             List<LocationDTO> dtoList = new ArrayList<>();
             
-            for (Locations location : locations) {
+            for (Location location : locations) {
                 dtoList.add(locationMapper.toDTO(location));
             }
             

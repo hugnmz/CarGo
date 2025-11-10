@@ -4,7 +4,7 @@ import dao.ContractDetailsDAO;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import model.ContractDetails;
+import model.ContractDetail;
 import util.JdbcTemplateUtil;
 import util.di.annotation.Repository;
 
@@ -12,15 +12,15 @@ import util.di.annotation.Repository;
 public class ContractDetailsDAOImpl implements ContractDetailsDAO {
 
     @Override
-    public List<ContractDetails> getAllContractDetails() {
+    public List<ContractDetail> getAllContractDetails() {
         String sql = "SELECT * FROM dbo.ContractDetails";
-        return JdbcTemplateUtil.query(sql, ContractDetails.class);
+        return JdbcTemplateUtil.query(sql, ContractDetail.class);
     }
 
     @Override
-    public Optional<ContractDetails> getContractDetailById(Integer contractDetailId) {
+    public Optional<ContractDetail> getContractDetailById(Integer contractDetailId) {
         String sql = "SELECT * FROM dbo.ContractDetails WHERE contractDetailId = ?";
-        ContractDetails detail = JdbcTemplateUtil.queryOne(sql, ContractDetails.class, contractDetailId);
+        ContractDetail detail = JdbcTemplateUtil.queryOne(sql, ContractDetail.class, contractDetailId);
         return Optional.ofNullable(detail);
     }
 
@@ -32,15 +32,15 @@ public class ContractDetailsDAOImpl implements ContractDetailsDAO {
     }
 
     @Override
-    public List<ContractDetails> getContractDetailsByVehicle(Integer vehicleId) {
+    public List<ContractDetail> getContractDetailsByVehicle(Integer vehicleId) {
         String sql = "SELECT * FROM dbo.ContractDetails WHERE vehicleId = ?";
-        return JdbcTemplateUtil.query(sql, ContractDetails.class, vehicleId);
+        return JdbcTemplateUtil.query(sql, ContractDetail.class, vehicleId);
     }
     
     @Override
-    public List<ContractDetails> getContractDetailsByContractId(Integer contractId) {
+    public List<ContractDetail> getContractDetailsByContractId(Integer contractId) {
         String sql = "SELECT ct.*, v.plateNumber, c.name FROM dbo.ContractDetails ct JOIN dbo.Vehicles v ON v.vehicleId = ct.vehicleId JOIN dbo.Cars c ON c.carId = v.carId WHERE  ct.contractId = ? ORDER BY contractDetailId";
-        return JdbcTemplateUtil.query(sql, ContractDetails.class, contractId);
+        return JdbcTemplateUtil.query(sql, ContractDetail.class, contractId);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class ContractDetailsDAOImpl implements ContractDetailsDAO {
     }
 
     @Override
-    public boolean addContractDetail(ContractDetails contractDetail) {
+    public boolean addContractDetail(ContractDetail contractDetail) {
         String sql = "INSERT INTO dbo.ContractDetails(contractId, vehicleId, price, rentStartDate, rentEndDate, note) " +
                     "VALUES (?, ?, ?, ?, ?, ?)";
         int result = JdbcTemplateUtil.insertAndReturnKey(sql,

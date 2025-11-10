@@ -13,7 +13,7 @@ import java.util.Optional;
  *
  * @author admin
  */
-public interface CustomerService {
+public interface CustomersService {
 
     //login
     Optional<CustomerDTO> loginCustomer(String username, String password);

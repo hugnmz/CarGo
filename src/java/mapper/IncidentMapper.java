@@ -1,19 +1,19 @@
 package mapper;
 
 import dto.IncidentDTO;
-import model.Incidents;
-import model.ContractDetails;
+import model.Incident;
+import model.ContractDetail;
 import model.IncidentTypes;
 import util.di.annotation.Component;
 
 /**
- * IncidentMapper - Chuyển đổi giữa IncidentDTO và Incidents Model
+ * IncidentMapper - Chuyển đổi giữa IncidentDTO và Incident Model
  */
 @Component
 public class IncidentMapper {
 
     // Chuyen tu Model sang DTO
-    public IncidentDTO toDTO(Incidents incident) {
+    public IncidentDTO toDTO(Incident incident) {
         if (incident == null) {
             return null;
         }
@@ -31,7 +31,7 @@ public class IncidentMapper {
 
         // Contract information (nested)
         if (incident.getContractDetail() != null) {
-            ContractDetails contractDetail = incident.getContractDetail();
+            ContractDetail contractDetail = incident.getContractDetail();
             dto.setContractId(contractDetail.getContractId());
             
             // Vehicle information from contract detail
@@ -64,12 +64,12 @@ public class IncidentMapper {
     }
 
     // Chuyen tu DTO sang Model
-    public Incidents toModel(IncidentDTO dto) {
+    public Incident toModel(IncidentDTO dto) {
         if (dto == null) {
             return null;
         }
 
-        Incidents incident = new Incidents();
+        Incident incident = new Incident();
         
         // Basic incident fields
         incident.setIncidentId(dto.getIncidentId());
@@ -82,7 +82,7 @@ public class IncidentMapper {
 
         // Create nested ContractDetail object if contract info is provided
         if (dto.getContractId() != null || dto.getVehicleId() != null) {
-            ContractDetails contractDetail = new ContractDetails();
+            ContractDetail contractDetail = new ContractDetail();
             contractDetail.setContractDetailId(dto.getContractDetailId());
             contractDetail.setContractId(dto.getContractId());
             contractDetail.setVehicleId(dto.getVehicleId());

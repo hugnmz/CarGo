@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
-public class Incidents {
+public class Incident {
     private Integer incidentId;      // ID sự cố
     private String description;      // Mô tả sự cố
     private BigDecimal fineAmount;   // So tien phat
@@ -14,13 +14,13 @@ public class Incidents {
     private Integer incidentTypeId;  // ID loại sự cố
     
     // Các đối tượng liên quan
-    private ContractDetails contractDetail; // Chi tiết hợp đồng
+    private ContractDetail contractDetail; // Chi tiết hợp đồng
     private IncidentTypes incidentType;     // Loại sự cố
     
     // Constructors
-    public Incidents() {}
+    public Incident() {}
     
-    public Incidents(String description, BigDecimal fineAmount, LocalDateTime incidentDate, 
+    public Incident(String description, BigDecimal fineAmount, LocalDateTime incidentDate, 
                     Integer contractDetailId, Integer incidentTypeId) {
         this.description = description;
         this.fineAmount = fineAmount;
@@ -52,8 +52,8 @@ public class Incidents {
     public Integer getIncidentTypeId() { return incidentTypeId; }
     public void setIncidentTypeId(Integer incidentTypeId) { this.incidentTypeId = incidentTypeId; }
     
-    public ContractDetails getContractDetail() { return contractDetail; }
-    public void setContractDetail(ContractDetails contractDetail) { this.contractDetail = contractDetail; }
+    public ContractDetail getContractDetail() { return contractDetail; }
+    public void setContractDetail(ContractDetail contractDetail) { this.contractDetail = contractDetail; }
     
     public IncidentTypes getIncidentType() { return incidentType; }
     public void setIncidentType(IncidentTypes incidentType) { this.incidentType = incidentType; }

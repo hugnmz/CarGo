@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import service.ContractService;
-import service.CustomerService;
 import service.LocationService;
 import util.di.DIContainer;
 import util.AuthUtil;
@@ -27,12 +26,13 @@ import util.MessageUtil;
 import util.exception.ValidationException;
 import util.exception.BusinessException;
 import util.exception.DataAccessException;
+import service.CustomersService;
 
 @WebServlet(name = "CustomerServlet", urlPatterns = {"/CustomerServlet"})
 public class CustomerServlet extends HttpServlet {
 
     // service xu ly thong tin khach hang
-    private CustomerService customerService;
+    private CustomersService customerService;
     // service xu ly hop dong
     private ContractService contractService;
 
@@ -43,7 +43,7 @@ public class CustomerServlet extends HttpServlet {
         super.init();
         try {
             // khoi tao customer service tu di container
-            customerService = DIContainer.get(CustomerService.class);
+            customerService = DIContainer.get(CustomersService.class);
             // khoi tao contract service tu di container
             contractService = DIContainer.get(ContractService.class);
 

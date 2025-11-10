@@ -35,7 +35,7 @@ public class Cars {
     private Fuels fuel;              // Loại nhiên liệu
     @Nested
     private Seatings seating;        // Số chỗ ngồi
-    private List<Vehicles> vehicles; // Danh sách xe thực tế
+    private List<Vehicle> vehicles; // Danh sách xe thực tế
     @Nested(prefix = "cp")
     private CarPrices carPrices; // Giá xe hiện tại
     
@@ -90,8 +90,8 @@ public class Cars {
     public void setSeating(Seatings seating) { this.seating = seating; }
     
     
-    public List<Vehicles> getVehicles() { return vehicles; }
-    public void setVehicles(List<Vehicles> vehicles) { this.vehicles = vehicles; }
+    public List<Vehicle> getVehicles() { return vehicles; }
+    public void setVehicles(List<Vehicle> vehicles) { this.vehicles = vehicles; }
     
     public CarPrices getCarPrices() { return carPrices; }
     public void setCarPrices(CarPrices carPrices) { this.carPrices = carPrices; }

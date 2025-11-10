@@ -7,7 +7,7 @@ package dao;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import model.ContractDetails;
+import model.ContractDetail;
 
 /**
  *
@@ -15,19 +15,19 @@ import model.ContractDetails;
  */
 public interface ContractDetailsDAO {
 
-    List<ContractDetails> getAllContractDetails();
+    List<ContractDetail> getAllContractDetails();
 
-    Optional<ContractDetails> getContractDetailById(Integer contractDetailId);
+    Optional<ContractDetail> getContractDetailById(Integer contractDetailId);
 
     boolean deleteContractDetail(Integer contractDetailId);
 
     boolean deleteContractDetailByContractId(Integer contractId);
 
-    List<ContractDetails> getContractDetailsByVehicle(Integer vehicleId);
+    List<ContractDetail> getContractDetailsByVehicle(Integer vehicleId);
 
-    List<ContractDetails> getContractDetailsByContractId(Integer contractId);
+    List<ContractDetail> getContractDetailsByContractId(Integer contractId);
 
     boolean checkVehicleAvailability(Integer vehicleId, LocalDateTime startDate, LocalDateTime endDate);
 
-    boolean addContractDetail(ContractDetails contractDetail);
+    boolean addContractDetail(ContractDetail contractDetail);
 }

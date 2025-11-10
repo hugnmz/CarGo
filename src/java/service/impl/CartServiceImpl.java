@@ -22,7 +22,7 @@ import mapper.CartMapper;
 import mapper.OrderMapper;
 import model.Carts;
 import model.Orders;
-import model.Vehicles;
+import model.Vehicle;
 import service.CartService;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
@@ -244,12 +244,12 @@ public class CartServiceImpl implements CartService {
                 throw new ValidationException(MessageUtil.getError("error.date.format.invalid"));
             }
 
-            Optional<Vehicles> v = vehiclesDAO.getVehicleById(vehicleId);
+            Optional<Vehicle> v = vehiclesDAO.getVehicleById(vehicleId);
             if (v.isEmpty()) {
                 throw new ValidationException(MessageUtil.getError("error.vehicle.info.missing"));
             }
 
-            Vehicles vehicle = v.get();
+            Vehicle vehicle = v.get();
 
             // kiem tra xe co active khong
             if (!vehicle.getIsActive()) {
@@ -269,12 +269,12 @@ public class CartServiceImpl implements CartService {
     public BigDecimal calculateRentalPrice(Integer vehicleId, LocalDateTime startDate, LocalDateTime endDate) {
         try {
             // 1. lay thong tin xe
-            Optional<Vehicles> vehicleOpt = vehiclesDAO.getVehicleById(vehicleId);
+            Optional<Vehicle> vehicleOpt = vehiclesDAO.getVehicleById(vehicleId);
             if (vehicleOpt.isEmpty()) {
                 throw new ValidationException(MessageUtil.getError("error.vehicle.info.missing"));
             }
 
-            Vehicles vehicle = vehicleOpt.get();
+            Vehicle vehicle = vehicleOpt.get();
             Integer carId = vehicle.getCarId();
 
             // 2. lay gia hien tai cua model xe

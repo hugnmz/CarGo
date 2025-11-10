@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import model.Contracts;
+import model.Contract;
 import util.DB;
 import util.JdbcTemplateUtil;
 import util.di.annotation.Repository;
@@ -19,20 +19,20 @@ import util.di.annotation.Repository;
 public class ContractsDAOImpl implements ContractsDAO {
 
     @Override
-    public List<Contracts> getAllContracts() {
+    public List<Contract> getAllContracts() {
         String sql = "SELECT * FROM dbo.Contracts";
-        return JdbcTemplateUtil.query(sql, Contracts.class);
+        return JdbcTemplateUtil.query(sql, Contract.class);
     }
 
     @Override
-    public Optional<Contracts> getContractById(Integer contractId) {
+    public Optional<Contract> getContractById(Integer contractId) {
         String sql = "SELECT * FROM dbo.Contracts WHERE contractId = ?";
-        Contracts contract = JdbcTemplateUtil.queryOne(sql, Contracts.class, contractId);
+        Contract contract = JdbcTemplateUtil.queryOne(sql, Contract.class, contractId);
         return Optional.ofNullable(contract);
     }
 
     @Override
-    public boolean addContract(Contracts contract) {
+    public boolean addContract(Contract contract) {
         String sql = "INSERT INTO dbo.Contracts (customerId, staffId, status, startDate, endDate, totalAmount, depositAmount, createAt) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         int result = JdbcTemplateUtil.insertAndReturnKey(sql,
@@ -48,7 +48,7 @@ public class ContractsDAOImpl implements ContractsDAO {
     }
 
     @Override
-    public boolean updateContract(Contracts contract) {
+    public boolean updateContract(Contract contract) {
         String sql = "UPDATE dbo.Contracts SET customerId=?, staffId=?, status=?, startDate=?, endDate=?, totalAmount=?, depositAmount=? WHERE contractId=?";
         int result = JdbcTemplateUtil.update(sql,
                 contract.getCustomerId(),
@@ -77,27 +77,27 @@ public class ContractsDAOImpl implements ContractsDAO {
     }
 
     @Override
-    public List<Contracts> getContractByCustomer(Integer customerId) {
+    public List<Contract> getContractByCustomer(Integer customerId) {
         String sql = "SELECT * FROM dbo.Contracts WHERE customerId = ? ORDER BY contractId DESC";
-        return JdbcTemplateUtil.query(sql, Contracts.class, customerId);
+        return JdbcTemplateUtil.query(sql, Contract.class, customerId);
     }
 
     @Override
-    public List<Contracts> getContractByStaff(Integer staffId) {
+    public List<Contract> getContractByStaff(Integer staffId) {
         String sql = "SELECT * FROM dbo.Contracts WHERE staffId = ? ORDER BY contractId DESC";
-        return JdbcTemplateUtil.query(sql, Contracts.class, staffId);
+        return JdbcTemplateUtil.query(sql, Contract.class, staffId);
     }
 
     @Override
-    public List<Contracts> getContractByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+    public List<Contract> getContractByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
         String sql = "SELECT * FROM dbo.Contracts WHERE startDate >= ? AND endDate <= ? ORDER BY contractId DESC";
-        return JdbcTemplateUtil.query(sql, Contracts.class, startDate, endDate);
+        return JdbcTemplateUtil.query(sql, Contract.class, startDate, endDate);
     }
 
     @Override
-    public List<Contracts> getContractByStatus(String status) {
+    public List<Contract> getContractByStatus(String status) {
         String sql = "SELECT * FROM dbo.Contracts WHERE status = ? ORDER BY contractId DESC";
-        return JdbcTemplateUtil.query(sql, Contracts.class, status);
+        return JdbcTemplateUtil.query(sql, Contract.class, status);
     }
 
     @Override
@@ -191,7 +191,7 @@ public class ContractsDAOImpl implements ContractsDAO {
     @Override
     public BigDecimal getTotalAmount(Integer contractId) {
         String sql = "SELECT totalAmount FROM Contracts WHERE contractId = ?";
-        Contracts contract = JdbcTemplateUtil.queryOne(sql, Contracts.class, contractId);
+        Contract contract = JdbcTemplateUtil.queryOne(sql, Contract.class, contractId);
         return contract != null ? contract.getTotalAmount() : null;
     }
 

@@ -8,26 +8,26 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-import service.CustomerService;
 import util.di.DIContainer;
 import util.MessageUtil;
 import util.exception.BusinessException;
 import util.exception.DataAccessException;
 import util.exception.ValidationException;
+import service.CustomersService;
 
 
 @WebServlet("/VerifyServlet")
 public class VerifyServlet extends HttpServlet {
     
     // service xu ly thong tin khach hang
-    private CustomerService customerService;
+    private CustomersService customerService;
     
     @Override
     public void init() throws ServletException {
         super.init();
         try {
             // khoi tao customer service tu di container
-            customerService = DIContainer.get(CustomerService.class);
+            customerService = DIContainer.get(CustomersService.class);
         } catch (Exception e) {
             throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }

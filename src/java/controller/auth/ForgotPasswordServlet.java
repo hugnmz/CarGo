@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
-import service.CustomerService;
 import util.EmailUtil;
 import util.MessageUtil;
 import util.di.DIContainer;
@@ -16,17 +15,18 @@ import util.exception.ValidationException;
 import util.exception.BusinessException;
 import util.exception.DataAccessException;
 import dto.CustomerDTO;
+import service.CustomersService;
 
 @WebServlet("/ForgotPasswordServlet")
 public class ForgotPasswordServlet extends HttpServlet {
 
-    private CustomerService customerService;
+    private CustomersService customerService;
 
     @Override
     public void init() throws ServletException {
         super.init();
         try {
-            customerService = DIContainer.get(CustomerService.class);
+            customerService = DIContainer.get(CustomersService.class);
         } catch (Exception e) {
             throw new ServletException(MessageUtil.getError("error.system"), e);
         }

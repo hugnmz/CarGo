@@ -7,7 +7,7 @@ import java.util.List;
 import util.di.annotation.Column;
 import util.di.annotation.Nested;
 
-public class Contracts {
+public class Contract {
 
     @Column()
     private Integer contractId;       // ID hợp đồng
@@ -30,17 +30,17 @@ public class Contracts {
 
     @Nested
     // Các đối tượng liên quan
-    private Customers customer;      // Khách hàng
+    private Customer customer;      // Khách hàng
     @Nested
-    private Users staff;            // Nhân viên
-    private List<ContractDetails> contractDetails; // Chi tiết hợp đồng
+    private User staff;            // Nhân viên
+    private List<ContractDetail> contractDetails; // Chi tiết hợp đồng
     private List<Payments> payments; // Thanh toán
     
     // Constructors
-    public Contracts() {
+    public Contract() {
     }
 
-    public Contracts(Integer customerId, LocalDateTime startDate, LocalDateTime endDate) {
+    public Contract(Integer customerId, LocalDateTime startDate, LocalDateTime endDate) {
         this.customerId = customerId;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -123,27 +123,27 @@ public class Contracts {
         this.depositAmount = depositAmount;
     }
 
-    public Customers getCustomer() {
+    public Customer getCustomer() {
         return customer;
     }
 
-    public void setCustomer(Customers customer) {
+    public void setCustomer(Customer customer) {
         this.customer = customer;
     }
 
-    public Users getStaff() {
+    public User getStaff() {
         return staff;
     }
 
-    public void setStaff(Users staff) {
+    public void setStaff(User staff) {
         this.staff = staff;
     }
 
-    public List<ContractDetails> getContractDetails() {
+    public List<ContractDetail> getContractDetails() {
         return contractDetails;
     }
 
-    public void setContractDetails(List<ContractDetails> contractDetails) {
+    public void setContractDetails(List<ContractDetail> contractDetails) {
         this.contractDetails = contractDetails;
     }
 

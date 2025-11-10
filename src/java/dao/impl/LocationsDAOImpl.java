@@ -5,27 +5,27 @@
  */
 package dao.impl;
 
-import dao.LocationsDAO;
 import java.util.List;
-import model.Locations;
-import model.Users;
+import model.Location;
+import model.User;
 import util.JdbcTemplateUtil;
 import util.di.annotation.Repository;
+import dao.LocationDAO;
 
 /**
  *
  * @author admin
  */
 @Repository
-public class LocationsDAOImpl implements LocationsDAO {
+public class LocationsDAOImpl implements LocationDAO {
 
     @Override
     public Integer findIdByCity(String city) {
 
         String sql = "select locationId, city, address from Locations "
                 + "where UPPER(LTRIM(RTRIM(city))) = UPPER(LTRIM(RTRIM(?)))";
-        // Map to Locations entity then return id
-        model.Locations loc = JdbcTemplateUtil.queryOne(sql, model.Locations.class, city);
+        // Map to Location entity then return id
+        model.Location loc = JdbcTemplateUtil.queryOne(sql, model.Location.class, city);
         return (loc != null) ? loc.getLocationId() : null;
     }
 
@@ -49,9 +49,9 @@ public class LocationsDAOImpl implements LocationsDAO {
     }
 
     @Override
-    public List<Locations> getAllLocations() {
+    public List<Location> getAllLocations() {
         String sql = "SELECT * FROM Locations";
-        return JdbcTemplateUtil.query(sql, Locations.class);
+        return JdbcTemplateUtil.query(sql, Location.class);
     }
 
 }

@@ -7,7 +7,7 @@ package model;
 import java.util.List;
 import util.di.annotation.Column;
 
-public class Locations {
+public class Location {
     @Column()
     private Integer locationId;      // ID địa điểm
     @Column()
@@ -16,14 +16,14 @@ public class Locations {
     private String address;          // Dia chi
     
     // Các đối tượng liên quan
-    private List<Users> users;       // Danh sach nguoi dung
-    private List<Customers> customers; // Danh sách khách hàng
+    private List<User> users;       // Danh sach nguoi dung
+    private List<Customer> customers; // Danh sách khách hàng
     private List<Cars> cars;         // Danh sách xe
     
     // Constructors
-    public Locations() {}
+    public Location() {}
     
-    public Locations(String city, String address) {
+    public Location(String city, String address) {
         this.city = city;
         this.address = address;
     }
@@ -38,11 +38,11 @@ public class Locations {
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
     
-    public List<Users> getUsers() { return users; }
-    public void setUsers(List<Users> users) { this.users = users; }
+    public List<User> getUsers() { return users; }
+    public void setUsers(List<User> users) { this.users = users; }
     
-    public List<Customers> getCustomers() { return customers; }
-    public void setCustomers(List<Customers> customers) { this.customers = customers; }
+    public List<Customer> getCustomers() { return customers; }
+    public void setCustomers(List<Customer> customers) { this.customers = customers; }
     
     public List<Cars> getCars() { return cars; }
     public void setCars(List<Cars> cars) { this.cars = cars; }

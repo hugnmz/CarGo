@@ -1,41 +1,41 @@
 package dao;
 
-import model.Feedbacks;
+import model.Feedback;
 import java.util.List;
 
 public interface FeedbacksDAO {
 
     // Lấy tất cả phản hồi
-    List<Feedbacks> getAllFeedbacks();
+    List<Feedback> getAllFeedbacks();
 
     // Lấy phản hồi theo ID
-    Feedbacks getFeedbackById(Integer feedbackId);
+    Feedback getFeedbackById(Integer feedbackId);
 
     // Lấy phản hồi theo khách hàng
-    List<Feedbacks> getFeedbacksByCustomer(Integer customerId);
+    List<Feedback> getFeedbacksByCustomer(Integer customerId);
 
     // Lấy phản hồi theo xe
-    List<Feedbacks> getFeedbacksByVehicle(Integer vehicleId);
+    List<Feedback> getFeedbacksByVehicle(Integer vehicleId);
 
     // Lấy phản hồi theo khách hàng và xe
-    List<Feedbacks> getFeedbacksByCustomerAndVehicle(Integer customerId, Integer vehicleId);
+    List<Feedback> getFeedbacksByCustomerAndVehicle(Integer customerId, Integer vehicleId);
 
     // Thêm phản hồi mới
-    boolean addFeedback(Feedbacks feedback);
+    boolean addFeedback(Feedback feedback);
 
     // Cập nhật phản hồi
-    boolean updateFeedback(Feedbacks feedback);
+    boolean updateFeedback(Feedback feedback);
 
     // Xóa phản hồi
     boolean deleteFeedback(Integer feedbackId);
 
     // Lấy phản hồi gần đây nhất
-    List<Feedbacks> getRecentFeedbacks(int limit);
+    List<Feedback> getRecentFeedbacks(int limit);
 
     // Lấy phản hồi theo khoảng thời gian
-    List<Feedbacks> getFeedbacksByDateRange(java.time.LocalDateTime startDate, java.time.LocalDateTime endDate);
+    List<Feedback> getFeedbacksByDateRange(java.time.LocalDateTime startDate, java.time.LocalDateTime endDate);
     // Thêm vào cuối interface
 // Lấy danh sách phản hồi mới nhất có phân trang (offset, limit)
 
-    List<Feedbacks> getRecentFeedbacksPaged(int offset, int limit);
+    List<Feedback> getRecentFeedbacksPaged(int offset, int limit);
 }

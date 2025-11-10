@@ -1,11 +1,11 @@
 package dao;
 
 import java.util.List;
-import model.Locations;
+import model.Location;
 
-public interface LocationsDAO {
+public interface LocationDAO {
 
-    List<Locations> getAllLocations();
+    List<Location> getAllLocations();
 
     Integer findIdByCity(String city);
 

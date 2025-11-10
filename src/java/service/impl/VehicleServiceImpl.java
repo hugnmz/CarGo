@@ -4,7 +4,6 @@
  */
 package service.impl;
 
-import dao.LocationsDAO;
 import dao.VehiclesDAO;
 import dto.LocationDTO;
 import dto.VehicleDTO;
@@ -13,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import mapper.VehicleMapper;
-import model.Vehicles;
+import model.Vehicle;
 import service.VehicleService;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
@@ -22,6 +21,7 @@ import util.exception.ApplicationException;
 import util.exception.DataAccessException;
 import util.exception.ValidationException;
 import util.exception.BusinessException;
+import dao.LocationDAO;
 
 /**
  *
@@ -37,14 +37,14 @@ public class VehicleServiceImpl implements VehicleService {
     private VehicleMapper vehicleMapper;
 
     @Autowired
-    private LocationsDAO locationsDAO;
+    private LocationDAO locationsDAO;
 
     @Override
     public List<VehicleDTO> getVehicleByCarId(Integer carId) {
-        List<Vehicles> vehicles = vehiclesDAO.getVehiclesByCar(carId);
+        List<Vehicle> vehicles = vehiclesDAO.getVehiclesByCar(carId);
         List<VehicleDTO> vehicleDTO = new ArrayList<>();
 
-        for (Vehicles v : vehicles) {
+        for (Vehicle v : vehicles) {
             VehicleDTO dto = vehicleMapper.toDTO(v);
             vehicleDTO.add(dto);
         }
@@ -53,7 +53,7 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public Optional<VehicleDTO> getVehicleById(Integer vehicleId) {
-        Optional<Vehicles> vehicle = vehiclesDAO.getVehicleById(vehicleId);
+        Optional<Vehicle> vehicle = vehiclesDAO.getVehicleById(vehicleId);
         if (vehicle.isPresent()) {
             VehicleDTO dto = vehicleMapper.toDTO(vehicle.get());
             return Optional.of(dto);
@@ -64,10 +64,10 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
 
     public List<VehicleDTO> getAvailableVehiclesByCar(Integer carId, LocalDateTime startDate, LocalDateTime endDate) {
-        List<Vehicles> vehicles = vehiclesDAO.getAvailableVehiclesByCar(carId, startDate, endDate);
+        List<Vehicle> vehicles = vehiclesDAO.getAvailableVehiclesByCar(carId, startDate, endDate);
         List<VehicleDTO> vehicleDTOs = new ArrayList<>();
         
-        for (Vehicles v : vehicles) {
+        for (Vehicle v : vehicles) {
             VehicleDTO dto = vehicleMapper.toDTO(v);
             vehicleDTOs.add(dto);
         }
@@ -105,7 +105,7 @@ public class VehicleServiceImpl implements VehicleService {
 
         try {
             // Chuyển DTO sang Model
-            Vehicles vehicle = vehicleMapper.toModel(vehicleDTO);
+            Vehicle vehicle = vehicleMapper.toModel(vehicleDTO);
 
             // Kiểm tra biển số trùng
             if (vehiclesDAO.getVehicleyPlateNumber(vehicle.getPlateNumber()).isPresent()) {
@@ -138,7 +138,7 @@ public class VehicleServiceImpl implements VehicleService {
                 throw new BusinessException(MessageUtil.getError("error.vehicle.plate.exists"));
             }
 
-            Vehicles vehicle = vehicleMapper.toModel(vehicleDTO);
+            Vehicle vehicle = vehicleMapper.toModel(vehicleDTO);
             boolean updated = vehiclesDAO.updateVehicle(vehicle);
 
             if (!updated) {

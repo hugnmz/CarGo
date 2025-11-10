@@ -17,8 +17,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import util.di.DIContainer;
-import service.CustomerService;
 import service.UserService;
+import service.CustomersService;
 
 /**
  *
@@ -27,13 +27,13 @@ import service.UserService;
 @WebServlet(name = "ControllerInfoCustomer", urlPatterns = {"/managecus"})
 public class HomeManageCustomer extends HttpServlet {
 
-    private CustomerService customerService;
+    private CustomersService customerService;
 
     @Override
     public void init() throws ServletException {
         super.init();
         try {
-            customerService = DIContainer.get(CustomerService.class);
+            customerService = DIContainer.get(CustomersService.class);
         } catch (Exception e) {
             throw new RuntimeException("Dependency injection error", e);
         }

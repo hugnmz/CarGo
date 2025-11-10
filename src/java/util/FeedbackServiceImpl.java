@@ -3,7 +3,7 @@ package impl;
 import dao.FeedbacksDAO;
 import dto.FeedbackDTO;
 import mapper.FeedbackMapper;
-import model.Feedbacks;
+import model.Feedback;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
 
@@ -25,7 +25,7 @@ public class FeedbackServiceImpl implements service.FeedbackService {
         // Giới hạn limit
         int safeLimit = Math.max(1, Math.min(limit, 20));
         int safeOffset = Math.max(0, offset);
-        List<Feedbacks> list = feedbacksDAO.getRecentFeedbacksPaged(safeOffset, safeLimit);
+        List<Feedback> list = feedbacksDAO.getRecentFeedbacksPaged(safeOffset, safeLimit);
         return list.stream().map(feedbackMapper::toDTO).collect(Collectors.toList());
     }
 
@@ -41,7 +41,7 @@ public class FeedbackServiceImpl implements service.FeedbackService {
             throw new IllegalArgumentException("Comment too long");
         }
 
-        Feedbacks f = new Feedbacks();
+        Feedback f = new Feedback();
         f.setCustomerId(customerId);
         // Cho phép feedback chung (không gắn xe)
         f.setVehicleId(vehicleId); // có thể null

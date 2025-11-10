@@ -2,19 +2,19 @@
 package mapper;
 
 import dto.UserDTO;
-import model.Users;
-import model.Locations;
+import model.User;
+import model.Location;
 import model.Roles;
 import util.di.annotation.Component;
 
 /**
- * UserMapper - Chuyển đổi giữa UserDTO và Users Model
+ * UserMapper - Chuyển đổi giữa UserDTO và User Model
  */
 @Component
 public class UserMapper {
 
     // ===== Chuyển từ Model -> DTO =====
-    public UserDTO toDTO(Users user) {
+    public UserDTO toDTO(User user) {
         if (user == null) {
             return null;
         }
@@ -47,12 +47,12 @@ public class UserMapper {
     }
 
     // ===== Chuyển từ DTO -> Model =====
-    public Users toModel(UserDTO dto) {
+    public User toModel(UserDTO dto) {
         if (dto == null) {
             return null;
         }
 
-        Users user = new Users();
+        User user = new User();
 
         // Thông tin cơ bản
         user.setUserId(dto.getUserId());
@@ -69,7 +69,7 @@ public class UserMapper {
 
         // Địa điểm (optional)
         if (dto.getLocationId() != null || dto.getCity() != null || dto.getAddress() != null) {
-            Locations location = new Locations();
+            Location location = new Location();
             location.setLocationId(dto.getLocationId());
             location.setCity(dto.getCity());
             location.setAddress(dto.getAddress());

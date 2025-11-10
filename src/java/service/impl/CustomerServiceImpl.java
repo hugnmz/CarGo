@@ -4,8 +4,6 @@
  */
 package service.impl;
 
-import dao.CustomersDAO;
-import dao.LocationsDAO;
 import dto.CustomerDTO;
 import dto.LocationDTO;
 import java.time.LocalDateTime;
@@ -13,9 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import mapper.CustomerMapper;
-import model.Customers;
+import model.Customer;
 import util.PasswordUtil;
-import service.CustomerService;
 import util.VerificationUtil;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
@@ -24,33 +21,36 @@ import util.exception.ApplicationException;
 import util.exception.DataAccessException;
 import util.exception.ValidationException;
 import util.exception.BusinessException;
+import service.CustomersService;
+import dao.LocationDAO;
+import dao.CustomerDAO;
 
 /**
  *
  * @author admin
  */
 @Service
-public class CustomerServiceImpl implements CustomerService {
+public class CustomerServiceImpl implements CustomersService {
 
     @Autowired
-    private CustomersDAO customersDAO;
+    private CustomerDAO customersDAO;
 
     @Autowired
     private CustomerMapper customerMapper;
 
     @Autowired
-    private LocationsDAO locationsDAO;
+    private LocationDAO locationsDAO;
 
     @Override
     public Optional<CustomerDTO> loginCustomer(String username, String password) {
 
         // Bước 1: Lấy thông tin khách hàng từ database theo username
-        Optional<Customers> oc = customersDAO.getCustomerByUserName(username);
+        Optional<Customer> oc = customersDAO.getCustomerByUserName(username);
         if (oc.isEmpty()) {
             throw new ValidationException(MessageUtil.getError("error.login.invalid"));
         }
 
-        Customers customer = oc.get();
+        Customer customer = oc.get();
 
         if (!customer.isIsVerified()) {
             throw new ValidationException(MessageUtil.getError("error.account.not.verified"));
@@ -102,7 +102,7 @@ public class CustomerServiceImpl implements CustomerService {
             LocalDateTime expireAt = VerificationUtil.expiryAfterMinutes(10);
 
             // Bước 5: Chuyển đổi DTO sang Model
-            Customers customer = customerMapper.toUsers(customerDTO);
+            Customer customer = customerMapper.toUsers(customerDTO);
             customer.setPasswordHash(passwordHash); // Lưu hash password (byte[])
             customer.setPasswordSalt(passwordSalt); // Lưu salt (byte[])
             customer.setLocationId(locationId);
@@ -127,7 +127,7 @@ public class CustomerServiceImpl implements CustomerService {
             throw new ValidationException(MessageUtil.getError("error.validation.data.invalid"));
         }
 
-        Optional<Customers> oc = customersDAO.getCustomerByUserName(username);
+        Optional<Customer> oc = customersDAO.getCustomerByUserName(username);
         if (!oc.isPresent()) {
             throw new ValidationException(MessageUtil.getError("error.validation.customer.not.found"));
         }
@@ -142,7 +142,7 @@ public class CustomerServiceImpl implements CustomerService {
             throw new ValidationException(MessageUtil.getError("error.validation.data.invalid"));
         }
 
-        Optional<Customers> oc = customersDAO.getCustomerById(customerId);
+        Optional<Customer> oc = customersDAO.getCustomerById(customerId);
         if (!oc.isPresent()) {
             throw new ValidationException(MessageUtil.getError("error.validation.customer.not.found"));
         }
@@ -155,11 +155,11 @@ public class CustomerServiceImpl implements CustomerService {
         // Lấy danh sách tất cả khách hàng
         try {
             // Lấy danh sách khách hàng từ database
-            List<Customers> customersList = customersDAO.getAllCustomers();
+            List<Customer> customersList = customersDAO.getAllCustomers();
             List<CustomerDTO> dto = new ArrayList<>();
 
             // Chuyển đổi từng Model sang DTO
-            for (Customers c : customersList) {
+            for (Customer c : customersList) {
                 dto.add(customerMapper.toDTO(c));
             }
 
@@ -180,7 +180,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         try {
             // Chuyển đổi DTO sang Model
-            Customers customers = customerMapper.toUsers(customerDTO);
+            Customer customers = customerMapper.toUsers(customerDTO);
             // Lưu vào database
             boolean result = customersDAO.addCustomer(customers);
             if (!result) {
@@ -200,12 +200,12 @@ public class CustomerServiceImpl implements CustomerService {
         if (customerDTO == null) {
             throw new ValidationException(MessageUtil.getError("error.validation.data.invalid"));
         }
-        Optional<Customers> existingCustomer = customersDAO.getCustomerById(customerDTO.getCustomerId());
+        Optional<Customer> existingCustomer = customersDAO.getCustomerById(customerDTO.getCustomerId());
         if (existingCustomer.isEmpty()) {
             throw new ValidationException(MessageUtil.getError("error.validation.customer.not.found"));
         }
 
-        Customers existing = existingCustomer.get();
+        Customer existing = existingCustomer.get();
 
         if (customerDTO.getFullName() != null) {
             existing.setFullName(customerDTO.getFullName());
@@ -318,12 +318,12 @@ public class CustomerServiceImpl implements CustomerService {
             }
 
             // Bước 1: Lấy thông tin khách hàng từ database
-            Optional<Customers> oc = customersDAO.getCustomerById(customerId);
+            Optional<Customer> oc = customersDAO.getCustomerById(customerId);
             if (!oc.isPresent()) {
                 throw new ValidationException(MessageUtil.getError("error.validation.customer.not.found"));
             }
 
-            Customers customer = oc.get();
+            Customer customer = oc.get();
 
             // Bước 2: Xác thực mật khẩu cũ
             if (!PasswordUtil.verifyPassword(oldPassword,
@@ -356,12 +356,12 @@ public class CustomerServiceImpl implements CustomerService {
         // Dat lai mat khau cho khach hang (quen mat khau)
         try {
             // Bước 1: Lấy thông tin khách hàng từ database theo username
-            Optional<Customers> oc = customersDAO.getCustomerByUserName(username);
+            Optional<Customer> oc = customersDAO.getCustomerByUserName(username);
             if (!oc.isPresent()) {
                 throw new ValidationException(MessageUtil.getError("error.validation.customer.not.found"));
             }
 
-            Customers customer = oc.get();
+            Customer customer = oc.get();
 
             // Bước 2: Mã hóa mật khẩu mới
             byte[] newSalt = PasswordUtil.generateSalt(); // Tạo salt mới
@@ -387,12 +387,12 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public boolean verifyAccount(String username, String code) {
         try {
-            Optional<Customers> oc = customersDAO.getCustomerByUserName(username);
+            Optional<Customer> oc = customersDAO.getCustomerByUserName(username);
             if (oc.isEmpty()) {
                 throw new ValidationException(MessageUtil.getError("error.validation.customer.not.found"));
             }
 
-            Customers c = oc.get();
+            Customer c = oc.get();
 
             boolean check = !c.isIsVerified()
                     && c.getVerifyCode() != null
@@ -421,12 +421,12 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Optional<String> generateAndStoreVerificationCode(String username) {
-        Optional<Customers> oc = customersDAO.getCustomerByUserName(username);
+        Optional<Customer> oc = customersDAO.getCustomerByUserName(username);
         if (oc.isEmpty() || oc.get().isIsVerified()) {
             return Optional.empty();
         }
 
-        Customers c = oc.get();
+        Customer c = oc.get();
         String code = VerificationUtil.generateNumbericCode();
 
         c.setVerifyCode(code);
@@ -439,7 +439,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Optional<CustomerDTO> getCustomerByUsernameAndEmail(String username, String email) {
         try {
-            Optional<Customers> oc = customersDAO.getCustomerByUsernameAndEmail(username, email);
+            Optional<Customer> oc = customersDAO.getCustomerByUsernameAndEmail(username, email);
             if (!oc.isPresent()) {
                 return Optional.empty();
             }
@@ -454,12 +454,12 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Optional<String> generateAndStoreResetCode(String username) {
         try {
-            Optional<Customers> oc = customersDAO.getCustomerByUserName(username);
+            Optional<Customer> oc = customersDAO.getCustomerByUserName(username);
             if (!oc.isPresent()) {
                 return Optional.empty();
             }
 
-            Customers customer = oc.get();
+            Customer customer = oc.get();
             String code = VerificationUtil.generateNumbericCode(); // 6 digits
             LocalDateTime expireAt = LocalDateTime.now().plusMinutes(15); // 15 minutes
 
@@ -480,12 +480,12 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public boolean resetPasswordWithCode(String username, String code, String newPassword) {
         try {
-            Optional<Customers> oc = customersDAO.getCustomerByUserName(username);
+            Optional<Customer> oc = customersDAO.getCustomerByUserName(username);
             if (!oc.isPresent()) {
                 throw new ValidationException(MessageUtil.getError("error.validation.customer.not.found"));
             }
 
-            Customers customer = oc.get();
+            Customer customer = oc.get();
 
             // Verify code
             if (customer.getVerifyCode() == null

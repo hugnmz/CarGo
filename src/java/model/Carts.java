@@ -18,7 +18,7 @@ public class Carts {
     
     // Các đối tượng liên quan
     @Nested
-    private Customers customer;       // Khách hàng
+    private Customer customer;       // Khách hàng
     private List<Orders> orders;      // Danh sach don hang trong gio
     
     // Constructors
@@ -39,8 +39,8 @@ public class Carts {
     public LocalDateTime getCreateAt() { return createAt; }
     public void setCreateAt(LocalDateTime createAt) { this.createAt = createAt; }
     
-    public Customers getCustomer() { return customer; }
-    public void setCustomer(Customers customer) { this.customer = customer; }
+    public Customer getCustomer() { return customer; }
+    public void setCustomer(Customer customer) { this.customer = customer; }
     
     public List<Orders> getOrders() { return orders; }
     public void setOrders(List<Orders> orders) { this.orders = orders; }

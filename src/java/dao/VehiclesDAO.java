@@ -7,7 +7,7 @@ package dao;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import model.Vehicles;
+import model.Vehicle;
 
 /**
  *
@@ -15,23 +15,23 @@ import model.Vehicles;
  */
 public interface VehiclesDAO {
 
-    List<Vehicles> getAllVehicles();
+    List<Vehicle> getAllVehicles();
 
-    Optional<Vehicles> getVehicleById(Integer vehicleId);
+    Optional<Vehicle> getVehicleById(Integer vehicleId);
 
-    Optional<Vehicles> getVehicleyPlateNumber(String plateNumber);
+    Optional<Vehicle> getVehicleyPlateNumber(String plateNumber);
 
-    boolean addVehicle(Vehicles vehicle);
+    boolean addVehicle(Vehicle vehicle);
 
-    boolean updateVehicle(Vehicles vehicle);
+    boolean updateVehicle(Vehicle vehicle);
 
     boolean deleteVehicle(Integer vehicleId);
 
     public boolean deleteVehiclesByCarId(Integer carId);
 
-    List<Vehicles> getVehiclesByCar(Integer CarId);
+    List<Vehicle> getVehiclesByCar(Integer CarId);
 
-    List<Vehicles> getAvailableVehiclesByCar(Integer carId, LocalDateTime startDate,
+    List<Vehicle> getAvailableVehiclesByCar(Integer carId, LocalDateTime startDate,
             LocalDateTime endDate);
 
     boolean isVehicleAvailable(Integer vehicleId, LocalDateTime startDate, LocalDateTime endDate);

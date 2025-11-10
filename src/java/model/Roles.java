@@ -14,7 +14,7 @@ public class Roles {
 
     // QUAN HỆ 1-N: 1 role có thể có nhiều user
     @Nested
-    private List<Users> users;
+    private List<User> users;
 
     // Các hằng số tên role định nghĩa sẵn
     public static final String ADMIN = "ADMIN";
@@ -46,11 +46,11 @@ public class Roles {
         this.roleName = roleName;
     }
 
-    public List<Users> getUsers() {
+    public List<User> getUsers() {
         return users;
     }
 
-    public void setUsers(List<Users> users) {
+    public void setUsers(List<User> users) {
         this.users = users;
     }
 

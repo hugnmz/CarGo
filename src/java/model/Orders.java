@@ -26,16 +26,16 @@ public class Orders {
     @Nested
     private Carts cart;              // Gio hang
     @Nested
-    private Vehicles vehicle;        // Xe
+    private Vehicle vehicle;        // Xe
     @Nested
     private Cars car;
     @Nested
-    private Locations location;
+    private Location location;
     
     // Constructors
     public Orders() {}
 
-    public Orders( Integer cartId, Integer vehicleId, LocalDateTime rentStartDate, LocalDateTime rentEndDate, BigDecimal price, Carts cart, Vehicles vehicle, Cars car, Locations location) {
+    public Orders( Integer cartId, Integer vehicleId, LocalDateTime rentStartDate, LocalDateTime rentEndDate, BigDecimal price, Carts cart, Vehicle vehicle, Cars car, Location location) {
         this.cartId = cartId;
         this.vehicleId = vehicleId;
         this.rentStartDate = rentStartDate;
@@ -71,8 +71,8 @@ public class Orders {
     public Carts getCart() { return cart; }
     public void setCart(Carts cart) { this.cart = cart; }
     
-    public Vehicles getVehicle() { return vehicle; }
-    public void setVehicle(Vehicles vehicle) { this.vehicle = vehicle; }
+    public Vehicle getVehicle() { return vehicle; }
+    public void setVehicle(Vehicle vehicle) { this.vehicle = vehicle; }
 
     public Cars getCar() {
         return car;
@@ -82,11 +82,11 @@ public class Orders {
         this.car = car;
     }
 
-    public Locations getLocation() {
+    public Location getLocation() {
         return location;
     }
 
-    public void setLocation(Locations location) {
+    public void setLocation(Location location) {
         this.location = location;
     }
     

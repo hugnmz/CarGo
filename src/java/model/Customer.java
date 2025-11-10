@@ -10,7 +10,7 @@ import java.util.List;
 import util.di.annotation.Column;
 import util.di.annotation.Nested;
 
-public class Customers {
+public class Customer {
 
     @Column()
     private Integer customerId;      // ID khách hàng
@@ -43,15 +43,15 @@ public class Customers {
 
     @Nested
 // Các đối tượng liên quan
-    private Locations location;     // Dia diem
-    private List<Contracts> contracts; // Danh sách hợp đồng
+    private Location location;     // Dia diem
+    private List<Contract> contracts; // Danh sách hợp đồng
     private Carts cart;             // Gio hang
 
     // Constructors
-    public Customers() {
+    public Customer() {
     }
 
-    public Customers(String username, String fullName, String phone, String email) {
+    public Customer(String username, String fullName, String phone, String email) {
         this.username = username;
         this.fullName = fullName;
         this.phone = phone;
@@ -140,19 +140,19 @@ public class Customers {
         this.locationId = locationId;
     }
 
-    public Locations getLocation() {
+    public Location getLocation() {
         return location;
     }
 
-    public void setLocation(Locations location) {
+    public void setLocation(Location location) {
         this.location = location;
     }
 
-    public List<Contracts> getContracts() {
+    public List<Contract> getContracts() {
         return contracts;
     }
 
-    public void setContracts(List<Contracts> contracts) {
+    public void setContracts(List<Contract> contracts) {
         this.contracts = contracts;
     }
 

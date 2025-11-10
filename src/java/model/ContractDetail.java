@@ -6,7 +6,7 @@ import java.util.List;
 import util.di.annotation.Column;
 import util.di.annotation.Nested;
 
-public class ContractDetails {
+public class ContractDetail {
     
     @Column()
     private Integer contractDetailId; // ID chi tiết hợp đồng
@@ -24,15 +24,15 @@ public class ContractDetails {
     private String note;             // Ghi chú
     @Nested
     // Các đối tượng liên quan
-    private Contracts contract;      // Hợp đồng
+    private Contract contract;      // Hợp đồng
     @Nested
-    private Vehicles vehicle;        // Xe thuê
-    private List<Incidents> incidents; // Sự cố
+    private Vehicle vehicle;        // Xe thuê
+    private List<Incident> incidents; // Sự cố
     
     // Constructors
-    public ContractDetails() {}
+    public ContractDetail() {}
     
-    public ContractDetails(Integer contractId, Integer vehicleId, BigDecimal price, 
+    public ContractDetail(Integer contractId, Integer vehicleId, BigDecimal price, 
                           LocalDateTime rentStartDate, LocalDateTime rentEndDate) {
         this.contractId = contractId;
         this.vehicleId = vehicleId;
@@ -63,12 +63,12 @@ public class ContractDetails {
     public String getNote() { return note; }
     public void setNote(String note) { this.note = note; }
     
-    public Contracts getContract() { return contract; }
-    public void setContract(Contracts contract) { this.contract = contract; }
+    public Contract getContract() { return contract; }
+    public void setContract(Contract contract) { this.contract = contract; }
     
-    public Vehicles getVehicle() { return vehicle; }
-    public void setVehicle(Vehicles vehicle) { this.vehicle = vehicle; }
+    public Vehicle getVehicle() { return vehicle; }
+    public void setVehicle(Vehicle vehicle) { this.vehicle = vehicle; }
     
-    public List<Incidents> getIncidents() { return incidents; }
-    public void setIncidents(List<Incidents> incidents) { this.incidents = incidents; }
+    public List<Incident> getIncidents() { return incidents; }
+    public void setIncidents(List<Incident> incidents) { this.incidents = incidents; }
 }

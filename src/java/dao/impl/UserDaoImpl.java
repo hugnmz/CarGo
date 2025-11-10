@@ -1,39 +1,39 @@
 package dao.impl;
 
-import dao.UsersDAO;
-import model.Users;
+import model.User;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import util.JdbcTemplateUtil;
 import util.di.annotation.Repository;
+import dao.UserDAO;
 
 @Repository
-public class UserDaoImpl implements UsersDAO {
+public class UserDaoImpl implements UserDAO {
 
     @Override
-    public List<Users> getAllUsers() {
+    public List<User> getAllUsers() {
         String sql = "SELECT u.*, l.city, r.roleName\n"
                 + "        FROM Users u\n"
                 + "        LEFT JOIN Locations l ON u.locationId = l.locationId\n"
                 + "        LEFT JOIN Roles r ON u.roleId = r.roleId";
-        return JdbcTemplateUtil.query(sql, Users.class);
+        return JdbcTemplateUtil.query(sql, User.class);
     }
 
     @Override
-    public Optional<Users> getUserById(Integer userId) {
+    public Optional<User> getUserById(Integer userId) {
         String sql = """
             SELECT u.*, l.city
             FROM Users u
             LEFT JOIN Locations l ON u.locationId = l.locationId
             WHERE u.userId = ?
         """;
-        Users one = JdbcTemplateUtil.queryOne(sql, Users.class, userId);
+        User one = JdbcTemplateUtil.queryOne(sql, User.class, userId);
         return Optional.ofNullable(one);
     }
 
     @Override
-    public Optional<Users> getUserByUsername(String username) {
+    public Optional<User> getUserByUsername(String username) {
         String sql = """
             SELECT u.*, l.city, r.roleName
                     FROM Users u
@@ -41,12 +41,12 @@ public class UserDaoImpl implements UsersDAO {
                     LEFT JOIN Roles r ON u.roleId = r.roleId
                     WHERE u.username = ?
         """;
-        Users one = JdbcTemplateUtil.queryOne(sql, Users.class, username);
+        User one = JdbcTemplateUtil.queryOne(sql, User.class, username);
         return Optional.ofNullable(one);
     }
 
     @Override
-    public boolean createUser(Users user) {
+    public boolean createUser(User user) {
         String sql = """
         INSERT INTO Users (
             username, password_hash, password_salt,
@@ -77,7 +77,7 @@ public class UserDaoImpl implements UsersDAO {
     }
 
     @Override
-    public boolean updateUser(Users user) {
+    public boolean updateUser(User user) {
         String sql = """
             UPDATE Users SET
                 fullName = ?, phone = ?, email = ?, locationId = ?

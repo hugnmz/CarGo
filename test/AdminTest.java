@@ -5,7 +5,7 @@
 //package test;
 
 import util.PasswordUtil;
-import model.Users;
+import model.User;
 import dao.impl.UserDaoImpl;
 import java.util.Optional;
 
@@ -21,7 +21,7 @@ public class AdminTest {
             UserDaoImpl userDao = new UserDaoImpl();
 
             // Tạo đối tượng admin
-            Users admin = new Users();
+            User admin = new User();
             admin.setUsername("admin");
             admin.setFullName("System Administrator");
 

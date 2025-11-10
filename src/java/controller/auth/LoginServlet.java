@@ -9,19 +9,19 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.List;
 import java.util.ArrayList;
-import service.CustomerService;
 import service.UserService;
 import util.di.DIContainer;
 import util.MessageUtil;
 import util.exception.ValidationException;
 import util.exception.BusinessException;
 import util.exception.DataAccessException;
+import service.CustomersService;
 
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
 
     // service xu ly thong tin khach hang
-    private CustomerService customerService;
+    private CustomersService customerService;
     // service xu ly thong tin user
     private UserService userService;
 
@@ -30,7 +30,7 @@ public class LoginServlet extends HttpServlet {
         super.init();
         try {
             // khoi tao customer service tu di container
-            customerService = DIContainer.get(CustomerService.class);
+            customerService = DIContainer.get(CustomersService.class);
             // khoi tao user service tu di container
             userService = DIContainer.get(UserService.class);
         } catch (Exception e) {

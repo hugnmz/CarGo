@@ -4,38 +4,38 @@
  */
 package dao.impl;
 
-import dao.CustomersDAO;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
-import model.Customers;
+import model.Customer;
 import util.JdbcTemplateUtil;
 import util.di.annotation.Repository;
+import dao.CustomerDAO;
 
 /**
  *
  * @author admin
  */
 @Repository
-public class CustomersDAOImpl implements CustomersDAO {
+public class CustomersDAOImpl implements CustomerDAO {
 
     @Override
-    public List<Customers> getAllCustomers() {
+    public List<Customer> getAllCustomers() {
         String sql = "select * from Customers c JOIN Locations l ON c.locationId = l.locationId";
-        return JdbcTemplateUtil.query(sql, Customers.class);
+        return JdbcTemplateUtil.query(sql, Customer.class);
     }
 
     @Override
-    public Optional<Customers> getCustomerById(Integer customerId) {
+    public Optional<Customer> getCustomerById(Integer customerId) {
         String sql = "select c.*, l.city "
                 + "from Customers c left join Locations l on "
                 + "c.locationId = l.locationId where c.customerId = ?";
-        Customers one = JdbcTemplateUtil.queryOne(sql, Customers.class, customerId);
+        Customer one = JdbcTemplateUtil.queryOne(sql, Customer.class, customerId);
         return Optional.ofNullable(one);
     }
 
     @Override
-    public boolean addCustomer(Customers c) {
+    public boolean addCustomer(Customer c) {
         String sql = "INSERT INTO Customers("
                 + "username, password_hash, password_salt, fullName, phone, email, dateOfBirth, "
                 + "isVerified, verifyCode, verifyCodeExpire, locationId, createAt"
@@ -63,7 +63,7 @@ public class CustomersDAOImpl implements CustomersDAO {
     }
 
     @Override
-    public boolean updateCustomer(Customers customer) {
+    public boolean updateCustomer(Customer customer) {
         String sql = "update Customers set fullName = ?, phone = ?, email = ?, dateOfBirth = ?,"
                 + "locationId = ?, verifyCode = ?, verifyCodeExpire = ?, isVerified=?"
                 + " where customerId = ?";
@@ -112,11 +112,11 @@ public class CustomersDAOImpl implements CustomersDAO {
     }
 
     @Override
-    public Optional<Customers> getCustomerByUserName(String username) {
+    public Optional<Customer> getCustomerByUserName(String username) {
         String sql = "select c.*, l.city "
                 + "from Customers c left join Locations l on "
                 + "c.locationId = l.locationId where c.username = ?";
-        Customers one = JdbcTemplateUtil.queryOne(sql, Customers.class, username);
+        Customer one = JdbcTemplateUtil.queryOne(sql, Customer.class, username);
         return Optional.ofNullable(one);
 
     }
@@ -129,11 +129,11 @@ public class CustomersDAOImpl implements CustomersDAO {
     }
 
     @Override
-    public Optional<Customers> getCustomerByUsernameAndEmail(String username, String email) {
+    public Optional<Customer> getCustomerByUsernameAndEmail(String username, String email) {
         String sql = "select c.*, l.city "
                 + "from Customers c left join Locations l on "
                 + "c.locationId = l.locationId where c.username = ? AND c.email = ?";
-        Customers one = JdbcTemplateUtil.queryOne(sql, Customers.class, username, email);
+        Customer one = JdbcTemplateUtil.queryOne(sql, Customer.class, username, email);
         return Optional.ofNullable(one);
     }
 

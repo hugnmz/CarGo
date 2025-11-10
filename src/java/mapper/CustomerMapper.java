@@ -6,8 +6,8 @@
 package mapper;
 
 import dto.CustomerDTO;
-import model.Customers;
-import model.Locations;
+import model.Customer;
+import model.Location;
 import util.di.annotation.Component;
 
 /**
@@ -19,7 +19,7 @@ import util.di.annotation.Component;
 public class CustomerMapper {
 
     // chuyển từ model sang DTO
-    public CustomerDTO toDTO(Customers customer) {
+    public CustomerDTO toDTO(Customer customer) {
 
         if (customer == null) {
             return null;
@@ -46,13 +46,13 @@ public class CustomerMapper {
     }
 
     // từ dto sang model
-    public Customers toUsers(CustomerDTO dto) {
+    public Customer toUsers(CustomerDTO dto) {
         if (dto == null) {
             return null;
         }
 
         // tạo mới Customer
-        Customers user = new Customers();
+        Customer user = new Customer();
         user.setCustomerId(dto.getCustomerId());
         user.setUsername(dto.getUsername());
         user.setFullName(dto.getFullName());
@@ -62,17 +62,17 @@ public class CustomerMapper {
         user.setDateOfBirth(dto.getDateOfBirth());
         user.setIsVerified(dto.getIsVerified()); // Thêm mapping cho isVerified
         if (dto.getCity() != null) {
-            Locations location = new Locations();
+            Location location = new Location();
             location.setCity(dto.getCity());
             user.setLocation(location);
         }
         //tra ve user
         if (dto.getLocationId() != null) {
-            Locations location = new Locations();
+            Location location = new Location();
             location.setLocationId(dto.getLocationId()); // Set locationId
             location.setCity(dto.getCity());
             user.setLocation(location);
-            user.setLocationId(dto.getLocationId()); // Set cho field locationId trong Customers
+            user.setLocationId(dto.getLocationId()); // Set cho field locationId trong Customer
         }
         return user;
     }

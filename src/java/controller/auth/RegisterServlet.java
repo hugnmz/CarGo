@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import util.MessageUtil;
-import service.CustomerService;
 import service.LocationService;
 import dto.LocationDTO;
 import java.time.LocalDate;
@@ -23,12 +22,13 @@ import util.exception.ApplicationException;
 import util.exception.ValidationException;
 import util.exception.BusinessException;
 import util.exception.DataAccessException;
+import service.CustomersService;
 
 @WebServlet("/RegisterServlet")
 public class RegisterServlet extends HttpServlet {
 
     // service xu ly thong tin khach hang
-    private CustomerService customerService;
+    private CustomersService customerService;
     private LocationService locationService;
 
     @Override
@@ -36,7 +36,7 @@ public class RegisterServlet extends HttpServlet {
         super.init();
         try {
             // khoi tao customer service tu di container
-            customerService = DIContainer.get(CustomerService.class);
+            customerService = DIContainer.get(CustomersService.class);
             // khoi tao location service tu di container
             locationService = DIContainer.get(LocationService.class);
         } catch (Exception e) {

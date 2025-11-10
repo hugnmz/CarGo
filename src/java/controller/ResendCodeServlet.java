@@ -13,22 +13,22 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import service.CustomerService;
 import util.EmailUtil;
 import util.di.DIContainer;
 import util.MessageUtil;
 import util.exception.*;
+import service.CustomersService;
 
 @WebServlet("/resend-code")
 public class ResendCodeServlet extends HttpServlet {
 
-    private CustomerService customerService;
+    private CustomersService customerService;
 
     @Override
     public void init() throws ServletException {
         super.init();
         try {
-            customerService = DIContainer.get(CustomerService.class);
+            customerService = DIContainer.get(CustomersService.class);
         } catch (Exception e) {
             throw new ServletException(MessageUtil.getError("error.system.dependency.injection"), e);
         }

@@ -3,9 +3,7 @@ package service.impl;
 import dao.CarsDAO;
 import dao.ContractsDAO;
 import dao.ContractDetailsDAO;
-import dao.CustomersDAO;
 import dao.OrdersDAO;
-import dao.UsersDAO;
 import dao.VehiclesDAO;
 import dto.ContractDTO;
 import dto.ContractDetailDTO;
@@ -20,9 +18,9 @@ import java.util.Optional;
 import mapper.ContractMapper;
 import mapper.ContractDetailMapper;
 import mapper.OrderMapper;
-import model.ContractDetails;
-import model.Contracts;
-import model.Customers;
+import model.ContractDetail;
+import model.Contract;
+import model.Customer;
 import service.ContractService;
 import util.di.annotation.Autowired;
 import util.di.annotation.Service;
@@ -30,6 +28,8 @@ import util.MessageUtil;
 import util.exception.ApplicationException;
 import util.exception.DataAccessException;
 import util.exception.BusinessException;
+import dao.UserDAO;
+import dao.CustomerDAO;
 
 @Service
 public class ContractServiceImpl implements ContractService {
@@ -41,7 +41,7 @@ public class ContractServiceImpl implements ContractService {
     private ContractDetailsDAO contractDetailsDAO;
 
     @Autowired
-    private CustomersDAO customersDAO;
+    private CustomerDAO customersDAO;
 
     @Autowired
     private OrdersDAO ordersDAO;
@@ -62,16 +62,16 @@ public class ContractServiceImpl implements ContractService {
     private CarsDAO carsDAO;
 
     @Autowired
-    private UsersDAO usersDAO;
+    private UserDAO usersDAO;
 
     @Override
     public List<ContractDTO> getContractsByCustomer(Integer customerId) {
         List<ContractDTO> contractDTOs = new ArrayList<>();
 
         // Lấy danh sách contracts từ DAO
-        List<Contracts> contracts = contractsDAO.getContractByCustomer(customerId);
+        List<Contract> contracts = contractsDAO.getContractByCustomer(customerId);
 
-        for (Contracts contract : contracts) {
+        for (Contract contract : contracts) {
             ContractDTO dto = contractMapper.toDTO(contract);
             contractDTOs.add(dto);
         }
@@ -81,11 +81,11 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     public Optional<ContractDTO> getContractById(Integer contractId) {
-        Optional<Contracts> contract = contractsDAO.getContractById(contractId);
+        Optional<Contract> contract = contractsDAO.getContractById(contractId);
         if (contract.isPresent()) {
             ContractDTO dto = contractMapper.toDTO(contract.get());
 
-            Optional<Customers> customer = customersDAO.getCustomerById(dto.getCustomerId());
+            Optional<Customer> customer = customersDAO.getCustomerById(dto.getCustomerId());
             if (customer.isPresent() && customer.get().getFullName() != null) {
                 dto.setCustomerName(customer.get().getFullName());
             }
@@ -103,10 +103,10 @@ public class ContractServiceImpl implements ContractService {
     public List<ContractDetailDTO> getContractDetails(Integer contractId) {
         List<ContractDetailDTO> detailDTOs = new ArrayList<>();
 
-        List<ContractDetails> details = contractDetailsDAO.getContractDetailsByContractId(contractId);
+        List<ContractDetail> details = contractDetailsDAO.getContractDetailsByContractId(contractId);
 
-        for (ContractDetails detail : details) {
-            Optional<model.Vehicles> vehicle = vehiclesDAO.getVehicleById(detail.getVehicleId());
+        for (ContractDetail detail : details) {
+            Optional<model.Vehicle> vehicle = vehiclesDAO.getVehicleById(detail.getVehicleId());
             vehicle.ifPresent(c -> detail.setVehicle(c));
             Optional<model.Cars> car = carsDAO.getCarById(detail.getVehicle().getCarId());
             car.ifPresent(c -> detail.getVehicle().setCar(c));
@@ -157,10 +157,10 @@ public class ContractServiceImpl implements ContractService {
     public List<ContractDTO> getContractsByStaff(Integer staffId) {
         List<ContractDTO> contractDTOs = new ArrayList<>();
         try {
-            List<Contracts> contracts = contractsDAO.getContractByStaff(staffId);
-            for (Contracts contract : contracts) {
+            List<Contract> contracts = contractsDAO.getContractByStaff(staffId);
+            for (Contract contract : contracts) {
                 ContractDTO dto = contractMapper.toDTO(contract);
-                Optional<Customers> customer = customersDAO.getCustomerById(dto.getCustomerId());
+                Optional<Customer> customer = customersDAO.getCustomerById(dto.getCustomerId());
                 customer.ifPresent(c -> dto.setCustomerName(c.getFullName()));
                 contractDTOs.add(dto);
             }
@@ -177,13 +177,13 @@ public class ContractServiceImpl implements ContractService {
         List<ContractDTO> contractDTOs = new ArrayList<>();
 
         try {
-            List<model.Contracts> contracts = contractsDAO.getAllContracts();
-            for (Contracts contract : contracts) {
+            List<model.Contract> contracts = contractsDAO.getAllContracts();
+            for (Contract contract : contracts) {
                 ContractDTO dto = contractMapper.toDTO(contract);
-                Optional<model.Customers> customer = customersDAO.getCustomerById(dto.getCustomerId());
+                Optional<model.Customer> customer = customersDAO.getCustomerById(dto.getCustomerId());
                 customer.ifPresent(c -> dto.setCustomerName(c.getFullName()));
                 customer.ifPresent(c -> dto.setCustomerPhone(c.getPhone()));
-                Optional<model.Users> staff = usersDAO.getUserById(dto.getStaffId());
+                Optional<model.User> staff = usersDAO.getUserById(dto.getStaffId());
                 staff.ifPresent(s -> dto.setStaffName(s.getFullName()));
                 contractDTOs.add(dto);
             }
@@ -198,7 +198,7 @@ public class ContractServiceImpl implements ContractService {
     @Override
     public boolean createContract(ContractDTO contractDTO) {
         try {
-            model.Contracts contract = contractMapper.toModel(contractDTO);
+            model.Contract contract = contractMapper.toModel(contractDTO);
             if (contract.getCreateAt() == null) {
                 contract.setCreateAt(LocalDateTime.now());
             }
@@ -270,7 +270,7 @@ public class ContractServiceImpl implements ContractService {
 
     private String getCustomerName(Integer customerId) {
         try {
-            Optional<model.Customers> customer = customersDAO.getCustomerById(customerId);
+            Optional<model.Customer> customer = customersDAO.getCustomerById(customerId);
             if (customer.isPresent() && customer.get().getFullName() != null) {
                 return customer.get().getFullName();
             }
@@ -337,7 +337,7 @@ public class ContractServiceImpl implements ContractService {
             BigDecimal deposit = calculateDepositAmount(total);
 
             // Tạo Contract entity
-            model.Contracts contract = new model.Contracts();
+            model.Contract contract = new model.Contract();
             contract.setCustomerId(customerId);
             contract.setStartDate(start);
             contract.setEndDate(end);
@@ -356,9 +356,9 @@ public class ContractServiceImpl implements ContractService {
             }
 
             // Lấy contract ID vừa tạo
-            List<Contracts> customerContracts = contractsDAO.getContractByCustomer(customerId);
-            model.Contracts savedContract = null;
-            for (model.Contracts c : customerContracts) {
+            List<Contract> customerContracts = contractsDAO.getContractByCustomer(customerId);
+            model.Contract savedContract = null;
+            for (model.Contract c : customerContracts) {
                 if (c.getStartDate().equals(start) && c.getEndDate().equals(end)) {
                     savedContract = c;
                     break;
@@ -375,7 +375,7 @@ public class ContractServiceImpl implements ContractService {
             List<ContractDetailDTO> contractDetails = new ArrayList<>();
             for (OrderDTO order : orders) {
                 // Tạo contract detail
-                ContractDetails detail = new ContractDetails();
+                ContractDetail detail = new ContractDetail();
                 detail.setContractId(contractId);
                 detail.setVehicleId(order.getVehicleId());
                 detail.setPrice(order.getPrice());

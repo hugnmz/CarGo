@@ -1,27 +1,27 @@
 package dao;
 
-import model.Incidents;
+import model.Incident;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface IncidentsDAO {
     
-    List<Incidents> getAllIncidents();
+    List<Incident> getAllIncidents();
     
-    Incidents getIncidentById(Integer incidentId);
+    Incident getIncidentById(Integer incidentId);
     
-    List<Incidents> getIncidentsByContractDetail(Integer contractDetailId);
+    List<Incident> getIncidentsByContractDetail(Integer contractDetailId);
     
-    List<Incidents> getIncidentsByStatus(String status);
+    List<Incident> getIncidentsByStatus(String status);
     
-    List<Incidents> getIncidentsByType(Integer incidentTypeId);
+    List<Incident> getIncidentsByType(Integer incidentTypeId);
     
-    List<Incidents> getIncidentsByDateRange(LocalDateTime startDate, LocalDateTime endDate);
+    List<Incident> getIncidentsByDateRange(LocalDateTime startDate, LocalDateTime endDate);
     
-    boolean addIncident(Incidents incident);
+    boolean addIncident(Incident incident);
     
-    boolean updateIncident(Incidents incident);
+    boolean updateIncident(Incident incident);
     
     boolean updateIncidentStatus(Integer incidentId, String status);
     
@@ -29,9 +29,9 @@ public interface IncidentsDAO {
     
     BigDecimal getTotalFineAmount(Integer contractDetailId);
     
-    List<Incidents> getPendingIncidents();
+    List<Incident> getPendingIncidents();
     
-    List<Incidents> getResolvedIncidents();
+    List<Incident> getResolvedIncidents();
     
-    List<Incidents> getIncidentsByFineRange(BigDecimal minFine, BigDecimal maxFine);
+    List<Incident> getIncidentsByFineRange(BigDecimal minFine, BigDecimal maxFine);
 }

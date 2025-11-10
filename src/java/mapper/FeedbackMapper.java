@@ -1,9 +1,9 @@
 package mapper;
 
 import dto.FeedbackDTO;
-import model.Feedbacks;
-import model.Customers;
-import model.Vehicles;
+import model.Feedback;
+import model.Customer;
+import model.Vehicle;
 import util.di.annotation.Component;
 
 
@@ -11,7 +11,7 @@ import util.di.annotation.Component;
 public class FeedbackMapper {
 
     // Chuyen tu Model sang DTO
-    public FeedbackDTO toDTO(Feedbacks feedback) {
+    public FeedbackDTO toDTO(Feedback feedback) {
         if (feedback == null) {
             return null;
         }
@@ -27,14 +27,14 @@ public class FeedbackMapper {
 
         // Customer information (nested)
         if (feedback.getCustomer() != null) {
-            Customers customer = feedback.getCustomer();
+            Customer customer = feedback.getCustomer();
             dto.setCustomerName(customer.getFullName());
             dto.setCustomerEmail(customer.getEmail());
         }
 
         // Vehicle information (nested)
         if (feedback.getVehicle() != null) {
-            Vehicles vehicle = feedback.getVehicle();
+            Vehicle vehicle = feedback.getVehicle();
             dto.setPlateNumber(vehicle.getPlateNumber());
             
             // Car information from vehicle
@@ -48,12 +48,12 @@ public class FeedbackMapper {
     }
 
     // Chuyen tu DTO sang Model
-    public Feedbacks toModel(FeedbackDTO dto) {
+    public Feedback toModel(FeedbackDTO dto) {
         if (dto == null) {
             return null;
         }
 
-        Feedbacks feedback = new Feedbacks();
+        Feedback feedback = new Feedback();
         
         // Basic feedback fields
         feedback.setFeedbackId(dto.getFeedbackId());
@@ -64,7 +64,7 @@ public class FeedbackMapper {
 
         // Create nested Customer object if customer info is provided
         if (dto.getCustomerName() != null || dto.getCustomerEmail() != null) {
-            Customers customer = new Customers();
+            Customer customer = new Customer();
             customer.setCustomerId(dto.getCustomerId());
             customer.setFullName(dto.getCustomerName());
             customer.setEmail(dto.getCustomerEmail());
@@ -73,7 +73,7 @@ public class FeedbackMapper {
 
         // Create nested Vehicle object if vehicle info is provided
         if (dto.getPlateNumber() != null || dto.getCarName() != null) {
-            Vehicles vehicle = new Vehicles();
+            Vehicle vehicle = new Vehicle();
             vehicle.setVehicleId(dto.getVehicleId());
             vehicle.setPlateNumber(dto.getPlateNumber());
             feedback.setVehicle(vehicle);

@@ -4,7 +4,7 @@ import java.util.List;
 import util.di.annotation.Column;
 import util.di.annotation.Nested;
 
-public class Vehicles {
+public class Vehicle {
 
     @Column()
     private Integer vehicleId;       // ID xe thực tế
@@ -21,16 +21,16 @@ public class Vehicles {
     private Cars car;
     
     @Nested(prefix = "l")                                   // Model xe
-    private Locations location;
-    private List<ContractDetails> contractDetails; // Chi tiết hợp đồng
+    private Location location;
+    private List<ContractDetail> contractDetails; // Chi tiết hợp đồng
     private List<Orders> orders;      // Don hang trong gio
-    private List<Feedbacks> feedbacks; // Phản hồi
+    private List<Feedback> feedbacks; // Phản hồi
 
     // Constructors
-    public Vehicles() {
+    public Vehicle() {
     }
 
-    public Vehicles(Integer vehicleId, Integer carId, String plateNumber, Boolean isActive, Integer locationId, Cars car, Locations location, List<ContractDetails> contractDetails, List<Orders> orders, List<Feedbacks> feedbacks) {
+    public Vehicle(Integer vehicleId, Integer carId, String plateNumber, Boolean isActive, Integer locationId, Cars car, Location location, List<ContractDetail> contractDetails, List<Orders> orders, List<Feedback> feedbacks) {
         this.vehicleId = vehicleId;
         this.carId = carId;
         this.plateNumber = plateNumber;
@@ -93,11 +93,11 @@ public class Vehicles {
         this.car = car;
     }
 
-    public List<ContractDetails> getContractDetails() {
+    public List<ContractDetail> getContractDetails() {
         return contractDetails;
     }
 
-    public void setContractDetails(List<ContractDetails> contractDetails) {
+    public void setContractDetails(List<ContractDetail> contractDetails) {
         this.contractDetails = contractDetails;
     }
 
@@ -109,19 +109,19 @@ public class Vehicles {
         this.orders = orders;
     }
 
-    public List<Feedbacks> getFeedbacks() {
+    public List<Feedback> getFeedbacks() {
         return feedbacks;
     }
 
-    public void setFeedbacks(List<Feedbacks> feedbacks) {
+    public void setFeedbacks(List<Feedback> feedbacks) {
         this.feedbacks = feedbacks;
     }
 
-    public Locations getLocation() {
+    public Location getLocation() {
         return location;
     }
 
-    public void setLocation(Locations location) {
+    public void setLocation(Location location) {
         this.location = location;
     }
 }

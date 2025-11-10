@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
-import model.Users;
+import model.User;
 import service.RoleService;
 import util.di.DIContainer;
 import util.EmailUtil;

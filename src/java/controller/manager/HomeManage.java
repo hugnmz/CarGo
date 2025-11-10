@@ -15,8 +15,8 @@ import jakarta.servlet.http.HttpSession;
 import service.ContractService;
 import service.VehicleService;
 import util.di.DIContainer;
-import service.CustomerService;
 import service.UserService;
+import service.CustomersService;
 
 /**
  *
@@ -26,14 +26,14 @@ import service.UserService;
 public class HomeManage extends HttpServlet {
 
     private VehicleService vehiclesService;
-    private CustomerService customerService;
+    private CustomersService customerService;
     private ContractService contractService;
 
     @Override
     public void init() throws ServletException {
         try {
             vehiclesService = DIContainer.get(VehicleService.class);
-            customerService = DIContainer.get(CustomerService.class);
+            customerService = DIContainer.get(CustomersService.class);
             contractService = DIContainer.get(ContractService.class);
         } catch (Exception e) {
             throw new RuntimeException(e);

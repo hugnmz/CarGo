@@ -1,13 +1,13 @@
 package mapper;
 
 import dto.ContractDetailDTO;
-import model.ContractDetails;
+import model.ContractDetail;
 import util.di.annotation.Component;
 
 @Component
 public class ContractDetailMapper {
 
-    public ContractDetailDTO toDTO(ContractDetails detail) {
+    public ContractDetailDTO toDTO(ContractDetail detail) {
         if (detail == null) {
             return null;
         }
@@ -33,12 +33,12 @@ public class ContractDetailMapper {
         return dto;
     }
 
-    public ContractDetails toModel(ContractDetailDTO dto) {
+    public ContractDetail toModel(ContractDetailDTO dto) {
         if (dto == null) {
             return null;
         }
 
-        ContractDetails detail = new ContractDetails();
+        ContractDetail detail = new ContractDetail();
 
         // Map basic fields
         detail.setContractDetailId(dto.getContractDetailId());

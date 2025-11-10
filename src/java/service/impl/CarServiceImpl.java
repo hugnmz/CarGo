@@ -46,7 +46,7 @@ public class CarServiceImpl implements CarService {
     private VehiclesDAO vehiclesDAO;
 
     @Autowired
-    private LocationsDAO locationsDAO;
+    private LocationDAO locationsDAO;
 
     @Autowired
     private CarMapper carMapper;
@@ -308,7 +308,7 @@ public class CarServiceImpl implements CarService {
         for (Cars car : cars) {
             CarDTO dto = carMapper.toDTO(car);
 
-            // Set locationCity from Vehicles if available
+            // Set locationCity from Vehicle if available
             if (car.getVehicles() != null && !car.getVehicles().isEmpty()) {
                 var firstVehicle = car.getVehicles().get(0);
                 if (firstVehicle.getLocation() != null && firstVehicle.getLocation().getCity() != null) {
