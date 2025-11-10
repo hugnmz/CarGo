@@ -85,9 +85,18 @@
 
     <div class="container my-5">
       <div class="mb-4">
-        <button onclick="window.history.back()" class="back-btn" style="border: none; background: none; cursor: pointer;">
-          <i class="fa fa-arrow-left me-2"></i>Quay lại
-        </button>
+        <c:choose>
+          <c:when test="${not empty refererUrl}">
+            <a href="${refererUrl}" class="btn btn-outline-secondary">
+              <i class="fa fa-arrow-left me-2"></i>Quay lại
+            </a>
+          </c:when>
+          <c:otherwise>
+            <button onclick="window.history.back()" class="btn btn-outline-secondary">
+              <i class="fa fa-arrow-left me-2"></i>Quay lại
+            </button>
+          </c:otherwise>
+        </c:choose>
       </div>
 
       <c:if test="${not empty error}">

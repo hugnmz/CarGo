@@ -75,6 +75,12 @@ public class CartServiceImpl implements CartService {
             if (startDate.isAfter(endDate) || startDate.isEqual(endDate)) {
                 throw new ValidationException(MessageUtil.getError("error.rental.minimum"));
             }
+            
+            // Kiểm tra không được đặt xe trong quá khứ
+            LocalDate today = LocalDate.now();
+            if (startDate.isBefore(today)) {
+                throw new ValidationException(MessageUtil.getError("error.date.past"));
+            }
 
             // (2) Kiểm tra vehicle có rảnh theo hợp đồng
             if (!vehiclesDAO.isVehicleAvailable(vehicleId, rentStartDate, rentEndDate)) {

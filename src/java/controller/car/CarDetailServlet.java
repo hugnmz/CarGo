@@ -63,6 +63,8 @@ public class CarDetailServlet extends HttpServlet {
             if (!carDTO.isPresent()) {
                 // neu khong tim thay xe thi dat thong bao loi
                 request.setAttribute("error", MessageUtil.getError("error.car.not.found"));
+                // lay referer URL de quay lai trang truoc do
+                setRefererUrl(request);
                 request.getRequestDispatcher("/customer/car-detail.jsp").forward(request, response);
                 return;
             }
@@ -74,14 +76,25 @@ public class CarDetailServlet extends HttpServlet {
             request.setAttribute("car", carDTO.get());
             // dat danh sach phuong tien vao request de truyen sang jsp
             request.setAttribute("vehicles", vehicles);
+            
+            // lay referer URL de quay lai trang truoc do
+            setRefererUrl(request);
 
             // chuyen huong den trang chi tiet xe
             request.getRequestDispatcher("/customer/car-detail.jsp").forward(request, response);
         } catch (ValidationException | BusinessException | DataAccessException e) {
             request.setAttribute("error", MessageUtil.getErrorFromException(e));
+            
+            // lay referer URL de quay lai trang truoc do
+            setRefererUrl(request);
+            
             request.getRequestDispatcher("/customer/car-detail.jsp").forward(request, response);
         } catch (Exception e) {
             request.setAttribute("error", MessageUtil.getError("error.system.car.detail"));
+            
+            // lay referer URL de quay lai trang truoc do
+            setRefererUrl(request);
+            
             request.getRequestDispatcher("/customer/car-detail.jsp").forward(request, response);
         }
     }
@@ -93,4 +106,14 @@ public class CarDetailServlet extends HttpServlet {
         doGet(request, response);
     }
 
+        private void setRefererUrl(HttpServletRequest request) {
+        String referer = request.getHeader("Referer");
+        // neu referer tu header la chinh trang car-detail, bo qua no
+        if (referer != null && referer.contains("/car-detail")) {
+            referer = null;
+        }
+        if (referer != null && !referer.trim().isEmpty()) {
+            request.setAttribute("refererUrl", referer);
+        }
+    }
 }
