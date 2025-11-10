@@ -126,6 +126,9 @@
                         <a class="list-group-item list-group-item-action" href="${pageContext.request.contextPath}/returncar">
                             <i class="fas fa-undo"></i> Danh sách trả xe
                         </a>
+                        <a class="list-group-item list-group-item-action" href="${pageContext.request.contextPath}/deposit">
+                            <i class="fas fa-money-bill-wave"></i> Danh sách đặt cọc
+                        </a>
                         <a class="list-group-item list-group-item-action text-primary" 
                            href="${pageContext.request.contextPath}/staff?action=manage">
                             <i class="fas fa-user"></i> Hồ sơ cá nhân

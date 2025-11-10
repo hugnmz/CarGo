@@ -484,4 +484,21 @@ public class ContractServiceImpl implements ContractService {
         }
     }
 
+    @Override
+    public boolean requestDeposit(Integer contractId) {
+        return contractsDAO.requestDeposit(contractId);
+    }
+
+    @Override
+    public List<ContractDTO> getContractsWithDepositRequest() {
+        List<Contract> contracts = contractsDAO.getContractsWithDepositRequest();
+        return contracts.stream()
+                .map(contractMapper::toDTO)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    @Override
+    public boolean cancelDepositRequest(Integer contractId) {
+        return contractsDAO.cancelDepositRequest(contractId);
+    }
 }

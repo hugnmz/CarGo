@@ -30,15 +30,26 @@ public interface ContractService {
     List<ContractDTO> getAllContracts();
 
     boolean createContract(ContractDTO contractDTO);
-    
+
     List<ContractDTO> createContractsFromCart(Integer customerId, Integer[] selectedOrderIds);
 
-        void updateContractTotalAmount(Integer contractId, BigDecimal totalAmount);
+    void updateContractTotalAmount(Integer contractId, BigDecimal totalAmount);
 
     void updateStaffId(Integer staffId, Integer contractId);
 
-    void updateNote(String note, Integer contractId);    boolean updateContractStatus(Integer contractId, String status, String reason);
+    void updateNote(String note, Integer contractId);
+
+    boolean updateContractStatus(Integer contractId, String status, String reason);
 
     //dem so hop dong dang co
     int countContract();
+
+    // Thêm yêu cầu đặt cọc
+    boolean requestDeposit(Integer contractId);
+
+// Lấy danh sách hợp đồng có yêu cầu đặt cọc
+    List<ContractDTO> getContractsWithDepositRequest();
+
+// Hủy yêu cầu đặt cọc
+    boolean cancelDepositRequest(Integer contractId);
 }

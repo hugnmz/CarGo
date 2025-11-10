@@ -200,4 +200,36 @@ public class ContractsDAOImpl implements ContractsDAO {
         String sql = "INSERT INTO paymentLogs (contractId, message, createdAt) VALUES (?, ?, NOW())";
         return JdbcTemplateUtil.update(sql, contractId, message) > 0;
     }
+
+    @Override
+    public boolean requestDeposit(Integer contractId) {
+        // Nếu có field depositRequested trong DB:
+        // String sql = "UPDATE dbo.Contracts SET depositRequested = 1 WHERE contractId = ?";
+        // return JdbcTemplateUtil.update(sql, contractId) > 0;
+
+        // Hoặc dùng note để đánh dấu (nếu không muốn thay đổi DB):
+        String sql = "UPDATE dbo.Contracts SET note = 'DEPOSIT_REQUESTED' WHERE contractId = ? AND (note IS NULL OR note NOT LIKE '%DEPOSIT_REQUESTED%')";
+        return JdbcTemplateUtil.update(sql, contractId) > 0;
+    }
+
+    @Override
+    public List<Contract> getContractsWithDepositRequest() {
+        // Nếu có field depositRequested:
+        // String sql = "SELECT * FROM dbo.Contracts WHERE status = 'ACCEPTED' AND depositRequested = 1 ORDER BY contractId DESC";
+
+        // Hoặc dùng note:
+        String sql = "SELECT * FROM dbo.Contracts WHERE status = 'ACCEPTED' AND note LIKE '%DEPOSIT_REQUESTED%' ORDER BY contractId DESC";
+        return JdbcTemplateUtil.query(sql, Contract.class);
+    }
+
+    @Override
+    public boolean cancelDepositRequest(Integer contractId) {
+        // Nếu có field depositRequested:
+        // String sql = "UPDATE dbo.Contracts SET depositRequested = 0 WHERE contractId = ?";
+
+        // Hoặc dùng note:
+        String sql = "UPDATE dbo.Contracts SET note = REPLACE(note, 'DEPOSIT_REQUESTED', '') WHERE contractId = ?";
+        return JdbcTemplateUtil.update(sql, contractId) > 0;
+    }
+
 }

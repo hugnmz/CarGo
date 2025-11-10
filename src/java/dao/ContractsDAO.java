@@ -53,4 +53,13 @@ public interface ContractsDAO {
     BigDecimal getTotalAmount(Integer contractId);
 
     boolean addPaymentLog(Integer contractId, String message);
+
+// Thêm yêu cầu đặt cọc
+    boolean requestDeposit(Integer contractId);
+
+// Lấy danh sách hợp đồng có yêu cầu đặt cọc
+    List<Contract> getContractsWithDepositRequest();
+
+// Hủy yêu cầu đặt cọc
+    boolean cancelDepositRequest(Integer contractId);
 }
