@@ -15,7 +15,7 @@
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
             />
         <link
-            href="${pageContext.request.contextPath}/css/auth/register.css"
+            href="${pageContext.request.contextPath}/CSS/auth/register.css"
             rel="stylesheet"
             />
     </head>

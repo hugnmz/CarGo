@@ -27,11 +27,10 @@ public class CarsDAOImpl implements CarsDAO {
                 + "LEFT JOIN dbo.Seatings s ON c.seatingId = s.seatingId "
                 + "LEFT JOIN dbo.CarPrices cp ON c.carId = cp.carId AND cp.endDate IS NULL";
 
-
         return JdbcTemplateUtil.query(sql, Cars.class);
     }
 
-     @Override
+    @Override
     public List<Cars> getAllCar() {
         String sql = """
         SELECT 
@@ -86,20 +85,20 @@ public class CarsDAOImpl implements CarsDAO {
     @Override
     public boolean addCar(Cars car) {
         String sql = "INSERT INTO dbo.Cars (name, year, description, image, categoryId, fuelId, seatingId) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        
-        int result = JdbcTemplateUtil.update(sql, 
-            car.getName(), 
-            car.getYear(), 
-            car.getDescription(), 
-            car.getImage(), 
-            car.getCategoryId(), 
-            car.getFuelId(), 
-            car.getSeatingId()
+
+        int result = JdbcTemplateUtil.update(sql,
+                car.getName(),
+                car.getYear(),
+                car.getDescription(),
+                car.getImage(),
+                car.getCategoryId(),
+                car.getFuelId(),
+                car.getSeatingId()
         );
-        
+
         return result > 0;
     }
-    
+
     @Override
     public int addCarAndReturnId(Cars car) {
         String sql = "INSERT INTO dbo.Cars (name, year, description, image, categoryId, fuelId, seatingId) "
@@ -191,7 +190,6 @@ public class CarsDAOImpl implements CarsDAO {
             cat.categoryName,
             f.fuelType,
             s.seatingType,
-            l.city,
             cp.priceId AS cp_priceId,
             cp.dailyPrice AS cp_dailyPrice,
             cp.depositAmount AS cp_depositAmount,
@@ -199,8 +197,6 @@ public class CarsDAOImpl implements CarsDAO {
             cp.endDate AS cp_endDate,
             cp.createAt AS cp_createAt
         FROM dbo.Cars c
-        JOIN dbo.Vehicles v ON v.carId = c.carId
-        JOIN dbo.Locations l ON l.locationId = v.locationId
         JOIN dbo.CarPrices cp ON cp.priceId = (
             SELECT TOP 1 priceId
             FROM dbo.CarPrices
@@ -211,7 +207,11 @@ public class CarsDAOImpl implements CarsDAO {
         JOIN dbo.Fuels f ON f.fuelId = c.fuelId
         JOIN dbo.Seatings s ON s.seatingId = c.seatingId
         """ + condition;
+
         return JdbcTemplateUtil.query(sql, Cars.class);
     }
 
+    public static void main(String[] args) {
+        System.out.println(JdbcTemplateUtil.formatConditionSearchCar(1, null, null, null));
+    }
 }

@@ -4,7 +4,7 @@ prefix="c" uri="jakarta.tags.core" %>
   <head>
     <title>Xác minh email</title>
     <link
-      href="${pageContext.request.contextPath}/css/auth/verify.css"
+      href="${pageContext.request.contextPath}/CSS/auth/verify.css"
       rel="stylesheet"
     />
   </head>

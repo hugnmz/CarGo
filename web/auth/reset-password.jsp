@@ -13,7 +13,7 @@
       rel="stylesheet"
     />
     <link
-      href="${pageContext.request.contextPath}/css/auth/login.css"
+      href="${pageContext.request.contextPath}/CSS/auth/login.css"
       rel="stylesheet"
     />
   </head>

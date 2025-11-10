@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Liên Hệ - Dịch Vụ Cho Thuê Xe</title>
     <link
-      href="${pageContext.request.contextPath}/css/customer/contact.css"
+      href="${pageContext.request.contextPath}/CSS/customer/contact.css"
       rel="stylesheet"
     />
   </head>
